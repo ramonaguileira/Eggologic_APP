@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "captura",
     "tienda",
     "impacto",
+    "guardian",
 ]
 
 MIDDLEWARE = [
@@ -117,3 +118,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 TIENDA_DATOS_TRANSFERENCIA = os.environ.get(
     "TIENDA_DATOS_TRANSFERENCIA", "Te enviamos los datos para transferir por WhatsApp."
 )
+
+# Guardian (Managed Guardian Service), siempre en testnet. Las credenciales de cada usuario
+# se leen en guardian/cliente.py (GUARDIAN_PROPONENTE_EMAIL, GUARDIAN_R001_EMAIL, etc.).
+GUARDIAN_URL = os.environ.get("GUARDIAN_URL", "")
+GUARDIAN_POLICY_ID = os.environ.get("GUARDIAN_POLICY_ID", "")

@@ -52,6 +52,7 @@ python manage.py migrate
 python manage.py cargar_demo --password "<contraseña de prueba>"
 python manage.py test
 python manage.py runserver
+python manage.py guardian_estado   # revisa la conexión con Guardian sin escribir nada
 ```
 
 ## Estado (05/10/2026)
@@ -61,7 +62,7 @@ python manage.py runserver
 | 0 | Propuesta | Aprobada |
 | 1 | Captura | Aprobada |
 | 2 | Tienda e impacto | Para revisar |
-| 3 | Guardian | Configuración lista; falta el código |
+| 3 | Guardian | Conexión verificada; faltan los reportes |
 | 4 | Entregables ANDE (demo 19/10/2026) | Pendiente |
 
 **Etapa 3 (Guardian).** Usa estas variables de entorno, cargadas según el instructivo que tiene Ramón:
@@ -82,7 +83,7 @@ Lo que Ramón dejó hecho en Guardian (MGS 1.6.1), según el instructivo, el 05/
   | --- | --- |
   | `Eggologic_Proponente` | Project_Proponent |
   | `Eggologic_vvb` | VVB (CarboSur) |
-  | `Eggologic_r001` | Project_Participating_Entity, nombre `R-001` |
+  | `Eggologic_r001` | Project_Participating_Entity. El alta quedó con el nombre comercial, no `R-001` (ver `docs/etapa-3.md`) |
 
 - El Proponente aprobó al restaurante y el Standard Registry aprobó al VVB.
 - Red del entorno: `guardianservice.app` y `testnet.mirrornode.hedera.com` permitidos.
@@ -97,5 +98,7 @@ Cosas de MGS que aprendimos:
 
 - Las invitaciones se mandan desde la cuenta de administrador del tenant, no desde el Standard Registry.
 - Un usuario sin el rol `Default policy user` recibe "Access Restricted" y errores 403.
+- La policy no deja corregir un alta aprobada: si se revoca, vuelve a "esperando aprobación" con el mismo documento.
+- El restaurante solo puede enviar reportes cuando hay un proyecto validado.
 
 **Hosting.** Netlify no puede correr Django, así que falta elegir un hosting de Python con `https` (el GPS del celular lo necesita).

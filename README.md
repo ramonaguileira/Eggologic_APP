@@ -11,7 +11,7 @@ El diseño vive en el [Plano de arquitectura: app/dapp Eggologic en Hedera](http
 | 0 | [Propuesta aprobada](docs/etapa-0-propuesta.md) y [análisis de la policy FLW](docs/guardian/analisis-policy-flw.md) | Aprobada |
 | 1 | [Captura: retiros, lotes BSF, granja y exportación para CarboSur](docs/etapa-1.md) | Aprobada |
 | 2 | [Tienda de huevos e impacto con gráficas; foto y GPS en los retiros](docs/etapa-2.md) | Lista, para revisar |
-| 3 | Guardian: policy FLW, reportes por restaurante, tokens en testnet | Pendiente |
+| 3 | [Guardian: policy FLW, reportes por restaurante, tokens en testnet](docs/etapa-3.md) | En curso: conexión verificada |
 | 4 | Entregables ANDE (demostrable 19/10/2026) | Pendiente |
 
 ## Correr la app en tu computadora
@@ -53,3 +53,7 @@ Sin datos de ejemplo, el primer usuario se crea con `python manage.py createsupe
 ```bash
 python manage.py test
 ```
+
+## Guardian
+
+`python manage.py guardian_estado` revisa la conexión con Guardian sin escribir nada. Necesita las variables `GUARDIAN_*` (ver `.env.example`).
