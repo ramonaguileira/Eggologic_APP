@@ -1,0 +1,37 @@
+{% load static %}<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Eggologic{% endblock %}</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body>
+  <header class="barra">
+    <a class="marca" href="{% url 'inicio' %}">🥚 Eggologic</a>
+    {% if user.is_authenticated %}
+      <nav class="menu">
+        {% if user.puede_ver_datos %}
+          <a href="{% url 'captura:panel' %}">Panel</a>
+          <a href="{% url 'captura:retiros' %}">Retiros</a>
+          <a href="{% url 'captura:lotes' %}">Lotes</a>
+          <a href="{% url 'captura:granja' %}">Granja</a>
+        {% endif %}
+        {% if user.is_staff %}<a href="{% url 'admin:index' %}">Administración</a>{% endif %}
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="enlace">Salir</button>
+        </form>
+      </nav>
+    {% endif %}
+  </header>
+
+  <main class="contenido">
+    {% for mensaje in messages %}
+      <p class="aviso">{{ mensaje }}</p>
+    {% endfor %}
+    {% block contenido %}{% endblock %}
+  </main>
+</body>
+</html>

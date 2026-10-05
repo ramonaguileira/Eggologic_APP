@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block titulo %}Panel · Eggologic{% endblock %}
+
+{% block contenido %}
+  <h1>Panel de campo</h1>
+
+  {% if user.puede_capturar %}
+    <div class="atajos">
+      <a class="boton" href="{% url 'captura:retiro_nuevo' %}">+ Retiro</a>
+      <a class="boton" href="{% url 'captura:lote_nuevo' %}">+ Lote</a>
+      <a class="boton" href="{% url 'captura:granja_nuevo' %}">+ Granja</a>
+    </div>
+  {% endif %}
+
+  <h2>Últimos {{ dias }} días</h2>
+  <div class="cifras">
+    <div class="cifra"><strong>{{ retiros.cantidad }}</strong><span>retiros</span></div>
+    <div class="cifra"><strong>{{ retiros.levantado|default:0|floatformat:1 }}</strong><span>kg levantados</span></div>
+    <div class="cifra"><strong>{{ retiros.organicos|default:0|floatformat:1 }}</strong><span>kg orgánicos clasificados</span></div>
+    <div class="cifra"><strong>{{ retiros.pct_impropios|default:0|floatformat:1 }} %</strong><span>de impropios</span></div>
+    <div class="cifra"><strong>{{ lotes.larvas|default:0|floatformat:1 }}</strong><span>kg de larvas cosechadas</span></div>
+    <div class="cifra"><strong>{{ lotes.frass|default:0|floatformat:1 }}</strong><span>kg de frass</span></div>
+    <div class="cifra"><strong>{{ granja.huevos_producidos|default:0 }}</strong><span>huevos producidos</span></div>
+    <div class="cifra"><strong>{{ granja.larvas_usadas|default:0|floatformat:1 }}</strong><span>kg de larvas a las gallinas</span></div>
+  </div>
+
+  {% if sin_clasificar %}
+    <p class="aviso">
+      Hay {{ sin_clasificar }} retiro{{ sin_clasificar|pluralize }} sin clasificar.
+      <a href="{% url 'captura:retiros' %}">Ver retiros</a>
+    </p>
+  {% endif %}
+
+  <h2>Lotes en curso</h2>
+  {% if lotes_en_curso %}
+    <ul class="lista">
+      {% for lote in lotes_en_curso %}
+        <li>
+          <strong>{{ lote }}</strong>:
+          {{ lote.kg_residuo|floatformat:1 }} kg de residuo, {{ lote.bandejas }} bandeja{{ lote.bandejas|pluralize }}.
+          {% if user.puede_capturar %}<a href="{% url 'captura:lote_editar' lote.pk %}">Registrar cosecha</a>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="tenue">No hay lotes en curso.</p>
+  {% endif %}
+
+  <h2>Exportar para CarboSur</h2>
+  <p>
+    <a href="{% url 'captura:exportar_retiros' %}">retiros.csv</a> ·
+    <a href="{% url 'captura:exportar_lotes' %}">lotes.csv</a> ·
+    <a href="{% url 'captura:exportar_granja' %}">granja.csv</a>
+  </p>
+{% endblock %}

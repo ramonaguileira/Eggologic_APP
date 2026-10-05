@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block titulo %}Retiros · Eggologic{% endblock %}
+
+{% block contenido %}
+  <div class="encabezado">
+    <h1>Retiros</h1>
+    {% if user.puede_capturar %}<a class="boton" href="{% url 'captura:retiro_nuevo' %}">+ Nuevo retiro</a>{% endif %}
+  </div>
+  <p class="tenue">Últimos 50. Todos los datos están en <a href="{% url 'captura:exportar_retiros' %}">retiros.csv</a>.</p>
+
+  <div class="tabla">
+    <table>
+      <thead>
+        <tr>
+          <th>N.º</th><th>Fecha</th><th>Restaurante</th><th>kg levantados</th>
+          <th>Impropios</th><th>Vegetales</th><th>Plato</th><th>Lote</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for retiro in retiros %}
+          <tr>
+            <td>{{ retiro.pk }}</td>
+            <td>{{ retiro.fecha|date:"d/m H:i" }}</td>
+            <td>{{ retiro.restaurante.nombre }}</td>
+            <td class="num">{{ retiro.kg_levantados|floatformat:1 }}</td>
+            {% if retiro.clasificado %}
+              <td class="num">{{ retiro.kg_impropios|floatformat:1 }}</td>
+              <td class="num">{{ retiro.kg_restos_vegetales|floatformat:1 }}</td>
+              <td class="num">{{ retiro.kg_residuos_plato|floatformat:1 }}</td>
+            {% else %}
+              <td colspan="3"><span class="etiqueta">Sin clasificar</span></td>
+            {% endif %}
+            <td>{{ retiro.lote_id|default:"—" }}</td>
+            <td>{% if user.puede_capturar %}<a href="{% url 'captura:retiro_editar' retiro.pk %}">Editar</a>{% endif %}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="9" class="tenue">Todavía no hay retiros.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

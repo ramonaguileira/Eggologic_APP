@@ -1,0 +1,57 @@
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+
+class Usuario(AbstractUser):
+    class Rol(models.TextChoices):
+        ADMIN = "admin", "Administración"
+        # SUPUESTO: un solo rol para chofer, planta BSF y granja.
+        OPERADOR = "operador", "Operador de campo"
+        RESTAURANTE = "restaurante", "Restaurante"
+        CLIENTE = "cliente", "Cliente"
+        CARBOSUR = "carbosur", "CarboSur (solo lectura)"
+
+    rol = models.CharField(max_length=20, choices=Rol.choices, default=Rol.CLIENTE)
+
+    def es_admin(self):
+        return self.is_superuser or self.rol == self.Rol.ADMIN
+
+    def puede_capturar(self):
+        return self.es_admin() or self.rol == self.Rol.OPERADOR
+
+    def puede_ver_datos(self):
+        """Ver los registros de campo y exportarlos (sin poder editarlos)."""
+        return self.puede_capturar() or self.rol == self.Rol.CARBOSUR
+
+
+class Restaurante(models.Model):
+    nombre = models.CharField("nombre comercial", max_length=120)
+    codigo = models.CharField(
+        "código público",
+        max_length=20,
+        unique=True,
+        help_text="Identificador que se usa fuera de la app en lugar del nombre. Ej.: R-001.",
+    )
+    # Datos privados: quedan solo en la base de la app.
+    razon_social = models.CharField(max_length=200, blank=True)
+    contacto = models.CharField("persona de contacto", max_length=120, blank=True)
+    telefono = models.CharField("teléfono", max_length=40, blank=True)
+    email = models.EmailField(blank=True)
+    direccion = models.CharField("dirección", max_length=200, blank=True)
+
+    usuario = models.OneToOneField(
+        Usuario,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="restaurante",
+        help_text="Login del restaurante en la app (opcional por ahora).",
+    )
+    activo = models.BooleanField(default=True)
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["nombre"]
+
+    def __str__(self):
+        return f"{self.nombre} ({self.codigo})"

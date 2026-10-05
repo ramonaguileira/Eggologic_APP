@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block titulo %}{{ titulo }} · Eggologic{% endblock %}
+
+{% block contenido %}
+  <section class="tarjeta angosta">
+    <h1>{{ titulo }}</h1>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="error">{{ form.non_field_errors }}</div>{% endif %}
+      {% for campo in form %}
+        <div class="campo{% if campo.errors %} con-error{% endif %}">
+          <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+          {{ campo }}
+          {% if campo.help_text %}<small>{{ campo.help_text }}</small>{% endif %}
+          {% if campo.errors %}<div class="error">{{ campo.errors }}</div>{% endif %}
+        </div>
+      {% endfor %}
+      <div class="acciones">
+        <button type="submit" class="boton">Guardar</button>
+        <a href="{% url volver_a %}">Cancelar</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

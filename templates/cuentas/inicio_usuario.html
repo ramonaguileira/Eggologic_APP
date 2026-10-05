@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+  <section class="tarjeta angosta">
+    <h1>¡Hola, {{ user.first_name|default:user.username }}!</h1>
+    <p>Muy pronto vas a poder comprar huevos y ver tu impacto desde acá.</p>
+  </section>
+{% endblock %}

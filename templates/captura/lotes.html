@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block titulo %}Lotes · Eggologic{% endblock %}
+
+{% block contenido %}
+  <div class="encabezado">
+    <h1>Lotes de bioconversión</h1>
+    {% if user.puede_capturar %}<a class="boton" href="{% url 'captura:lote_nuevo' %}">+ Nuevo lote</a>{% endif %}
+  </div>
+  <p class="tenue">Últimos 50. Todos los datos están en <a href="{% url 'captura:exportar_lotes' %}">lotes.csv</a>.</p>
+
+  <div class="tabla">
+    <table>
+      <thead>
+        <tr>
+          <th>N.º</th><th>Inicio</th><th>Retiros</th><th>kg residuo</th><th>Bandejas</th>
+          <th>Neonatos (g)</th><th>Cosecha</th><th>kg larvas</th><th>kg frass</th>
+          <th>kg larva cada 100 kg</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lote in lotes %}
+          <tr>
+            <td>{{ lote.pk }}</td>
+            <td>{{ lote.fecha_inicio|date:"d/m/Y" }}</td>
+            <td class="num">{{ lote.retiros.all|length }}</td>
+            <td class="num">{{ lote.kg_residuo|floatformat:1 }}</td>
+            <td class="num">{{ lote.bandejas }}</td>
+            <td class="num">{{ lote.g_neonatos|floatformat:1 }}</td>
+            {% if lote.cosechado %}
+              <td>{{ lote.fecha_cosecha|date:"d/m/Y" }}</td>
+              <td class="num">{{ lote.kg_larvas|floatformat:1 }}</td>
+              <td class="num">{{ lote.kg_frass|floatformat:1 }}</td>
+              <td class="num">{{ lote.rendimiento|floatformat:1|default:"—" }}</td>
+            {% else %}
+              <td colspan="4"><span class="etiqueta">En curso</span></td>
+            {% endif %}
+            <td>{% if user.puede_capturar %}<a href="{% url 'captura:lote_editar' lote.pk %}">Editar</a>{% endif %}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="11" class="tenue">Todavía no hay lotes.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

@@ -1,0 +1,133 @@
+/* Estilos de Eggologic: una sola hoja, pensada primero para el celular. */
+
+:root {
+  --verde: #2f6b3f;
+  --verde-claro: #e7f1e9;
+  --yema: #f2b632;
+  --texto: #1f2a22;
+  --tenue: #66736a;
+  --borde: #d6ded8;
+  --fondo: #f7f8f5;
+  --error: #b3261e;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--texto);
+  background: var(--fondo);
+  line-height: 1.5;
+}
+
+a { color: var(--verde); }
+
+/* Barra superior */
+.barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--verde);
+}
+.barra a, .barra .enlace { color: #fff; text-decoration: none; }
+.marca { font-weight: 700; font-size: 1.15rem; }
+.menu { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1rem; }
+.menu form { margin: 0; }
+.enlace { background: none; border: 0; padding: 0; font: inherit; cursor: pointer; }
+
+/* Contenido */
+.contenido { max-width: 960px; margin: 0 auto; padding: 1rem; }
+h1 { font-size: 1.5rem; margin: 0.5rem 0 1rem; }
+h2 { font-size: 1.1rem; margin: 1.5rem 0 0.75rem; }
+.tenue { color: var(--tenue); }
+
+.encabezado { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+
+.tarjeta {
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+.angosta { max-width: 520px; margin: 0 auto; }
+
+.aviso {
+  background: var(--verde-claro);
+  border-left: 4px solid var(--verde);
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+}
+
+/* Botones */
+.boton {
+  display: inline-block;
+  background: var(--verde);
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  padding: 0.7rem 1.1rem;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.atajos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+.atajos .boton { text-align: center; }
+
+/* Cifras del panel */
+.cifras { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+.cifra {
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-top: 4px solid var(--yema);
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+.cifra strong { display: block; font-size: 1.4rem; }
+.cifra span { color: var(--tenue); font-size: 0.9rem; }
+
+.lista { padding-left: 1.2rem; }
+.lista li { margin-bottom: 0.4rem; }
+
+/* Formularios */
+form label { display: block; font-weight: 600; margin-top: 0.9rem; }
+form input, form select, form textarea {
+  width: 100%;
+  padding: 0.65rem;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  font: inherit;
+  background: #fff;
+}
+form input[type="checkbox"] { width: auto; margin-right: 0.4rem; }
+form small { display: block; color: var(--tenue); }
+.campo ul { list-style: none; padding: 0; margin: 0.25rem 0 0; }
+.campo ul label { display: flex; align-items: center; font-weight: 400; margin-top: 0.4rem; }
+.con-error input, .con-error select { border-color: var(--error); }
+.error, .errorlist { color: var(--error); }
+.errorlist { padding-left: 1rem; margin: 0.25rem 0; }
+.acciones { display: flex; align-items: center; gap: 1rem; margin-top: 1.25rem; }
+.tarjeta form .boton { margin-top: 1rem; }
+
+/* Tablas: en el celular se desplazan de costado */
+.tabla { overflow-x: auto; background: #fff; border: 1px solid var(--borde); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+th, td { padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--borde); text-align: left; white-space: nowrap; }
+th { background: var(--verde-claro); font-weight: 600; }
+td.num { text-align: right; }
+.etiqueta {
+  background: #fdf1d3;
+  color: #7a5a06;
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.85rem;
+}
+
+@media (min-width: 720px) {
+  .cifras { grid-template-columns: repeat(4, 1fr); }
+  .atajos { display: flex; gap: 0.75rem; }
+}

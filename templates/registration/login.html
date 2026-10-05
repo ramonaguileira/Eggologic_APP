@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block titulo %}Ingresar · Eggologic{% endblock %}
+
+{% block contenido %}
+  <section class="tarjeta angosta">
+    <h1>Ingresar</h1>
+    <form method="post">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="error">{{ form.non_field_errors }}</div>{% endif %}
+      <label for="{{ form.username.id_for_label }}">Usuario</label>
+      {{ form.username }}
+      <label for="{{ form.password.id_for_label }}">Contraseña</label>
+      {{ form.password }}
+      <input type="hidden" name="next" value="{{ next }}">
+      <button type="submit" class="boton">Entrar</button>
+    </form>
+  </section>
+{% endblock %}
