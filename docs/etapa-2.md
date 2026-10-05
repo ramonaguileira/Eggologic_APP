@@ -30,7 +30,7 @@
   - el circuito residuo → larvas → huevos con sus números;
   - huevos por mes;
   - una calculadora con deslizador ("si compro N docenas por mes, rescato X kg por año");
-  - su nivel.
+  - su nivel y una barra con cuánto le falta para el siguiente.
 - **Restaurante:**
   - kg orgánicos entregados;
   - huevos que ayudó a producir;
@@ -60,7 +60,7 @@ Igual que antes (ver el [README](../README.md)). `cargar_demo` ahora carga cuatr
 
 ## Tests
 
-`python manage.py test` corre 41 tests. Cubren, además de lo anterior:
+`python manage.py test` corre 44 tests. Cubren, además de lo anterior:
 
 - foto obligatoria y GPS opcional;
 - clasificación en planta y acceso a las fotos;
@@ -72,7 +72,7 @@ Igual que antes (ver el [README](../README.md)). `cargar_demo` ahora carga cuatr
 
 1. El impacto de cada huevo es el promedio de todo el circuito: kg de residuo orgánico clasificado ÷ huevos producidos (hoy da unos 0,34 kg por huevo con los datos de ejemplo). Lo define CarboSur.
 2. Para el impacto del cliente cuentan solo los pedidos entregados.
-3. El nivel del cliente (Compra individual, Sostenedor, Regenerador, Guardián) lo asigna Eggologic desde la administración. Falta el criterio.
+3. ~~El nivel del cliente lo asigna Eggologic~~ Resuelto por Ramón: el nivel se calcula solo con los huevos recibidos. Desde 100 es Sostenedor, desde 500 Regenerador y desde 1.000 Guardián. "Mi impacto" muestra cuánto falta para el siguiente nivel.
 4. Sin control de stock: Eggologic confirma cada pedido a mano.
 5. Los productos y precios de `cargar_demo` son de ejemplo.
 6. Los datos para transferir son un texto configurable (`TIENDA_DATOS_TRANSFERENCIA` en el `.env`).

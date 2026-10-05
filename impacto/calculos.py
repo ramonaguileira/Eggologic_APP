@@ -19,6 +19,9 @@ from tienda.models import ItemPedido, Pedido
 MESES_EN_GRAFICA = 6
 KG_ORGANICOS = F("kg_restos_vegetales") + F("kg_residuos_plato")
 
+# Niveles de los clientes según los huevos recibidos (pedidos entregados). Definidos por Ramón el 05/10.
+NIVELES = [(0, "Compra individual"), (100, "Sostenedor"), (500, "Regenerador"), (1000, "Guardián")]
+
 
 def factores_del_circuito():
     """Cuánto residuo y cuánta larva hay, en promedio, detrás de cada huevo. None si faltan datos."""
@@ -75,6 +78,21 @@ def _por_mes(consulta, campo_fecha, campo_valor):
 def _a_fecha(valor):
     # TruncMonth sobre un DateTimeField devuelve datetime; las claves se comparan como date.
     return timezone.localtime(valor).date() if hasattr(valor, "hour") else valor
+
+
+def nivel_del_cliente(huevos):
+    """Nivel actual, el siguiente y cuánto falta para llegar."""
+    actual = [nivel for nivel in NIVELES if huevos >= nivel[0]][-1]
+    siguientes = [nivel for nivel in NIVELES if huevos < nivel[0]]
+    if not siguientes:
+        return {"nombre": actual[1], "siguiente": None, "faltan": 0, "progreso": 100}
+    desde, hasta = actual[0], siguientes[0][0]
+    return {
+        "nombre": actual[1],
+        "siguiente": siguientes[0][1],
+        "faltan": hasta - huevos,
+        "progreso": round((huevos - desde) * 100 / (hasta - desde)),
+    }
 
 
 def impacto_de_compras(usuario, factores):

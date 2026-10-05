@@ -120,8 +120,7 @@ class Command(BaseCommand):
         cliente = self.crear_usuario("cliente", Usuario.Rol.CLIENTE, password, nombre="Lucía")
         Cliente.objects.get_or_create(
             usuario=cliente,
-            defaults={"telefono": "099 000 000", "direccion": "Calle Ficticia 123, Maldonado",
-                      "nivel": Cliente.Nivel.SOSTENEDOR},
+            defaults={"telefono": "099 000 000", "direccion": "Calle Ficticia 123, Maldonado"},
         )
         # Un pedido cada diez días; el último todavía no se entregó.
         for dias_atras in range(DIAS - 5, 0, -10):

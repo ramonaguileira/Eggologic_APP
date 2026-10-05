@@ -79,3 +79,23 @@ class ImpactoTests(TestCase):
         respuesta = self.client.get(reverse("impacto:mi_impacto"))
         self.assertContains(respuesta, "El impacto de La Huerta")
         self.assertContains(respuesta, "¿Qué entregaste?")
+
+
+class NivelesTests(TestCase):
+    def test_niveles_segun_huevos_recibidos(self):
+        self.assertEqual(calculos.nivel_del_cliente(0)["nombre"], "Compra individual")
+        self.assertEqual(calculos.nivel_del_cliente(99)["nombre"], "Compra individual")
+        self.assertEqual(calculos.nivel_del_cliente(100)["nombre"], "Sostenedor")
+        self.assertEqual(calculos.nivel_del_cliente(500)["nombre"], "Regenerador")
+        self.assertEqual(calculos.nivel_del_cliente(1000)["nombre"], "Guardián")
+
+    def test_cuanto_falta_para_el_siguiente(self):
+        nivel = calculos.nivel_del_cliente(300)
+        self.assertEqual(nivel["siguiente"], "Regenerador")
+        self.assertEqual(nivel["faltan"], 200)
+        self.assertEqual(nivel["progreso"], 50)
+
+    def test_el_nivel_mas_alto_no_tiene_siguiente(self):
+        nivel = calculos.nivel_del_cliente(1500)
+        self.assertIsNone(nivel["siguiente"])
+        self.assertEqual(nivel["progreso"], 100)

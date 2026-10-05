@@ -6,7 +6,7 @@
 {% block contenido %}
   <div class="encabezado">
     <h1>{% if restaurante %}El impacto de {{ restaurante.nombre }}{% else %}Tu impacto{% endif %}</h1>
-    {% if nivel %}<span class="nivel">Nivel {{ nivel }}</span>{% endif %}
+    {% if nivel %}<span class="nivel">Nivel {{ nivel.nombre }}</span>{% endif %}
   </div>
 
   {% if entregas %}
@@ -59,6 +59,19 @@
         <p class="heroe-numero">0</p>
         <p class="heroe-texto">kg rescatados por ahora. Con tu primer pedido empieza a crecer.</p>
         <a class="boton" href="{% url 'tienda:tienda' %}">Hacer mi primer pedido</a>
+      {% endif %}
+    </section>
+
+    <section class="tarjeta progreso-nivel">
+      {% if nivel.siguiente %}
+        <p>Te faltan <strong>{{ nivel.faltan }} huevos</strong> para ser <strong>{{ nivel.siguiente }}</strong>.</p>
+        <div class="medidor" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ nivel.progreso }}"
+             aria-label="Avance hacia el nivel {{ nivel.siguiente }}">
+          <div class="medidor-relleno" style="width: {{ nivel.progreso }}%"></div>
+        </div>
+        <p class="tenue">Niveles: Sostenedor desde 100 huevos, Regenerador desde 500 y Guardián desde 1.000.</p>
+      {% else %}
+        <p>🎉 ¡Sos <strong>{{ nivel.nombre }}</strong>, el nivel más alto! Gracias por cerrar el círculo.</p>
       {% endif %}
     </section>
 

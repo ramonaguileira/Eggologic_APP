@@ -10,13 +10,14 @@ from . import calculos
 def mi_impacto(request):
     factores = calculos.factores_del_circuito()
     restaurante = getattr(request.user, "restaurante", None)
-    cliente = getattr(request.user, "cliente", None)
+    compras = calculos.impacto_de_compras(request.user, factores)
     contexto = {
         "factores": factores,
-        "compras": calculos.impacto_de_compras(request.user, factores),
+        "compras": compras,
         "entregas": calculos.impacto_de_entregas(restaurante, factores) if restaurante else None,
         "restaurante": restaurante,
-        "nivel": cliente.get_nivel_display() if cliente else None,
+        # Los niveles son para clientes, no para restaurantes.
+        "nivel": None if restaurante else calculos.nivel_del_cliente(compras["huevos"]),
         "comunidad": calculos.totales_de_la_comunidad(),
     }
     return render(request, "impacto/mi_impacto.html", contexto)

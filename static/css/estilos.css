@@ -231,6 +231,12 @@ form input[type="radio"] { width: auto; margin-right: 0.4rem; }
 .leyenda li { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem; }
 .muestra { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
 
+.progreso-nivel { margin-bottom: 1.5rem; }
+.progreso-nivel p { margin: 0 0 0.5rem; }
+/* Medidor: el riel es un tono más claro del mismo verde que el relleno. */
+.medidor { height: 12px; background: var(--verde-claro); border-radius: 999px; overflow: hidden; }
+.medidor-relleno { height: 100%; background: var(--serie-1); border-radius: 999px; transition: width 0.8s ease-out; }
+
 .calculadora { margin: 1.5rem 0; }
 .calculadora label { font-weight: 400; }
 .calculadora input[type="range"] { width: 100%; padding: 0; border: 0; accent-color: var(--verde); }

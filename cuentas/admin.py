@@ -21,7 +21,5 @@ class RestauranteAdmin(admin.ModelAdmin):
 
 @admin.register(Cliente)
 class ClienteAdmin(admin.ModelAdmin):
-    list_display = ["__str__", "telefono", "direccion", "nivel"]
-    list_filter = ["nivel"]
-    list_editable = ["nivel"]
+    list_display = ["__str__", "telefono", "direccion"]
     search_fields = ["usuario__username", "usuario__first_name", "usuario__last_name", "telefono"]

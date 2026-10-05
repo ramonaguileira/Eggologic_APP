@@ -61,17 +61,9 @@ class Restaurante(models.Model):
 
 
 class Cliente(models.Model):
-    class Nivel(models.TextChoices):
-        COMPRA_INDIVIDUAL = "compra_individual", "Compra individual"
-        SOSTENEDOR = "sostenedor", "Sostenedor"
-        REGENERADOR = "regenerador", "Regenerador"
-        GUARDIAN = "guardian", "Guardián"
-
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name="cliente")
     telefono = models.CharField("teléfono", max_length=40)
     direccion = models.CharField("dirección de entrega", max_length=200)
-    # SUPUESTO: el nivel lo asigna Eggologic desde la administración; falta definir el criterio.
-    nivel = models.CharField(max_length=20, choices=Nivel.choices, default=Nivel.COMPRA_INDIVIDUAL)
 
     def __str__(self):
         return self.usuario.get_full_name() or self.usuario.username
