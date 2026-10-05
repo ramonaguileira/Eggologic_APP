@@ -24,7 +24,7 @@ Lo marcado **SUPUESTO** espera confirmación.
 | Base de datos | PostgreSQL en el servidor; SQLite para correr local |
 | Guardian | Cada registro se guarda primero en la base y entra a una bandeja de salida; un comando por cron lo envía y reintenta (etapa de Guardian) |
 | Secretos | `.env` + `.env.example`, nunca en el repo |
-| Dependencias | Django, python-dotenv y psycopg. `requests` se suma en la etapa de Guardian; una librería de gráficas, en la de usuarios |
+| Dependencias | Django, python-dotenv y psycopg. `requests` se suma en la etapa de Guardian. Las gráficas se hacen con HTML y CSS, sin librería |
 
 ## Datos que se capturan
 
@@ -74,12 +74,12 @@ En las próximas etapas se suman `tienda/` (pedidos), `impacto/` (gráficas para
 
 | Etapa | Qué incluye | Estado |
 | --- | --- | --- |
-| 1 | Captura: usuarios y roles, retiros, lotes BSF, granja, panel, exportación CSV | Lista, para revisar |
-| 2 | Sector de usuarios: tienda de huevos (pedidos) e impacto interactivo con gráficas para clientes y restaurantes | Propuesta |
+| 1 | Captura: usuarios y roles, retiros, lotes BSF, granja, panel, exportación CSV | Aprobada |
+| 2 | Sector de usuarios: tienda de huevos (pedidos) e impacto interactivo con gráficas para clientes y restaurantes | Lista, para revisar |
 | 3 | Guardian: policy FLW en la cuenta nueva, envío de reportes por restaurante, tokens nuevos en testnet | Propuesta |
 | 4 | Entregables ANDE: circuito trazable, línea de base, informe Fase 1 | Propuesta |
 
-SUPUESTO: la tienda va antes que Guardian porque no depende de nada externo. Guardian necesita la cuenta, la policy instalada y habilitar la red.
+La tienda va antes que Guardian porque no depende de nada externo (confirmado por Ramón). Guardian necesita la cuenta, la policy instalada y habilitar la red.
 
 ## Cuenta de Guardian: cómo pasármela
 

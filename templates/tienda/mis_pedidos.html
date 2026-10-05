@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block titulo %}Mis pedidos · Eggologic{% endblock %}
+
+{% block contenido %}
+  <div class="encabezado">
+    <h1>Mis pedidos</h1>
+    <a class="boton" href="{% url 'tienda:tienda' %}">+ Nuevo pedido</a>
+  </div>
+
+  {% for pedido in pedidos %}
+    <article class="tarjeta pedido">
+      <div class="encabezado">
+        <h2>{{ pedido }} <span class="tenue">· {{ pedido.creado_en|date:"d/m/Y" }}</span></h2>
+        <span class="estado estado-{{ pedido.estado }}">{{ pedido.get_estado_display }}</span>
+      </div>
+      <ul class="lista">
+        {% for item in pedido.items.all %}
+          <li>{{ item.cantidad }} × {{ item.producto.nombre }} — $ {{ item.subtotal|floatformat:"0g" }}</li>
+        {% endfor %}
+      </ul>
+      <p><strong>Total: $ {{ pedido.total|floatformat:"0g" }}</strong> · {{ pedido.get_forma_pago_display }}</p>
+      {% if pedido.forma_pago == transferencia and pedido.estado in pendientes %}
+        <p class="aviso">{{ datos_transferencia }}</p>
+      {% endif %}
+    </article>
+  {% empty %}
+    <section class="tarjeta">
+      <p>Todavía no hiciste pedidos.</p>
+      <a class="boton" href="{% url 'tienda:tienda' %}">Ir a la tienda</a>
+    </section>
+  {% endfor %}
+{% endblock %}

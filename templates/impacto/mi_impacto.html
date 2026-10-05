@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block titulo %}Mi impacto · Eggologic{% endblock %}
+
+{% block contenido %}
+  <div class="encabezado">
+    <h1>{% if restaurante %}El impacto de {{ restaurante.nombre }}{% else %}Tu impacto{% endif %}</h1>
+    {% if nivel %}<span class="nivel">Nivel {{ nivel }}</span>{% endif %}
+  </div>
+
+  {% if entregas %}
+    {# --- Restaurante: lo que entregó --- #}
+    <section class="heroe">
+      <p class="heroe-numero" data-contar="{{ entregas.kg_organicos|stringformat:'f' }}" data-decimales="0">{{ entregas.kg_organicos|floatformat:"0g" }}</p>
+      <p class="heroe-texto">kg de residuos orgánicos que entregaste y se convirtieron en alimento para gallinas</p>
+    </section>
+
+    <div class="circuito">
+      <div class="paso"><span class="icono">🥕</span><strong>{{ entregas.retiros }}</strong><span>retiros</span></div>
+      <span class="flecha" aria-hidden="true">→</span>
+      <div class="paso"><span class="icono">🪱</span><strong>{{ entregas.kg_organicos|floatformat:"0g" }} kg</strong><span>a bioconversión</span></div>
+      <span class="flecha" aria-hidden="true">→</span>
+      <div class="paso"><span class="icono">🥚</span><strong>{{ entregas.huevos_equivalentes|floatformat:"0g"|default:"—" }}</strong><span>huevos que ayudaste a producir</span></div>
+    </div>
+
+    {% include "impacto/_barras.html" with serie=entregas.por_mes titulo="Kilos entregados por mes" unidad="kg" decimales="0" %}
+
+    <section class="tarjeta">
+      <h2>¿Qué entregaste?</h2>
+      <div class="apilada" role="img" aria-label="Composición de lo entregado: {% for parte in entregas.composicion %}{{ parte.nombre }} {{ parte.porcentaje|floatformat:0 }} %{% if not forloop.last %}, {% endif %}{% endfor %}">
+        {% for parte in entregas.composicion %}
+          {% if parte.kg %}
+            <div class="segmento {{ parte.clase }}" style="flex-grow: {{ parte.porcentaje|stringformat:'.2f' }}" tabindex="0">
+              <span class="globo">{{ parte.nombre }}: {{ parte.kg|floatformat:"0g" }} kg</span>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <ul class="leyenda">
+        {% for parte in entregas.composicion %}
+          <li><span class="muestra {{ parte.clase }}"></span>{{ parte.nombre }}: <strong>{{ parte.kg|floatformat:"0g" }} kg</strong> ({{ parte.porcentaje|floatformat:0 }} %)</li>
+        {% endfor %}
+      </ul>
+      <p class="tenue">Cuantos menos impropios (plásticos, latas, servilletas), más residuo se aprovecha.</p>
+    </section>
+
+    {% if compras.huevos %}
+      <p class="tenue">Además, recibiste {{ compras.huevos }} huevos de Eggologic.</p>
+    {% endif %}
+
+  {% else %}
+    {# --- Cliente: lo que compró --- #}
+    <section class="heroe">
+      {% if compras.huevos %}
+        <p class="heroe-numero" data-contar="{{ compras.kg_rescatados|stringformat:'f' }}" data-decimales="1">{{ compras.kg_rescatados|floatformat:1 }}</p>
+        <p class="heroe-texto">kg de residuos de restaurantes rescatados gracias a tus huevos</p>
+      {% else %}
+        <p class="heroe-numero">0</p>
+        <p class="heroe-texto">kg rescatados por ahora. Con tu primer pedido empieza a crecer.</p>
+        <a class="boton" href="{% url 'tienda:tienda' %}">Hacer mi primer pedido</a>
+      {% endif %}
+    </section>
+
+    {% if compras.huevos %}
+      <div class="circuito">
+        <div class="paso"><span class="icono">🥕</span><strong>{{ compras.kg_rescatados|floatformat:1 }} kg</strong><span>de residuo rescatado</span></div>
+        <span class="flecha" aria-hidden="true">→</span>
+        <div class="paso"><span class="icono">🪱</span><strong>{{ compras.kg_larva|floatformat:1 }} kg</strong><span>de larvas para las gallinas</span></div>
+        <span class="flecha" aria-hidden="true">→</span>
+        <div class="paso"><span class="icono">🥚</span><strong>{{ compras.huevos }}</strong><span>huevos en tu mesa</span></div>
+      </div>
+      {% include "impacto/_barras.html" with serie=compras.por_mes titulo="Huevos que recibiste por mes" unidad="huevos" decimales="0" %}
+    {% endif %}
+  {% endif %}
+
+  {% if factores and not entregas %}
+    <section class="tarjeta calculadora" id="calculadora" data-kg-por-huevo="{{ factores.kg_residuo_por_huevo|stringformat:'f' }}">
+      <h2>¿Cuánto rescatarías en un año?</h2>
+      <label for="docenas">Si cada mes compro <strong id="calc-docenas">2</strong> docenas de huevos…</label>
+      <input type="range" id="docenas" min="1" max="10" value="2">
+      <p class="calc-resultado">…rescato <strong id="calc-kg">—</strong> kg de residuos de restaurantes por año.</p>
+    </section>
+  {% endif %}
+
+  <h2>Entre todos</h2>
+  <div class="cifras">
+    <div class="cifra"><strong>{{ comunidad.kg_rescatados|floatformat:"0g" }}</strong><span>kg de residuos rescatados</span></div>
+    <div class="cifra"><strong>{{ comunidad.kg_larvas|floatformat:"0g" }}</strong><span>kg de larvas criadas</span></div>
+    <div class="cifra"><strong>{{ comunidad.huevos|floatformat:"0g" }}</strong><span>huevos producidos</span></div>
+    <div class="cifra"><strong>{{ comunidad.restaurantes }}</strong><span>restaurantes participando</span></div>
+  </div>
+  <p class="tenue nota">Las cifras se calculan con el promedio de todo el circuito Eggologic: residuo procesado, larvas criadas y huevos producidos.</p>
+
+  <script src="{% static 'js/impacto.js' %}" defer></script>
+{% endblock %}

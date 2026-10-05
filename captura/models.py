@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
+from django.core.validators import FileExtensionValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.formats import date_format, number_format
@@ -11,6 +11,12 @@ from cuentas.models import Restaurante
 
 CERO = Decimal("0")
 NO_NEGATIVO = [MinValueValidator(CERO)]
+FOTO_MAXIMO_MB = 15
+
+
+def validar_tamano_foto(archivo):
+    if archivo.size > FOTO_MAXIMO_MB * 1024 * 1024:
+        raise ValidationError(f"La foto no puede pesar más de {FOTO_MAXIMO_MB} MB.")
 
 
 def campo_kg(nombre, **opciones):
@@ -34,15 +40,27 @@ class RegistroBase(models.Model):
 class Retiro(RegistroBase):
     """Residuo que el chofer levanta en un restaurante, y cómo se clasifica.
 
-    La clasificación se puede cargar al levantar o después, en la planta. En términos del
-    FLW Standard: los restos vegetales se acercan a "partes no comestibles asociadas", los
-    residuos de plato a "alimento", y los impropios quedan fuera del inventario (SUPUESTO,
-    lo define CarboSur).
+    El chofer carga el restaurante, los kg y una foto; la fecha y la ubicación se toman solas.
+    La clasificación se completa después, en la planta. En términos del FLW Standard: los
+    restos vegetales se acercan a "partes no comestibles asociadas", los residuos de plato a
+    "alimento", y los impropios quedan fuera del inventario (SUPUESTO, lo define CarboSur).
     """
 
     restaurante = models.ForeignKey(Restaurante, on_delete=models.PROTECT, related_name="retiros")
     fecha = models.DateTimeField(default=timezone.now)
     kg_levantados = campo_kg("levantado (kg)")
+    foto = models.FileField(
+        upload_to="retiros/%Y/%m/",
+        blank=True,
+        validators=[
+            FileExtensionValidator(["jpg", "jpeg", "png", "webp", "heic", "heif"]),
+            validar_tamano_foto,
+        ],
+    )
+    # Las toma el celular del chofer al abrir el formulario. Quedan vacías si no dio permiso.
+    latitud = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitud = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    precision_m = models.PositiveIntegerField("precisión de la ubicación (m)", null=True, blank=True)
 
     kg_impropios = campo_kg("impropios (kg)", null=True, blank=True)
     kg_restos_vegetales = campo_kg("restos vegetales (kg)", null=True, blank=True)

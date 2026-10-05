@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "cuentas",
     "captura",
+    "tienda",
+    "impacto",
 ]
 
 MIDDLEWARE = [
@@ -105,4 +107,13 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# Fotos de los retiros. No se publican por URL: se ven solo con login (ver captura.views.retiro_foto).
+# SUPUESTO: en el piloto se guardan en el disco del servidor.
+MEDIA_ROOT = BASE_DIR / "media"
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Texto que ve el cliente cuando elige pagar por transferencia (cuenta, titular, etc.).
+TIENDA_DATOS_TRANSFERENCIA = os.environ.get(
+    "TIENDA_DATOS_TRANSFERENCIA", "Te enviamos los datos para transferir por WhatsApp."
+)

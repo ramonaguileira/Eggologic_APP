@@ -18,7 +18,15 @@
           <a href="{% url 'captura:lotes' %}">Lotes</a>
           <a href="{% url 'captura:granja' %}">Granja</a>
         {% endif %}
-        {% if user.is_staff %}<a href="{% url 'admin:index' %}">Administración</a>{% endif %}
+        {% if user.puede_comprar %}
+          <a href="{% url 'impacto:mi_impacto' %}">Mi impacto</a>
+          <a href="{% url 'tienda:tienda' %}">Tienda</a>
+          <a href="{% url 'tienda:mis_pedidos' %}">Mis pedidos</a>
+        {% endif %}
+        {% if user.is_staff %}
+          <a href="{% url 'admin:tienda_pedido_changelist' %}">Pedidos</a>
+          <a href="{% url 'admin:index' %}">Administración</a>
+        {% endif %}
         <form method="post" action="{% url 'logout' %}">
           {% csrf_token %}
           <button type="submit" class="enlace">Salir</button>

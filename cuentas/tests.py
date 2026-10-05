@@ -40,10 +40,31 @@ class InicioTests(TestCase):
         respuesta = self.client.get(reverse("inicio"))
         self.assertRedirects(respuesta, reverse("captura:panel"))
 
-    def test_cliente_ve_su_inicio(self):
+    def test_cliente_va_a_su_impacto(self):
         self.client.force_login(crear_usuario(Usuario.Rol.CLIENTE))
         respuesta = self.client.get(reverse("inicio"))
-        self.assertTemplateUsed(respuesta, "cuentas/inicio_usuario.html")
+        self.assertRedirects(respuesta, reverse("impacto:mi_impacto"))
+
+
+class RegistroTests(TestCase):
+    def test_un_cliente_se_registra_y_queda_logueado(self):
+        respuesta = self.client.post(
+            reverse("registrarse"),
+            {
+                "username": "lucia",
+                "first_name": "Lucía",
+                "email": "lucia@example.com",
+                "telefono": "099 123 456",
+                "direccion": "Calle 1, Maldonado",
+                "password1": "una-clave-bastante-larga",
+                "password2": "una-clave-bastante-larga",
+            },
+        )
+        self.assertRedirects(respuesta, reverse("tienda:tienda"))
+        usuario = Usuario.objects.get(username="lucia")
+        self.assertEqual(usuario.rol, Usuario.Rol.CLIENTE)
+        self.assertEqual(usuario.cliente.direccion, "Calle 1, Maldonado")
+        self.assertEqual(int(self.client.session["_auth_user_id"]), usuario.pk)
 
 
 class PermisosTests(TestCase):

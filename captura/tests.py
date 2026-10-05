@@ -1,8 +1,10 @@
+import tempfile
 from datetime import date
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
-from django.test import TestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from cuentas.models import Restaurante, Usuario
@@ -134,34 +136,86 @@ class RegistroGranjaTests(DatosDePrueba):
         self.assertIn("fecha", form.errors)
 
 
+# Las fotos de los tests se guardan en una carpeta temporal, no en media/.
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp())
 class VistasTests(DatosDePrueba):
-    def test_operador_carga_un_retiro(self):
-        self.client.force_login(self.operador)
-        respuesta = self.client.post(
-            reverse("captura:retiro_nuevo"),
-            {"restaurante": self.restaurante.pk, "fecha": "2026-10-05T10:30", "kg_levantados": "42.5"},
-        )
-        self.assertRedirects(respuesta, reverse("captura:retiros"))
-        retiro = Retiro.objects.get()
-        self.assertEqual(retiro.kg_levantados, Decimal("42.5"))
-        self.assertEqual(retiro.registrado_por, self.operador)
+    def foto(self):
+        return SimpleUploadedFile("tacho.jpg", b"\xff\xd8\xff contenido de prueba", content_type="image/jpeg")
 
-    def test_retiro_con_clasificacion_imposible_no_se_guarda(self):
+    def test_chofer_carga_retiro_con_foto_y_ubicacion(self):
         self.client.force_login(self.operador)
         respuesta = self.client.post(
             reverse("captura:retiro_nuevo"),
             {
                 "restaurante": self.restaurante.pk,
-                "fecha": "2026-10-05T10:30",
-                "kg_levantados": "10",
-                "kg_impropios": "1",
-                "kg_restos_vegetales": "8",
-                "kg_residuos_plato": "5",
+                "kg_levantados": "42.5",
+                "foto": self.foto(),
+                "latitud": "-34.909700",
+                "longitud": "-54.865300",
+                "precision_m": "12",
             },
+        )
+        self.assertRedirects(respuesta, reverse("captura:retiros"))
+        retiro = Retiro.objects.get()
+        self.assertEqual(retiro.kg_levantados, Decimal("42.5"))
+        self.assertEqual(retiro.registrado_por, self.operador)
+        self.assertEqual(retiro.latitud, Decimal("-34.909700"))
+        self.assertTrue(retiro.foto.name.endswith(".jpg"))
+        self.assertFalse(retiro.clasificado)
+
+    def test_retiro_sin_foto_no_se_guarda(self):
+        self.client.force_login(self.operador)
+        respuesta = self.client.post(
+            reverse("captura:retiro_nuevo"), {"restaurante": self.restaurante.pk, "kg_levantados": "20"}
+        )
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertFalse(Retiro.objects.exists())
+
+    def test_retiro_sin_ubicacion_se_guarda_igual(self):
+        self.client.force_login(self.operador)
+        self.client.post(
+            reverse("captura:retiro_nuevo"),
+            {"restaurante": self.restaurante.pk, "kg_levantados": "20", "foto": self.foto()},
+        )
+        self.assertIsNone(Retiro.objects.get().latitud)
+
+    def test_planta_clasifica_un_retiro(self):
+        retiro = self.crear_retiro("50")
+        self.client.force_login(self.operador)
+        respuesta = self.client.post(
+            reverse("captura:retiro_clasificar", args=[retiro.pk]),
+            {"kg_impropios": "2", "kg_restos_vegetales": "30", "kg_residuos_plato": "18"},
+        )
+        self.assertRedirects(respuesta, reverse("captura:retiros"))
+        retiro.refresh_from_db()
+        self.assertEqual(retiro.kg_organicos, Decimal("48"))
+
+    def test_clasificacion_imposible_no_se_guarda(self):
+        retiro = self.crear_retiro("10")
+        self.client.force_login(self.operador)
+        respuesta = self.client.post(
+            reverse("captura:retiro_clasificar", args=[retiro.pk]),
+            {"kg_impropios": "1", "kg_restos_vegetales": "8", "kg_residuos_plato": "5"},
         )
         self.assertEqual(respuesta.status_code, 200)
         self.assertContains(respuesta, "La clasificación suma más kg que lo levantado.")
-        self.assertFalse(Retiro.objects.exists())
+        retiro.refresh_from_db()
+        self.assertFalse(retiro.clasificado)
+
+    def test_la_foto_solo_la_ve_quien_accede_a_los_datos(self):
+        retiro = self.crear_retiro("50", foto=self.foto())
+        cliente = Usuario.objects.create_user(
+            username="cliente", password="clave-de-prueba-123", rol=Usuario.Rol.CLIENTE
+        )
+        url = reverse("captura:retiro_foto", args=[retiro.pk])
+
+        self.client.force_login(cliente)
+        self.assertEqual(self.client.get(url).status_code, 403)
+
+        self.client.force_login(self.operador)
+        respuesta = self.client.get(url)
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertEqual(b"".join(respuesta.streaming_content), b"\xff\xd8\xff contenido de prueba")
 
     def test_carbosur_exporta_retiros_para_excel(self):
         self.crear_retiro("42.5", (Decimal("1.5"), Decimal("25"), Decimal("16")))

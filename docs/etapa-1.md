@@ -24,8 +24,8 @@
 
 ## Qué quedó afuera a propósito
 
-- Fotos y GPS de los retiros: suman dependencias y almacenamiento. Se agregan si hacen falta.
 - Gemelo digital, tienda, impacto para usuarios y Guardian: son otras etapas.
+- Fotos y GPS: quedaron afuera en la primera versión, pero Ramón pidió sumarlos y se agregaron en la Etapa 2.
 
 ## Cómo correrlo
 

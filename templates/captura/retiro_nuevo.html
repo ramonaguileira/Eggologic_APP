@@ -1,0 +1,7 @@
+{% extends "captura/formulario.html" %}
+{% load static %}
+
+{% block antes_de_guardar %}
+  <p id="estado-ubicacion" class="tenue">Para registrar la ubicación, permití el acceso cuando el celular lo pida.</p>
+  <script src="{% static 'js/ubicacion.js' %}" defer></script>
+{% endblock %}

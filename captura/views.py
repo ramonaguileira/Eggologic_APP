@@ -3,14 +3,15 @@ from datetime import timedelta
 
 from django.contrib import messages
 from django.db.models import Count, F, Q, Sum
-from django.http import HttpResponse
+from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.formats import number_format
 
 from cuentas.models import Usuario
 from cuentas.permisos import requiere
 
-from .forms import LoteForm, RegistroGranjaForm, RetiroForm
+from .forms import LoteForm, RegistroGranjaForm, RetiroChoferForm, RetiroClasificacionForm
 from .models import Lote, RegistroGranja, Retiro
 
 DIAS_DEL_PANEL = 30
@@ -72,30 +73,39 @@ def granja(request):
 # --- Altas y ediciones --------------------------------------------------------
 
 
-def _formulario(request, clase_form, instancia, titulo, volver_a):
+def _formulario(request, clase_form, instancia, titulo, volver_a, plantilla="captura/formulario.html"):
     """Muestra un formulario de alta o edición y, si es válido, lo guarda."""
-    form = clase_form(request.POST or None, instance=instancia)
+    form = clase_form(request.POST or None, request.FILES or None, instance=instancia)
     if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, "Guardado.")
         return redirect(volver_a)
-    return render(
-        request,
-        "captura/formulario.html",
-        {"form": form, "titulo": titulo, "volver_a": volver_a},
-    )
+    return render(request, plantilla, {"form": form, "titulo": titulo, "volver_a": volver_a})
 
 
 @requiere(Usuario.puede_capturar)
 def retiro_nuevo(request):
     retiro = Retiro(registrado_por=request.user)
-    return _formulario(request, RetiroForm, retiro, "Nuevo retiro", "captura:retiros")
+    return _formulario(
+        request, RetiroChoferForm, retiro, "Nuevo retiro", "captura:retiros", "captura/retiro_nuevo.html"
+    )
 
 
 @requiere(Usuario.puede_capturar)
-def retiro_editar(request, pk):
+def retiro_clasificar(request, pk):
+    retiro = get_object_or_404(Retiro.objects.select_related("restaurante"), pk=pk)
+    kg = number_format(retiro.kg_levantados, 1)
+    titulo = f"Clasificar retiro N.º {pk} · {retiro.restaurante.nombre} · {kg} kg levantados"
+    return _formulario(request, RetiroClasificacionForm, retiro, titulo, "captura:retiros")
+
+
+@requiere(Usuario.puede_ver_datos)
+def retiro_foto(request, pk):
+    """Las fotos no se publican por URL: solo las ve quien tiene acceso a los datos de campo."""
     retiro = get_object_or_404(Retiro, pk=pk)
-    return _formulario(request, RetiroForm, retiro, f"Retiro N.º {pk}", "captura:retiros")
+    if not retiro.foto:
+        raise Http404
+    return FileResponse(retiro.foto.open("rb"))
 
 
 @requiere(Usuario.puede_capturar)
@@ -164,6 +174,9 @@ def exportar_retiros(request):
             _numero(r.kg_no_ingresa),
             "sí" if r.no_ingresa_estimado else "no",
             r.lote_id or "",
+            _numero(r.latitud),
+            _numero(r.longitud),
+            "sí" if r.foto else "no",
             r.observaciones,
         ]
         for r in Retiro.objects.select_related("restaurante").order_by("fecha")
@@ -180,6 +193,9 @@ def exportar_retiros(request):
         "kg_no_ingresa",
         "no_ingresa_estimado",
         "lote",
+        "latitud",
+        "longitud",
+        "tiene_foto",
         "observaciones",
     ]
     return _respuesta_csv("retiros.csv", encabezados, filas)

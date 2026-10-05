@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block titulo %}Crear cuenta · Eggologic{% endblock %}
+
+{% block contenido %}
+  <section class="tarjeta angosta">
+    <h1>Creá tu cuenta</h1>
+    <p class="tenue">Para pedir huevos y ver cuántos residuos ayudás a rescatar.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="error">{{ form.non_field_errors }}</div>{% endif %}
+      {% for campo in form %}
+        <div class="campo{% if campo.errors %} con-error{% endif %}">
+          <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+          {{ campo }}
+          {% if campo.errors %}<div class="error">{{ campo.errors }}</div>{% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="boton">Crear cuenta</button>
+    </form>
+    <p class="tenue">¿Ya tenés cuenta? <a href="{% url 'login' %}">Ingresá</a>.</p>
+  </section>
+{% endblock %}

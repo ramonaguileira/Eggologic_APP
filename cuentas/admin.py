@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import Restaurante, Usuario
+from .models import Cliente, Restaurante, Usuario
 
 
 @admin.register(Usuario)
@@ -17,3 +17,11 @@ class RestauranteAdmin(admin.ModelAdmin):
     list_display = ["nombre", "codigo", "contacto", "telefono", "activo"]
     list_filter = ["activo"]
     search_fields = ["nombre", "codigo", "razon_social"]
+
+
+@admin.register(Cliente)
+class ClienteAdmin(admin.ModelAdmin):
+    list_display = ["__str__", "telefono", "direccion", "nivel"]
+    list_filter = ["nivel"]
+    list_editable = ["nivel"]
+    search_fields = ["usuario__username", "usuario__first_name", "usuario__last_name", "telefono"]

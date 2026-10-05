@@ -7,17 +7,35 @@ from .models import Lote, RegistroGranja, Retiro
 
 # Los navegadores esperan estos formatos en los campos de fecha nativos.
 CAMPO_FECHA = forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d")
-CAMPO_FECHA_HORA = forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M")
 CAMPO_TEXTO = forms.Textarea(attrs={"rows": 2})
 
 
-class RetiroForm(forms.ModelForm):
+class RetiroChoferForm(forms.ModelForm):
+    """Lo que carga el chofer en el restaurante. La fecha y la ubicación se toman solas."""
+
+    class Meta:
+        model = Retiro
+        fields = ["restaurante", "kg_levantados", "foto", "latitud", "longitud", "precision_m"]
+        widgets = {
+            # En el celular, "capture" abre directo la cámara trasera.
+            "foto": forms.FileInput(attrs={"accept": "image/*", "capture": "environment"}),
+            "latitud": forms.HiddenInput,
+            "longitud": forms.HiddenInput,
+            "precision_m": forms.HiddenInput,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["foto"].required = True
+        self.fields["restaurante"].queryset = Restaurante.objects.filter(activo=True)
+
+
+class RetiroClasificacionForm(forms.ModelForm):
+    """Lo que se completa en la planta al clasificar el residuo."""
+
     class Meta:
         model = Retiro
         fields = [
-            "restaurante",
-            "fecha",
-            "kg_levantados",
             "kg_impropios",
             "kg_restos_vegetales",
             "kg_residuos_plato",
@@ -25,20 +43,16 @@ class RetiroForm(forms.ModelForm):
             "no_ingresa_estimado",
             "observaciones",
         ]
-        widgets = {"fecha": CAMPO_FECHA_HORA, "observaciones": CAMPO_TEXTO}
+        widgets = {"observaciones": CAMPO_TEXTO}
         help_texts = {
-            "kg_impropios": "Clasificación: si todavía no se hizo, dejá estos tres campos vacíos "
-            "y completalos en la planta.",
             "kg_no_ingresa": "Opcional: lo que el restaurante tiró a la basura común desde el último "
             "retiro. Lo pide CarboSur para la línea de base.",
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Solo restaurantes activos, salvo el que ya tenga el retiro que se está editando.
-        self.fields["restaurante"].queryset = Restaurante.objects.filter(
-            Q(activo=True) | Q(pk=self.instance.restaurante_id)
-        )
+        for campo in ["kg_impropios", "kg_restos_vegetales", "kg_residuos_plato"]:
+            self.fields[campo].required = True
 
 
 class LoteForm(forms.ModelForm):

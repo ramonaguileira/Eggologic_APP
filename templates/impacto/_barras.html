@@ -1,0 +1,30 @@
+{# Barras por mes de una sola serie. Recibe: serie, titulo, unidad, decimales. #}
+<figure class="grafica">
+  <figcaption>{{ titulo }}</figcaption>
+  <div class="barras">
+    {% for barra in serie %}
+      <div class="columna">
+        <div class="pista">
+          {% if barra.valor %}
+            <div class="barra-mes{% if forloop.last %} actual{% endif %}" style="height: {{ barra.altura }}%" tabindex="0"
+                 aria-label="{{ barra.etiqueta }}: {{ barra.valor|floatformat:decimales }} {{ unidad }}">
+              <span class="globo">{{ barra.valor|floatformat:decimales }} {{ unidad }}</span>
+            </div>
+          {% endif %}
+        </div>
+        <span class="mes">{{ barra.etiqueta }}</span>
+      </div>
+    {% endfor %}
+  </div>
+  <details class="ver-tabla">
+    <summary>Ver como tabla</summary>
+    <table>
+      <thead><tr><th>Mes</th><th class="num">{{ unidad|capfirst }}</th></tr></thead>
+      <tbody>
+        {% for barra in serie %}
+          <tr><td>{{ barra.etiqueta }}</td><td class="num">{{ barra.valor|floatformat:decimales }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </details>
+</figure>

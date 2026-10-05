@@ -9,6 +9,11 @@
   --borde: #d6ded8;
   --fondo: #f7f8f5;
   --error: #b3261e;
+  --superficie: #fff;
+  /* Colores de gráficas, validados para daltonismo (ver docs/etapa-2.md). */
+  --serie-1: #1f8a4c;
+  --serie-2: #e0a526;
+  --serie-3: #4a3aa7;
 }
 
 * { box-sizing: border-box; }
@@ -127,7 +132,117 @@ td.num { text-align: right; }
   font-size: 0.85rem;
 }
 
+/* Tienda */
+.productos { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
+.producto {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.producto.elegido { border-color: var(--verde); box-shadow: 0 0 0 2px var(--verde-claro); }
+.producto h2 { margin: 0 0 0.25rem; }
+.producto p { margin: 0.25rem 0; }
+.precio { font-size: 1.3rem; font-weight: 700; }
+.cantidad { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+.cantidad input { width: 4.5rem; text-align: center; font-size: 1.1rem; }
+.cantidad button {
+  width: 2.75rem; height: 2.75rem;
+  border-radius: 50%; border: 1px solid var(--verde);
+  background: var(--superficie); color: var(--verde);
+  font-size: 1.4rem; line-height: 1; cursor: pointer;
+}
+.resumen { margin: 1rem 0; }
+.total { font-size: 1.2rem; margin: 0; }
+form ul { list-style: none; padding: 0; margin: 0.25rem 0 0; }
+form ul label { display: flex; align-items: center; font-weight: 400; margin-top: 0.4rem; }
+form input[type="radio"] { width: auto; margin-right: 0.4rem; }
+.aviso-error { background: #fdecea; padding: 0.6rem 0.8rem; border-radius: 6px; }
+
+/* Pedidos */
+.pedido { margin-bottom: 0.75rem; }
+.pedido h2 { margin: 0; }
+.estado { border-radius: 999px; padding: 0.15rem 0.7rem; font-size: 0.85rem; background: var(--fondo); border: 1px solid var(--borde); }
+.estado-entregado { background: var(--verde-claro); border-color: var(--verde); }
+.estado-cancelado { color: var(--tenue); text-decoration: line-through; }
+.nivel { background: #fdf1d3; color: #7a5a06; border-radius: 999px; padding: 0.2rem 0.8rem; font-weight: 600; }
+
+/* Mi impacto */
+.heroe { text-align: center; padding: 1.5rem 1rem; }
+.heroe-numero { font-size: 3.5rem; font-weight: 700; margin: 0; color: var(--texto); }
+.heroe-texto { margin: 0.25rem auto 1rem; max-width: 26rem; color: var(--tenue); }
+
+.circuito { display: flex; align-items: center; justify-content: center; gap: 0.25rem; margin: 0.5rem 0 1.5rem; }
+.paso {
+  flex: 1; max-width: 9rem; text-align: center;
+  background: var(--superficie); border: 1px solid var(--borde); border-radius: 12px; padding: 0.6rem 0.4rem;
+}
+.paso .icono { display: block; font-size: 1.6rem; }
+.paso strong { display: block; }
+.paso span:last-child { font-size: 0.8rem; color: var(--tenue); }
+.flecha { color: var(--tenue); font-size: 1.2rem; }
+
+.grafica { margin: 0 0 1.5rem; background: var(--superficie); border: 1px solid var(--borde); border-radius: 12px; padding: 1rem; }
+.grafica figcaption { font-weight: 600; margin-bottom: 0.75rem; }
+.barras {
+  display: flex; align-items: flex-end; gap: 0.5rem;
+  height: 12rem; padding-top: 1.75rem; /* lugar para el globo de la barra más alta */
+  border-bottom: 1px solid var(--borde);
+}
+.columna { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; }
+.pista { flex: 1; width: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.barra-mes {
+  position: relative; width: 100%; max-width: 24px;
+  background: var(--serie-1); border-radius: 4px 4px 0 0;
+  transform-origin: bottom; animation: crecer 0.8s ease-out both;
+  cursor: pointer; outline-offset: 2px;
+}
+.barra-mes:hover, .barra-mes:focus { filter: brightness(1.15); }
+.mes { font-size: 0.8rem; color: var(--tenue); margin-top: 0.3rem; text-transform: capitalize; }
+@keyframes crecer { from { transform: scaleY(0); } }
+
+/* Globo: aparece al pasar el mouse o al tocar/enfocar la marca. */
+.globo {
+  position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+  background: var(--texto); color: #fff; font-size: 0.8rem; font-weight: 600;
+  padding: 0.2rem 0.5rem; border-radius: 6px; white-space: nowrap;
+  opacity: 0; pointer-events: none; transition: opacity 0.15s;
+}
+.barra-mes:hover .globo, .barra-mes:focus .globo, .barra-mes.actual .globo,
+.segmento:hover .globo, .segmento:focus .globo { opacity: 1; }
+/* En los extremos el globo se alinea al borde de su marca para no salirse de la pantalla. */
+.columna:first-child .globo, .segmento:first-child .globo { left: 0; transform: none; }
+.columna:last-child .globo, .segmento:last-child .globo { left: auto; right: 0; transform: none; }
+
+.ver-tabla { margin-top: 0.75rem; }
+.ver-tabla summary { cursor: pointer; color: var(--verde); }
+.ver-tabla table { margin-top: 0.5rem; font-variant-numeric: tabular-nums; }
+
+.apilada { display: flex; gap: 2px; height: 28px; margin: 0.5rem 0 0.75rem; background: var(--superficie); }
+.segmento { position: relative; flex-basis: 0; min-width: 4px; cursor: pointer; }
+.segmento:first-child { border-radius: 4px 0 0 4px; }
+.segmento:last-child { border-radius: 0 4px 4px 0; }
+.segmento:hover, .segmento:focus { filter: brightness(1.15); }
+.serie-1 { background: var(--serie-1); }
+.serie-2 { background: var(--serie-2); }
+.serie-3 { background: var(--serie-3); }
+.leyenda { list-style: none; padding: 0; margin: 0 0 0.5rem; }
+.leyenda li { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem; }
+.muestra { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+.calculadora { margin: 1.5rem 0; }
+.calculadora label { font-weight: 400; }
+.calculadora input[type="range"] { width: 100%; padding: 0; border: 0; accent-color: var(--verde); }
+.calc-resultado { font-size: 1.1rem; }
+.nota { font-size: 0.85rem; margin-top: 0.75rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .barra-mes { animation: none; }
+}
+
 @media (min-width: 720px) {
   .cifras { grid-template-columns: repeat(4, 1fr); }
   .atajos { display: flex; gap: 0.75rem; }
+  .productos { grid-template-columns: repeat(3, 1fr); }
 }

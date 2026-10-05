@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block titulo %}Tienda · Eggologic{% endblock %}
+
+{% block contenido %}
+  <h1>Tienda</h1>
+  <p class="tenue">Huevos de gallinas que comen larvas criadas con residuos de restaurantes de Maldonado.</p>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="error aviso-error">{{ form.non_field_errors }}</div>{% endif %}
+
+    <div class="productos">
+      {% for producto, campo in form.campos_de_productos %}
+        <article class="producto" data-precio="{{ producto.precio|stringformat:'f' }}" data-huevos="{{ producto.huevos }}">
+          <h2>{{ producto.nombre }}</h2>
+          {% if producto.descripcion %}<p class="tenue">{{ producto.descripcion }}</p>{% endif %}
+          <p class="precio">$ {{ producto.precio|floatformat:"0g" }}</p>
+          <div class="cantidad">
+            <button type="button" class="menos" aria-label="Uno menos de {{ producto.nombre }}">−</button>
+            {{ campo }}
+            <button type="button" class="mas" aria-label="Uno más de {{ producto.nombre }}">+</button>
+          </div>
+          {% if campo.errors %}<div class="error">{{ campo.errors }}</div>{% endif %}
+        </article>
+      {% empty %}
+        <p class="tenue">Por ahora no hay productos disponibles.</p>
+      {% endfor %}
+    </div>
+
+    <div class="resumen">
+      <p class="total">Total: <strong id="total">—</strong></p>
+      {% if kg_por_huevo %}
+        <p id="rescate" class="tenue" data-kg-por-huevo="{{ kg_por_huevo|stringformat:'f' }}"></p>
+      {% endif %}
+    </div>
+
+    <section class="tarjeta">
+      <h2>Entrega y pago</h2>
+      {% include "tienda/_campo.html" with campo=form.direccion %}
+      {% include "tienda/_campo.html" with campo=form.telefono %}
+      {% include "tienda/_campo.html" with campo=form.forma_pago %}
+      {% include "tienda/_campo.html" with campo=form.notas %}
+      <p class="tenue">Te contactamos para coordinar la entrega. Por ahora no hay pago online.</p>
+      <button type="submit" class="boton">Hacer pedido</button>
+    </section>
+  </form>
+
+  <script src="{% static 'js/tienda.js' %}" defer></script>
+{% endblock %}

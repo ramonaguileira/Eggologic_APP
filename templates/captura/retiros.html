@@ -14,7 +14,7 @@
       <thead>
         <tr>
           <th>N.º</th><th>Fecha</th><th>Restaurante</th><th>kg levantados</th>
-          <th>Impropios</th><th>Vegetales</th><th>Plato</th><th>Lote</th><th></th>
+          <th>Impropios</th><th>Vegetales</th><th>Plato</th><th>Foto</th><th>Ubicación</th><th>Lote</th><th></th>
         </tr>
       </thead>
       <tbody>
@@ -31,11 +31,21 @@
             {% else %}
               <td colspan="3"><span class="etiqueta">Sin clasificar</span></td>
             {% endif %}
+            <td>{% if retiro.foto %}<a href="{% url 'captura:retiro_foto' retiro.pk %}" target="_blank">Ver</a>{% else %}—{% endif %}</td>
+            <td>
+              {% if retiro.latitud is not None %}
+                <a href="https://www.openstreetmap.org/?mlat={{ retiro.latitud|stringformat:'f' }}&mlon={{ retiro.longitud|stringformat:'f' }}#map=18/{{ retiro.latitud|stringformat:'f' }}/{{ retiro.longitud|stringformat:'f' }}" target="_blank" rel="noopener">Mapa</a>
+              {% else %}—{% endif %}
+            </td>
             <td>{{ retiro.lote_id|default:"—" }}</td>
-            <td>{% if user.puede_capturar %}<a href="{% url 'captura:retiro_editar' retiro.pk %}">Editar</a>{% endif %}</td>
+            <td>
+              {% if user.puede_capturar %}
+                <a href="{% url 'captura:retiro_clasificar' retiro.pk %}">{% if retiro.clasificado %}Editar{% else %}Clasificar{% endif %}</a>
+              {% endif %}
+            </td>
           </tr>
         {% empty %}
-          <tr><td colspan="9" class="tenue">Todavía no hay retiros.</td></tr>
+          <tr><td colspan="11" class="tenue">Todavía no hay retiros.</td></tr>
         {% endfor %}
       </tbody>
     </table>
