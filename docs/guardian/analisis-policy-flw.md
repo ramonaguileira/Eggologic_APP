@@ -83,11 +83,11 @@ Los términos de `field0` reproducen los componentes de emisión de VM0046. Por 
 
 Ningún bloque calcula: el monto de cada mint es literalmente el número que escribió quien reporta. Para un sistema de MRV eso no alcanza. Los restaurantes, Camino Verde y la Planta BSF miden **kg**, no tCO2e.
 
-**Ajuste:** los schemas de captura llevan kg medidos, y la policy calcula en `customLogicBlock`. Mientras no lleguen los factores de CarboSur, se usan placeholders marcados SUPUESTO. Ya hay una lógica definida en el doc de julio *"Flujo Operativo y Arquitectura de App"*:
+**Ajuste:** los schemas de captura llevan kg medidos, y la policy calcula en `customLogicBlock`. Mientras no lleguen los factores de CarboSur, se usan placeholders marcados SUPUESTO. Ya hay una lógica definida en el doc de julio *"Flujo Operativo y Arquitectura de App"* y en la policy propia del Apex 2026 (EWD-RB v0.3, repo `EggoLogic-Hedera-Hackathon`):
 
 - neto = bruto − impropios
 - ajustado = neto × 0,70 (factor conservador)
-- categoría de calidad según % de impropios (Cat A ≤ 5 %)
+- categoría de calidad según % de impropios: A ≤ 5 %, B 5–10 %, R (rechazo) > 10 %
 - bioconversión = bandejas × 15 kg
 
 ### H2. FGET está denominado en tCO2e, y hay doble tokenización
@@ -147,9 +147,17 @@ Con custodia de claves (recomendado en el plano) hay dos opciones:
 
 Decisión para Marcel.
 
-### H7. Los tokens del hackathon probablemente no son los que va a mintear Guardian
+### H7. Los tokens del hackathon no los va a poder mintear la cuenta nueva de Guardian
 
-Guardian crea cada token y guarda sus claves (treasury, admin, supply, wipe…) en su vault al crearlo. Solo puede mintear tokens propios. Si `0.0.8291816` (Eggos) y `0.0.8291820` (CIN) se crearon con el SDK durante Apex 2026 y no desde la cuenta de Guardian actual, la policy adaptada va a crear tokens nuevos al publicarse. No se pudo confirmar contra el mirror node de testnet porque este entorno lo tiene bloqueado.
+Guardian crea cada token y guarda sus claves (treasury, admin, supply, wipe…) en su vault. Solo puede mintear tokens creados desde esa misma cuenta.
+
+Lo que muestra el repo del Apex 2026 (`EggoLogic-Hedera-Hackathon`):
+
+- Los IDs del plano, `0.0.8291816` (Eggos) y `0.0.8291820` (CIN), solo aparecen en el pitch deck.
+- El código, los docs y los registros de mint cacheados de la policy EWD-RB publicada usan otro par: `0.0.8287358` (EGGOCOIN) y `0.0.8287362` (CIN).
+- Ese mismo README dice que ya no hay acceso a la cuenta Standard Registry que publicó la policy.
+
+Conclusión: sea cual sea el par vigente, la cuenta nueva de Guardian va a crear tokens nuevos al publicar la policy adaptada. Los del hackathon quedan como la prueba de concepto premiada, igual que el plano ya prevé para producción. No se pudo confirmar contra el mirror node de testnet porque este entorno lo tiene bloqueado.
 
 ### H8. Defectos de los schemas a corregir al adaptar
 
@@ -190,7 +198,9 @@ Verificado contra el código de Guardian `main` (3.7.1-rc). La instancia MGS pue
 
 **Autenticación**
 
-1. `POST /accounts/login` con `{ "username", "password" }` (más `otp` si la cuenta tiene 2FA): devuelve un `refreshToken`.
+1. Login para obtener un `refreshToken`:
+   - en MGS (`guardianservice.app`, la instancia que usó el hackathon): `POST /accounts/loginByEmail` con `{ "email", "password" }`;
+   - en Guardian open source: `POST /accounts/login` con `{ "username", "password" }` (más `otp` si la cuenta tiene 2FA).
 2. `POST /accounts/access-token` con `{ "refreshToken" }`: devuelve un `accessToken`, que se usa como `Authorization: Bearer <accessToken>`.
 
 **Policy**
@@ -236,7 +246,7 @@ Verificado contra el código de Guardian `main` (3.7.1-rc). La instancia MGS pue
 
 **Ramón**
 
-7. ¿`0.0.8291816` y `0.0.8291820` se crearon desde la cuenta de Guardian actual o con el SDK? (H7)
+7. ¿Cuál es el par de tokens vigente (`0.0.8291816`/`0.0.8291820` o `0.0.8287358`/`0.0.8287362`)? ¿Se recuperó el acceso a la cuenta Standard Registry del hackathon? (H7)
 8. Base de emisión de Eggos: ¿kg, participación, tier? (H2)
 9. URL de la instancia MGS y una cuenta de prueba para la Etapa 2.
 

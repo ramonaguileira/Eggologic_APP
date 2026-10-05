@@ -8,7 +8,7 @@ El diseño vive en el [Plano de arquitectura: app/dapp Eggologic en Hedera](http
 
 | Etapa | Contenido | Estado |
 | --- | --- | --- |
-| Previa | [Análisis de la policy FLW Standard del hackathon](docs/guardian/analisis-policy-flw.md) | Hecho, pendiente de revisión |
+| 0 | [Propuesta de stack, estructura y modelo de datos](docs/etapa-0-propuesta.md) y [análisis de la policy FLW Standard del hackathon](docs/guardian/analisis-policy-flw.md) | Esperando aprobación |
 | 1 | Esquema unificado de captura (Camino Verde, restaurantes, Planta BSF) | Pendiente |
 | 2 | Integración con Guardian | Pendiente |
 | 3 | Schema definitivo de CarboSur | Pendiente |
