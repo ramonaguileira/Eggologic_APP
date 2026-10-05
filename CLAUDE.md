@@ -61,7 +61,7 @@ python manage.py runserver
 | 0 | Propuesta | Aprobada |
 | 1 | Captura | Aprobada |
 | 2 | Tienda e impacto | Para revisar |
-| 3 | Guardian | Pendiente |
+| 3 | Guardian | Configuración lista; falta el código |
 | 4 | Entregables ANDE (demo 19/10/2026) | Pendiente |
 
 **Etapa 3 (Guardian).** Usa estas variables de entorno, cargadas según el instructivo que tiene Ramón:
@@ -72,5 +72,30 @@ python manage.py runserver
 - `GUARDIAN_R001_EMAIL` y `GUARDIAN_R001_PASSWORD`
 
 El MGS hace el login con `POST /accounts/loginByEmail`. Detalle de la API en `docs/guardian/analisis-policy-flw.md`.
+
+Lo que Ramón dejó hecho en Guardian (MGS 1.6.1), según el instructivo, el 05/10/2026:
+
+- Policy FLW (`FWLI001.policy`) importada y publicada con la cuenta Standard Registry `Eggologic_Standard`.
+- Usuarios, cada uno con el rol de permisos `Default policy user` y la policy asignada:
+
+  | Usuario | Rol en la policy |
+  | --- | --- |
+  | `Eggologic_Proponente` | Project_Proponent |
+  | `Eggologic_vvb` | VVB (CarboSur) |
+  | `Eggologic_r001` | Project_Participating_Entity, nombre `R-001` |
+
+- El Proponente aprobó al restaurante y el Standard Registry aprobó al VVB.
+- Red del entorno: `guardianservice.app` y `testnet.mirrornode.hedera.com` permitidos.
+
+Lo primero en la Etapa 3:
+
+1. Comprobar que las seis variables existen. Mirar solo los nombres, nunca imprimir los valores.
+2. Probar el login de los dos usuarios.
+3. Confirmar que la policy corre en testnet.
+
+Cosas de MGS que aprendimos:
+
+- Las invitaciones se mandan desde la cuenta de administrador del tenant, no desde el Standard Registry.
+- Un usuario sin el rol `Default policy user` recibe "Access Restricted" y errores 403.
 
 **Hosting.** Netlify no puede correr Django, así que falta elegir un hosting de Python con `https` (el GPS del celular lo necesita).
