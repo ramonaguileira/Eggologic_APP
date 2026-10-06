@@ -184,6 +184,12 @@ class GuardianEstadoTests(TestCase):
         with self.assertRaisesMessage(CommandError, "problema"):
             self.correr(GuardianFalso(red="mainnet"))
 
+    def test_avisa_si_las_credenciales_del_proponente_estan_cruzadas(self):
+        cruzadas = {"GUARDIAN_PROPONENTE_EMAIL": "r001@prueba.uy", "GUARDIAN_PROPONENTE_PASSWORD": "clave-r001"}
+        with patch.dict(os.environ, cruzadas):
+            with self.assertRaisesMessage(CommandError, "entran como Eggologic_r001, que no es el Proponente"):
+                self.correr(GuardianFalso())
+
     def test_falla_si_falta_una_variable(self):
         with patch.dict(os.environ, {"GUARDIAN_POLICY_ID": ""}):
             with self.assertRaisesMessage(CommandError, "Faltan variables"):

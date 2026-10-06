@@ -38,16 +38,25 @@ class Command(BaseCommand):
             proponente = Sesion("PROPONENTE")
         except ErrorGuardian as error:
             raise CommandError(str(error))
-        self.revisar_usuario(proponente, "Project_Proponent")
+        if not self.revisar_usuario(proponente, "Project_Proponent"):
+            # Pasó en Render el 06/10: las variables del Proponente tenían las de un restaurante.
+            raise CommandError(
+                f"GUARDIAN_PROPONENTE_EMAIL y _PASSWORD entran como {proponente.usuario}, que no es el "
+                "Proponente. ¿Están cruzadas con las de un restaurante?"
+            )
+
+        try:
+            altas = {doc.get("owner"): doc for doc in proponente.bloque("ppe_grid_pp").get("data", [])}
+            # Al validar, Guardian suma una copia del proyecto (approved_project): se cuentan los originales.
+            documentos = proponente.bloque("project_grid_pp_2").get("data", [])
+        except ErrorGuardian as error:
+            raise CommandError(f"No se pudo leer la policy como Proponente. {error}")
 
         self.titulo("Restaurantes")
-        altas = {doc.get("owner"): doc for doc in proponente.bloque("ppe_grid_pp").get("data", [])}
         for restaurante in Restaurante.objects.filter(activo=True).order_by("codigo"):
             self.revisar_restaurante(restaurante, altas)
 
         self.titulo("Proyecto")
-        # Al validar, Guardian suma una copia del proyecto (approved_project): se cuentan los originales.
-        documentos = proponente.bloque("project_grid_pp_2").get("data", [])
         proyectos = [doc for doc in documentos if doc.get("type") == "project"]
         estados = [estado(doc) for doc in proyectos]
         for nombre in sorted(set(estados)):
@@ -79,8 +88,9 @@ class Command(BaseCommand):
             self.mal(f"La policy está en estado {policy.get('status')}, no publicada.")
         if policy.get("userRole") == rol_esperado:
             self.bien(f"Rol en la policy: {rol_esperado}")
-        else:
-            self.mal(f"Rol en la policy: {policy.get('userRole')}; se esperaba {rol_esperado}.")
+            return True
+        self.mal(f"Rol en la policy: {policy.get('userRole')}; se esperaba {rol_esperado}.")
+        return False
 
     def revisar_restaurante(self, restaurante, altas):
         clave = clave_de_restaurante(restaurante.codigo)
@@ -93,7 +103,9 @@ class Command(BaseCommand):
         except ErrorGuardian as error:
             self.mal(str(error))
             return
-        self.revisar_usuario(sesion, "Project_Participating_Entity")
+        if not self.revisar_usuario(sesion, "Project_Participating_Entity"):
+            self.mal(f"GUARDIAN_{clave}_EMAIL y _PASSWORD entran como {sesion.usuario}: ¿están cruzadas?")
+            return
 
         alta = altas.get(sesion.did)
         if alta is None:
