@@ -109,7 +109,15 @@ La configuración está en `render.yaml` (Blueprint), `build.sh` y `.python-vers
 - **Sin consola:** el primer usuario de administración lo crea `build.sh` (comando `crear_admin`) con las variables `DJANGO_SUPERUSER_*`.
 - **Diagnóstico en cada deploy:** `build.sh` corre `guardian_estado` (solo lee). El log del deploy muestra si Guardian responde, sin frenar el deploy si falla.
 
-Render da `https` en `eggologic.onrender.com` (o el dominio que asigne), que es lo que necesita el GPS del celular. Región Virginia, la más cercana a Uruguay entre las de Render (SUPUESTO).
+Render da `https` en `eggologic.onrender.com`, que es lo que necesita el GPS del celular. Región Virginia, la más cercana a Uruguay entre las de Render (SUPUESTO).
+
+**Estado (06/10): en línea en <https://eggologic.onrender.com>.** Ramón lo creó con un agente en el navegador:
+
+- Servicios en plan Free: la web `eggologic`, la base `eggologic-db` (PostgreSQL 18, 1 GB), el grupo `eggologic-guardian` y el Blueprint `eggologic` sobre la rama `claude/peaceful-bardeen-4k285s`.
+- **La base se creó el 05/10/2026 (23:46) y vence el 04/11/2026.** Antes de esa fecha hay que pasarla a un plan pago o exportar un respaldo; si no, se borra.
+- El diagnóstico de Guardian del deploy quedó en orden: Proponente y R-001 entran con su rol, alta de R-001 aprobada y un proyecto validado. En el primer intento las credenciales del Proponente y de R-001 estaban cruzadas en el panel; se intercambiaron y `guardian_estado` ahora avisa ese caso.
+- Datos cargados: el restaurante El Popu (R-001), los usuarios `chofer`, `planta`, `granja` y `carbosur` (sin contraseña todavía) y los productos Quincena ($160) y Maple ($310).
+- Pendientes: ponerles contraseña a esos cuatro usuarios desde `/admin/`; cambiar `TIENDA_DATOS_TRANSFERENCIA`, que quedó con el texto por defecto; y rotar las contraseñas de Guardian del Proponente y de R-001, porque se vieron en una captura de pantalla del agente (no se copiaron en ningún lado).
 
 **Pasos para crearlo** (los hace Ramón; este entorno no tiene acceso a Render):
 

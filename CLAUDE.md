@@ -69,6 +69,7 @@ python manage.py guardian_enviar   # manda a Guardian los reportes verificados (
 | 2 | Tienda e impacto | Para revisar |
 | 3 | Guardian | Para revisar; envío de prueba hecho |
 | 4 | Entregables ANDE (demo 19/10/2026) | Para revisar |
+| 5 | Experiencia de cliente y restaurante (más simple, clara y estética en el celular) | Después de la respuesta de Marcel |
 
 Todas las etapas pasan a la revisión de Marcel (`docs/para-marcel.md`).
 
@@ -114,6 +115,6 @@ Cosas de MGS que aprendimos:
 
 **Reporte mensual (decisiones de Ramón, 06/10).** Un reporte por restaurante por mes. Lo verifica una persona de Eggologic, y la app lo manda como el restaurante y lo aprueba como Proponente, lo que mintea FGET. Las tCO2e usan un factor provisorio hasta que CarboSur dé el suyo. Detalle en `docs/etapa-3.md`.
 
-**Hosting: Render, planes gratis** (decisiones de Ramón, 06/10). Configuración en `render.yaml`: web y PostgreSQL gratis. Sin cron (los reportes se mandan con el botón **Enviar al registro** de Reportes) y sin disco: las fotos de los retiros se guardan en la base (`captura/almacen.py`). La base gratis vence a los 30 días. El primer admin lo crea `build.sh` con `crear_admin`. Las credenciales de Guardian van en el grupo de variables `eggologic-guardian` del panel, nunca en el repo. Pasos y cómo pasar a pago en `docs/etapa-3.md`.
+**Hosting: Render, planes gratis** (decisiones de Ramón, 06/10). Configuración en `render.yaml`: web y PostgreSQL gratis. Sin cron (los reportes se mandan con el botón **Enviar al registro** de Reportes) y sin disco: las fotos de los retiros se guardan en la base (`captura/almacen.py`). En línea en https://eggologic.onrender.com desde el 06/10. **La base gratis vence el 04/11/2026**: antes hay que pasarla a pago o exportar un respaldo. El primer admin lo crea `build.sh` con `crear_admin`. Las credenciales de Guardian van en el grupo de variables `eggologic-guardian` del panel, nunca en el repo. Pasos y cómo pasar a pago en `docs/etapa-3.md`.
 
 **Restaurantes nuevos (resolución temporal, 06/10).** Se cargan en la app desde el primer día; el usuario en Guardian se crea cuando entran en serio al piloto, con el alta solo con el código. Mientras tanto sus meses esperan en **Reportes**. No habrá restaurantes nuevos antes del 19/10.
