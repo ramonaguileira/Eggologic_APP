@@ -46,7 +46,9 @@ class Command(BaseCommand):
             self.revisar_restaurante(restaurante, altas)
 
         self.titulo("Proyecto")
-        proyectos = proponente.bloque("project_grid_pp_2").get("data", [])
+        # Al validar, Guardian suma una copia del proyecto (approved_project): se cuentan los originales.
+        documentos = proponente.bloque("project_grid_pp_2").get("data", [])
+        proyectos = [doc for doc in documentos if doc.get("type") == "project"]
         estados = [estado(doc) for doc in proyectos]
         for nombre in sorted(set(estados)):
             self.stdout.write(f"  {estados.count(nombre)} proyecto(s) en estado {nombre}")

@@ -99,6 +99,7 @@ Cosas de MGS que aprendimos:
 - Las invitaciones se mandan desde la cuenta de administrador del tenant, no desde el Standard Registry.
 - Un usuario sin el rol `Default policy user` recibe "Access Restricted" y errores 403.
 - La policy no deja corregir un alta aprobada: si se revoca, vuelve a "esperando aprobación" con el mismo documento.
-- El restaurante solo puede enviar reportes cuando hay un proyecto validado.
+- El restaurante solo puede enviar reportes cuando hay un proyecto validado. El proyecto "Eggologic · FLW Nodo 1 (Maldonado)" quedó validado el 06/10/2026.
+- Al validar un proyecto, Guardian guarda una copia (`approved_project`) además del original (`project`).
 
 **Hosting.** Netlify no puede correr Django, así que falta elegir un hosting de Python con `https` (el GPS del celular lo necesita).

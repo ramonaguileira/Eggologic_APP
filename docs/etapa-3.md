@@ -65,7 +65,7 @@ El botón con el que un restaurante envía su reporte ("Add Entity Ground Report
 - La app no tiene credenciales del Standard Registry ni del VVB, así que los pasos 6 y 8 se hacen desde la interfaz de MGS.
 - El Project Description queda público. Entre los campos obligatorios están dos emails de contacto, nombre y dirección de la organización, coordenadas, metodologías y períodos. Tienen que ser datos de la organización, nunca personales.
 
-**Avance al 06/10.** Ramón hizo los pasos 5, 6 y 7 desde MGS. El proyecto está asignado al VVB, en estado "Waiting for Validation", y falta el paso 8. El restaurante todavía no ve ningún proyecto validado.
+**Avance al 06/10.** Ramón hizo los pasos 5 a 8 desde MGS. El proyecto está validado (topic `0.0.10881088`), y R-001 ya lo ve en su grilla: puede enviar reportes.
 
 Datos del Project Description, revisados contra el documento publicado (sin datos personales):
 
@@ -103,7 +103,7 @@ La policy publicada es la del hackathon sin cambios: no calcula nada (H1 del an�
 ## Preguntas para Ramón
 
 1. **Alta de R-001.** ¿Se deja como está o se crea otro usuario de Guardian registrado como `R-001`? Recomendación: dejarla, porque el documento ya es público y no se borra. Desde ahora, cada alta se hace solo con el código.
-2. ~~**Proyecto.** ¿Cargás el Project Description vos desde MGS?~~ Resuelto: lo cargó Ramón desde MGS el 06/10. Falta que el VVB lo valide.
+2. ~~**Proyecto.** ¿Cargás el Project Description vos desde MGS?~~ Resuelto: Ramón lo cargó y lo validó desde MGS el 06/10.
 3. **tCO2e.** Hasta que CarboSur dé los factores, ¿qué se manda en esos campos?
    - a) Un factor provisorio en `impacto/calculos.py`, marcado SUPUESTO. Permite mostrar el mint en la demo, pero el número es inventado y queda en un registro público, aunque sea testnet.
    - b) Adaptar la policy para que calcule y mintee por kg (`customLogicBlock`) y volver a publicarla. Es lo que recomienda el análisis, pero lleva trabajo en Guardian y crea tokens nuevos otra vez.

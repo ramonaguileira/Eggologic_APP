@@ -73,7 +73,9 @@ class GuardianFalso:
                 "document": {"credentialSubject": [{"field0": self.nombre_alta, "field1": "Restaurante"}]},
             }]})
         if ruta == "policies/policy-1/tag/project_grid_pp_2/blocks":
-            return Respuesta({"data": [{"option": {"status": estado}} for estado in self.proyectos]})
+            datos = [{"type": "project", "option": {"status": estado}} for estado in self.proyectos]
+            datos += [{"type": "approved_project", "option": {"status": "Validated"}} for estado in self.proyectos if estado == "Validated"]
+            return Respuesta({"data": datos})
         if metodo == "POST" and ruta == "policies/policy-1/tag/add_entity_report_btn/blocks":
             return Respuesta({})
         return Respuesta({"message": "Not Found"}, 404)
@@ -137,6 +139,7 @@ class GuardianEstadoTests(TestCase):
         self.assertIn("Red: testnet", salida)
         self.assertIn("Alta aprobada por el Proponente", salida)
         self.assertIn("Sin usuario en Guardian (faltan GUARDIAN_R002_EMAIL", salida)
+        self.assertIn("1 proyecto(s) en estado Validated", salida)
         self.assertIn("Hay un proyecto validado", salida)
         self.assertIn("Conexión con Guardian en orden", salida)
 
