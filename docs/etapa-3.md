@@ -65,6 +65,22 @@ El botón con el que un restaurante envía su reporte ("Add Entity Ground Report
 - La app no tiene credenciales del Standard Registry ni del VVB, así que los pasos 6 y 8 se hacen desde la interfaz de MGS.
 - El Project Description queda público. Entre los campos obligatorios están dos emails de contacto, nombre y dirección de la organización, coordenadas, metodologías y períodos. Tienen que ser datos de la organización, nunca personales.
 
+**Avance al 06/10.** Ramón hizo los pasos 5, 6 y 7 desde MGS. El proyecto está asignado al VVB, en estado "Waiting for Validation", y falta el paso 8. El restaurante todavía no ve ningún proyecto validado.
+
+Datos del Project Description, revisados contra el documento publicado (sin datos personales):
+
+| Campo | Valor |
+| --- | --- |
+| Project Name | Eggologic · FLW Nodo 1 (Maldonado) |
+| Category / Scale | Waste handling and disposal / Small-Scale |
+| Activities | Consumption, Transport, Processing, Farm |
+| Ubicación | Centro de Maldonado (-34.90, -54.95), sin la dirección de la planta |
+| Organización | Lisbor SAS, Maldonado, Uruguay |
+| Contacto | "Coordinación Nodo 1", con el email genérico de la organización |
+| Inicio y períodos | Inicio 05/10/2026; acreditación y monitoreo del 05/10/2026 al 30/09/2027 |
+| Additionality | Sí: sin el proyecto, el residuo va con la basura común a disposición final |
+| Methodology, Data Format & Calculations | Vacía a propósito: pide tCO2e a mano (ver hallazgo 3) |
+
 ### 3. Cada reporte del restaurante exige tCO2e
 
 En el schema "Ground Entity Report by PPE" estos campos son obligatorios:
@@ -81,11 +97,13 @@ La policy publicada es la del hackathon sin cambios: no calcula nada (H1 del an�
 ## SUPUESTOS
 
 1. Las credenciales de cada restaurante se llaman `GUARDIAN_<código sin guion>_EMAIL` y `_PASSWORD` (`R-001` → `GUARDIAN_R001_…`), como las que cargó Ramón.
+2. Los períodos de acreditación y monitoreo del proyecto cubren un año de piloto (05/10/2026 a 30/09/2027).
+3. Metodología declarada en el proyecto: FLW Standard (FLW Protocol, 2016), con VM0046 de Verra como referencia para la cuantificación. Lo valida CarboSur.
 
 ## Preguntas para Ramón
 
 1. **Alta de R-001.** ¿Se deja como está o se crea otro usuario de Guardian registrado como `R-001`? Recomendación: dejarla, porque el documento ya es público y no se borra. Desde ahora, cada alta se hace solo con el código.
-2. **Proyecto.** ¿Cargás el Project Description vos desde MGS? Recomendación: sí. Es una sola vez y no necesita código. Antes te paso la lista de datos para cada campo, sin datos personales. Después lo acepta el Standard Registry, el Proponente le asigna el VVB y el VVB lo valida.
+2. ~~**Proyecto.** ¿Cargás el Project Description vos desde MGS?~~ Resuelto: lo cargó Ramón desde MGS el 06/10. Falta que el VVB lo valide.
 3. **tCO2e.** Hasta que CarboSur dé los factores, ¿qué se manda en esos campos?
    - a) Un factor provisorio en `impacto/calculos.py`, marcado SUPUESTO. Permite mostrar el mint en la demo, pero el número es inventado y queda en un registro público, aunque sea testnet.
    - b) Adaptar la policy para que calcule y mintee por kg (`customLogicBlock`) y volver a publicarla. Es lo que recomienda el análisis, pero lleva trabajo en Guardian y crea tokens nuevos otra vez.
