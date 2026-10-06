@@ -40,7 +40,8 @@ App piloto de Eggologic (Nodo 1, Maldonado): registra el circuito residuo de res
 - `docs/`:
   - propuesta aprobada (`etapa-0-propuesta.md`);
   - un doc por etapa;
-  - análisis de la policy FLW (`guardian/analisis-policy-flw.md`).
+  - análisis de la policy FLW (`guardian/analisis-policy-flw.md`);
+  - respuestas sobre la API de Guardian/MGS (`guardian/respuestas-api-mgs.md`).
 
 ## Comandos
 
@@ -72,6 +73,13 @@ python manage.py runserver
 - `GUARDIAN_R001_EMAIL` y `GUARDIAN_R001_PASSWORD`
 
 El MGS hace el login con `POST /accounts/loginByEmail`. Detalle de la API en `docs/guardian/analisis-policy-flw.md`.
+
+Antes de escribir código, leé `docs/guardian/respuestas-api-mgs.md`, que trae lo que cambia el diseño:
+
+- **Tokens:** el access token dura 60 s, así que el login se hace una vez por usuario y después solo se renueva el token.
+- **Privacidad:** el mint publica los documentos de origen en IPFS, así que a Guardian van solo códigos seudónimos.
+- **Versión nueva de la policy:** cada usuario vuelve a elegir su rol, salvo que se use la migración.
+- **Dry Run:** no sirve para probar el login de varios usuarios.
 
 Lo que Ramón dejó hecho en Guardian (MGS 1.6.1), según el instructivo, el 05/10/2026:
 
