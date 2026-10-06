@@ -113,13 +113,13 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STORAGES = {
-    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    # Las fotos de los retiros van a la base (ver captura/almacen.py).
+    "default": {"BACKEND": "captura.almacen.AlmacenEnLaBase"},
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
 }
 
 # Fotos de los retiros. No se publican por URL: se ven solo con login (ver captura.views.retiro_foto).
-# SUPUESTO: en el piloto se guardan en el disco del servidor.
-# En Render van a un disco persistente (DJANGO_MEDIA_ROOT): el resto del disco se borra en cada deploy.
+# Se guardan en la base (STORAGES arriba). MEDIA_ROOT solo se usa si se vuelve a guardar en disco.
 MEDIA_ROOT = Path(os.environ.get("DJANGO_MEDIA_ROOT", BASE_DIR / "media"))
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

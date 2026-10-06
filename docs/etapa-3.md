@@ -104,7 +104,7 @@ La configuración está en `render.yaml` (Blueprint), `build.sh` y `.python-vers
 
 - **La base vence a los 30 días de creada.** Antes hay que pasarla a un plan pago o se pierden los datos (hay 14 días de gracia para hacerlo).
 - **La web se duerme a los 15 minutos sin uso** y tarda alrededor de un minuto en despertar: conviene abrirla un rato antes de la demo.
-- **Sin disco: las fotos de los retiros se borran** cada vez que la web se duerme o se redeploya. Los demás datos están en la base y no se pierden.
+- **Sin disco:** los archivos de la web se borran cada vez que se duerme o se redeploya. Por eso **las fotos de los retiros se guardan en la base** (`captura/almacen.py`, decisión de Ramón del 06/10). La base gratis tiene 1 GB: alcanza para cientos de fotos.
 - **Sin cron:** los reportes verificados se mandan con el botón **Enviar al registro** de la pantalla Reportes. Hace lo mismo que `guardian_enviar`: si un reporte queda "Enviado, falta la aprobación", se vuelve a tocar en un minuto.
 - **Sin consola:** el primer usuario de administración lo crea `build.sh` (comando `crear_admin`) con las variables `DJANGO_SUPERUSER_*`.
 
@@ -117,7 +117,7 @@ Render da `https` en `eggologic.onrender.com` (o el dominio que asigne), que es 
 3. En **Env Groups → eggologic-guardian**, sumar `GUARDIAN_POLICY_ID`, `GUARDIAN_PROPONENTE_EMAIL`, `GUARDIAN_PROPONENTE_PASSWORD`, `GUARDIAN_R001_EMAIL` y `GUARDIAN_R001_PASSWORD`. Render no pide las variables de un grupo, por eso se cargan a mano. Después, **Manual Deploy** del servicio web para que las tome.
 4. Entrar con el usuario de administración y cargar desde la administración el restaurante R-001 (con su nombre real y código `R-001`), los usuarios de chofer y planta, y los productos con sus precios.
 
-**Para pasar a pago** (después de la demo): plan Starter en la web con un disco de 1 GB montado en `/var/data` y `DJANGO_MEDIA_ROOT=/var/data/media` (fotos persistentes), base basic-256mb, y un servicio cron cada 15 minutos que corra `python manage.py guardian_enviar`. Ronda los US$ 15 por mes (confirmar en Render).
+**Para pasar a pago** (después de la demo): base basic-256mb (las fotos pueden seguir en la base) y un servicio cron cada 15 minutos que corra `python manage.py guardian_enviar`. Si más adelante se prefieren las fotos en disco: plan Starter en la web, un disco montado en `/var/data`, `DJANGO_MEDIA_ROOT=/var/data/media` y `FileSystemStorage` en `STORAGES["default"]`.
 
 `python manage.py check --deploy` deja tres avisos esperables: la clave secreta local de prueba (Render genera una fuerte), la redirección a https (la hace Render) y HSTS, que conviene activar recién con el dominio definitivo.
 
@@ -226,7 +226,7 @@ Resuelto con un factor provisorio (decisión 1). Las emisiones solo se muestran 
 ## Preguntas para Ramón
 
 1. **Qué muestra la demo de Guardian.** El 19/10 octubre todavía no terminó, así que no va a haber un reporte mensual real para verificar. Propuesta: mostrar la captura en vivo, la pantalla Reportes con octubre "en curso" y el reporte de prueba de setiembre ya registrado en Hedera, con su mint de FGET.
-2. **Fotos en Render gratis:** se borran cada vez que la web se duerme. ¿Alcanza para la demo, o las guardamos en la base mientras dure el plan gratis?
+2. ~~**Fotos en Render gratis**~~ Resuelto: se guardan en la base (06/10).
 
 ## Cómo correrlo
 

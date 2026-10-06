@@ -1,16 +1,15 @@
-import tempfile
 from datetime import date
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.urls import reverse
 
 from cuentas.models import Restaurante, Usuario
 
 from .forms import LoteForm, RegistroGranjaForm
-from .models import Lote, RegistroGranja, Retiro
+from .models import Archivo, Lote, RegistroGranja, Retiro
 
 
 class DatosDePrueba(TestCase):
@@ -136,8 +135,6 @@ class RegistroGranjaTests(DatosDePrueba):
         self.assertIn("fecha", form.errors)
 
 
-# Las fotos de los tests se guardan en una carpeta temporal, no en media/.
-@override_settings(MEDIA_ROOT=tempfile.mkdtemp())
 class VistasTests(DatosDePrueba):
     def foto(self):
         return SimpleUploadedFile("tacho.jpg", b"\xff\xd8\xff contenido de prueba", content_type="image/jpeg")
@@ -216,6 +213,8 @@ class VistasTests(DatosDePrueba):
         respuesta = self.client.get(url)
         self.assertEqual(respuesta.status_code, 200)
         self.assertEqual(b"".join(respuesta.streaming_content), b"\xff\xd8\xff contenido de prueba")
+        # En Render gratis no hay disco: la foto vive en la base.
+        self.assertTrue(Archivo.objects.filter(nombre=retiro.foto.name).exists())
 
     def test_carbosur_exporta_retiros_para_excel(self):
         self.crear_retiro("42.5", (Decimal("1.5"), Decimal("25"), Decimal("16")))

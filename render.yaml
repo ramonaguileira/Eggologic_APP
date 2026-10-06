@@ -3,7 +3,7 @@
 # Planes gratis (decisión de Ramón, 06/10), pensados para la demo. Límites que hay que tener presentes:
 # - la base gratis vence a los 30 días de creada: antes hay que pasarla a un plan pago;
 # - la web se duerme a los 15 minutos sin uso y tarda un minuto en despertar;
-# - la web no tiene disco: las fotos de los retiros se borran cada vez que se duerme o se redeploya;
+# - la web no tiene disco: por eso las fotos de los retiros se guardan en la base (captura/almacen.py);
 # - no hay cron gratis: los reportes se mandan con el botón "Enviar al registro" de la pantalla Reportes.
 # Para pasar a pago: plan starter en la web con un disco (DJANGO_MEDIA_ROOT en el disco) y un
 # servicio cron que corra "python manage.py guardian_enviar" (ver el doc).
