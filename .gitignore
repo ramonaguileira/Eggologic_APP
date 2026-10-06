@@ -5,3 +5,7 @@ __pycache__/
 db.sqlite3
 /staticfiles/
 /media/
+
+# Reportes de cobertura de pruebas
+.coverage
+htmlcov/
