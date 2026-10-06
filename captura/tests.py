@@ -241,13 +241,12 @@ class VistasTests(DatosDePrueba):
 
 
 class InformeVistaTests(DatosDePrueba):
-    def test_carbosur_ve_el_informe_con_codigos_y_sin_nombres(self):
+    def test_carbosur_ve_el_informe_con_codigo_y_nombre(self):
         self.crear_retiro("50", (Decimal("2"), Decimal("30"), Decimal("18")))
         carbosur = Usuario.objects.create_user(username="carbosur", password="clave-de-prueba-123", rol=Usuario.Rol.CARBOSUR)
         self.client.force_login(carbosur)
         respuesta = self.client.get(reverse("captura:informe"))
-        self.assertContains(respuesta, "R-001")
-        self.assertNotContains(respuesta, "La Huerta")
+        self.assertContains(respuesta, "R-001 · La Huerta")
 
     def test_un_cliente_no_entra(self):
         cliente = Usuario.objects.create_user(username="cliente", password="clave-de-prueba-123", rol=Usuario.Rol.CLIENTE)

@@ -51,7 +51,7 @@ python manage.py runserver
 ## Privacidad y seguridad (para mirar con lupa)
 
 - **Lo que va a Guardian es público** (IPFS + HCS). `documento()` manda solo el código del restaurante, kg, tCO2e y el período. Hay un test que verifica que el nombre no aparece.
-- El informe del circuito también usa solo códigos, porque sale de la app.
+- El informe del circuito lleva código y nombre de cada restaurante (decisión de Ramón); no va a Guardian.
 - **Secretos solo en variables de entorno.** El repo es público: las credenciales de Guardian van en el entorno de Render. Los errores de Guardian nunca repiten lo que se mandó (en el login va la contraseña).
 - Las fotos no tienen URL pública: se sirven por `captura.views.retiro_foto` con login y permiso.
 - **Producción:** `DEBUG=False`, https detrás del proxy de Render (`SECURE_PROXY_SSL_HEADER`), cookies seguras, WhiteNoise para los estáticos. `cargar_demo` se niega a correr sin `DEBUG`.

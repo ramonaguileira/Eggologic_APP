@@ -35,7 +35,7 @@ App piloto de Eggologic (Nodo 1, Maldonado): registra el circuito residuo de res
   - retiros: el chofer carga kg, foto y GPS automático; la planta clasifica después;
   - lotes BSF, granja;
   - panel y exportación CSV para CarboSur;
-  - informe del circuito (trazabilidad, línea de base, números para ANDE), solo con códigos de restaurante;
+  - informe del circuito (trazabilidad, línea de base, números para ANDE), con código y nombre de cada restaurante (no va a Guardian);
   - fotos de los retiros guardadas en la base (`captura/almacen.py`).
 - `tienda/`: productos y pedidos (pago contra entrega o transferencia).
 - `impacto/`: "Mi impacto" de clientes y restaurantes. Todas las fórmulas están en `impacto/calculos.py`, incluido el factor provisorio de CO2e.

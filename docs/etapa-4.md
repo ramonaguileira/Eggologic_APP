@@ -18,7 +18,7 @@
   - **Trazabilidad por lote:** de qué restaurantes salió el residuo de cada lote, qué rindió y cuántos huevos produjeron las gallinas con sus larvas;
   - **Registro verificable:** los reportes mensuales del período, con el enlace al registro público.
 
-  Se imprime o se guarda como PDF desde el navegador: al imprimir se ocultan el menú y los botones. Como el informe sale de la app, **los restaurantes figuran solo con su código**.
+  Se imprime o se guarda como PDF desde el navegador: al imprimir se ocultan el menú y los botones. Los restaurantes figuran con código y nombre (decisión de Ramón, 06/10). El nombre no va a Guardian: allá solo va el código.
 - **Enlace al registro público:** cada reporte registrado guarda el topic de HCS y el timestamp de consenso de su mensaje, y muestra "Ver en el registro público" (HashScan, testnet) en Reportes y en el informe.
 - **Fotos en la base** (`captura/almacen.py`): en Render gratis la web no tiene disco y los archivos se borran cada vez que se duerme. Las fotos se siguen viendo solo por la vista protegida `retiro_foto`.
 - **Guion de la demo:** [demo-19-10.md](demo-19-10.md).
@@ -39,14 +39,14 @@ Igual que antes. Con `cargar_demo`, entrar como `carbosur` o `admin` y abrir **I
 `python manage.py test` corre 76 tests. Los nuevos cubren:
 
 - el informe: el resumen del período, la línea de base (calculada solo con los retiros que la informaron) y la trazabilidad de un lote hasta los huevos;
-- que CarboSur vea el informe con códigos y sin nombres, y que un cliente no entre;
+- que CarboSur vea el informe con código y nombre de cada restaurante, y que un cliente no entre;
 - que la foto de un retiro quede guardada en la base;
 - el enlace público de un reporte registrado.
 
 ## SUPUESTOS
 
 1. Alcance de la etapa: informe del circuito con trazabilidad, línea de base y números para el informe Fase 1. ANDE puede pedir otro formato.
-2. El informe muestra solo códigos de restaurante, porque sale de la app.
+2. ~~El informe muestra solo códigos de restaurante~~ Resuelto por Ramón: lleva los nombres.
 3. El % que entra a Eggologic se calcula solo con los retiros que informaron la línea de base.
 4. Los huevos de un día se atribuyen al lote del que salieron las larvas de ese día (el registro de granja tiene un lote opcional).
 5. El lote entra al informe por su fecha de inicio; la cosecha, por su fecha de cosecha.
@@ -61,5 +61,5 @@ Igual que antes. Con `cargar_demo`, entrar como `carbosur` o `admin` y abrir **I
 
 ## Preguntas para Ramón
 
-1. ¿Qué espera ANDE exactamente del "circuito trazable" y del informe Fase 1? ¿Les alcanza este informe impreso como anexo de números?
-2. ¿El informe para ANDE puede llevar el nombre comercial de los restaurantes, o solo el código?
+1. Qué espera ANDE del "circuito trazable" y del informe Fase 1: Ramón todavía no lo sabe (06/10). Hasta saberlo, el informe impreso sirve como anexo de números.
+2. ~~¿El informe puede llevar el nombre de los restaurantes?~~ Resuelto: sí.

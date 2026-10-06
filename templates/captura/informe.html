@@ -9,7 +9,6 @@
   </div>
   <p>
     Eggologic · Nodo 1, Maldonado. Del {{ desde|date:"d/m/Y" }} al {{ hasta|date:"d/m/Y" }}.
-    Los restaurantes figuran solo con su código.
   </p>
 
   <form method="get" class="periodo no-imprimir">
@@ -46,7 +45,7 @@
       <tbody>
         {% for fila in restaurantes %}
           <tr>
-            <td>{{ fila.restaurante__codigo }}</td>
+            <td>{{ fila.restaurante__codigo }} · {{ fila.restaurante__nombre }}</td>
             <td class="num">{{ fila.retiros }}</td>
             <td class="num">{{ fila.levantado|floatformat:1 }}</td>
             <td class="num">{{ fila.organicos|default:0|floatformat:1 }}</td>
@@ -99,7 +98,7 @@
         {% for reporte in reportes %}
           <tr>
             <td>{{ reporte.mes|date:"F Y" }}</td>
-            <td>{{ reporte.restaurante.codigo }}</td>
+            <td>{{ reporte.restaurante.codigo }} · {{ reporte.restaurante.nombre }}</td>
             <td class="num">{{ reporte.kg_organicos|floatformat:1 }}</td>
             <td class="num">{{ reporte.tco2e_neto|floatformat:2 }}</td>
             <td>

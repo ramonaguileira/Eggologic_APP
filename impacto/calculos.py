@@ -164,7 +164,8 @@ def informe(desde, hasta):
     """Números del circuito entre dos fechas, inclusive: resumen, línea de base por restaurante
     y trazabilidad por lote.
 
-    Va a salir de la app (ANDE, CarboSur): identifica a los restaurantes solo por su código.
+    Va a salir de la app (ANDE, CarboSur). Lleva el nombre de los restaurantes (decisión de Ramón,
+    06/10): no va a Guardian, donde solo va el código.
     """
     retiros = Retiro.objects.filter(fecha__date__range=(desde, hasta))
     totales = retiros.aggregate(
@@ -196,7 +197,7 @@ def informe(desde, hasta):
 
     restaurantes = list(
         retiros.order_by("restaurante__codigo")
-        .values("restaurante__codigo")
+        .values("restaurante__codigo", "restaurante__nombre")
         .annotate(
             retiros=Count("id"),
             levantado=Sum("kg_levantados"),
