@@ -23,6 +23,9 @@
           <a href="{% url 'tienda:tienda' %}">Tienda</a>
           <a href="{% url 'tienda:mis_pedidos' %}">Mis pedidos</a>
         {% endif %}
+        {% if user.es_admin %}
+          <a href="{% url 'guardian:reportes' %}">Reportes</a>
+        {% endif %}
         {% if user.is_staff %}
           <a href="{% url 'admin:tienda_pedido_changelist' %}">Pedidos</a>
           <a href="{% url 'admin:index' %}">Administración</a>

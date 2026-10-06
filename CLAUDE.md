@@ -36,7 +36,8 @@ App piloto de Eggologic (Nodo 1, Maldonado): registra el circuito residuo de res
   - lotes BSF, granja;
   - panel y exportación CSV para CarboSur.
 - `tienda/`: productos y pedidos (pago contra entrega o transferencia).
-- `impacto/`: "Mi impacto" de clientes y restaurantes. Todas las fórmulas están en `impacto/calculos.py`.
+- `impacto/`: "Mi impacto" de clientes y restaurantes. Todas las fórmulas están en `impacto/calculos.py`, incluido el factor provisorio de CO2e.
+- `guardian/`: cliente de la API de MGS, reporte mensual por restaurante (lo verifica una persona en **Reportes**) y los comandos `guardian_estado` y `guardian_enviar`.
 - `docs/`:
   - propuesta aprobada (`etapa-0-propuesta.md`);
   - un doc por etapa;
@@ -53,16 +54,17 @@ python manage.py cargar_demo --password "<contraseña de prueba>"
 python manage.py test
 python manage.py runserver
 python manage.py guardian_estado   # revisa la conexión con Guardian sin escribir nada
+python manage.py guardian_enviar   # manda a Guardian los reportes verificados (escribe en el Guardian real)
 ```
 
-## Estado (05/10/2026)
+## Estado (06/10/2026)
 
 | Etapa | Contenido | Estado |
 | --- | --- | --- |
 | 0 | Propuesta | Aprobada |
 | 1 | Captura | Aprobada |
 | 2 | Tienda e impacto | Para revisar |
-| 3 | Guardian | Conexión verificada; faltan los reportes |
+| 3 | Guardian | Para revisar; falta el primer envío real |
 | 4 | Entregables ANDE (demo 19/10/2026) | Pendiente |
 
 **Etapa 3 (Guardian).** Usa estas variables de entorno, cargadas según el instructivo que tiene Ramón:
@@ -101,5 +103,7 @@ Cosas de MGS que aprendimos:
 - La policy no deja corregir un alta aprobada: si se revoca, vuelve a "esperando aprobación" con el mismo documento.
 - El restaurante solo puede enviar reportes cuando hay un proyecto validado. El proyecto "Eggologic · FLW Nodo 1 (Maldonado)" quedó validado el 06/10/2026.
 - Al validar un proyecto, Guardian guarda una copia (`approved_project`) además del original (`project`).
+
+**Reporte mensual (decisiones de Ramón, 06/10).** Un reporte por restaurante por mes. Lo verifica una persona de Eggologic, y la app lo manda como el restaurante y lo aprueba como Proponente, lo que mintea FGET. Las tCO2e usan un factor provisorio hasta que CarboSur dé el suyo. Detalle en `docs/etapa-3.md`.
 
 **Hosting.** Netlify no puede correr Django, así que falta elegir un hosting de Python con `https` (el GPS del celular lo necesita).

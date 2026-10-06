@@ -3,7 +3,7 @@ import os
 from django.core.management.base import BaseCommand, CommandError
 
 from cuentas.models import Restaurante
-from guardian.cliente import ErrorGuardian, Sesion, clave_de_restaurante
+from guardian.cliente import ErrorGuardian, Sesion, clave_de_restaurante, tiene_credenciales
 
 VARIABLES = [
     "GUARDIAN_URL",
@@ -85,7 +85,7 @@ class Command(BaseCommand):
     def revisar_restaurante(self, restaurante, altas):
         clave = clave_de_restaurante(restaurante.codigo)
         self.stdout.write(f"  {restaurante.codigo}")
-        if not os.environ.get(f"GUARDIAN_{clave}_EMAIL"):
+        if not tiene_credenciales(clave):
             self.aviso(f"Sin usuario en Guardian (faltan GUARDIAN_{clave}_EMAIL y GUARDIAN_{clave}_PASSWORD).")
             return
         try:

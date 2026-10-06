@@ -1,7 +1,7 @@
 # Etapa 3 — Guardian
 
 - **Fecha:** 05/10/2026
-- **Estado:** en curso. La conexión con Guardian está verificada. El envío de reportes espera las respuestas de la sección "Preguntas".
+- **Estado:** lista para revisar (06/10). Falta el primer envío real a Guardian, que espera el OK de Ramón (ver "Preguntas").
 
 ## Qué se verificó (05/10)
 
@@ -38,6 +38,38 @@
   - Falla si falta una variable, si un usuario no puede entrar, si la red no es testnet, si la policy no está publicada o si un rol no coincide.
   - Avisa, sin fallar, lo que está pendiente: restaurantes sin usuario en Guardian, un alta que no usa el código público, falta de un proyecto validado.
 - `requests` en `requirements.txt` (estaba previsto en la Etapa 0).
+- **Reporte mensual por restaurante** (06/10, con las decisiones de Ramón de abajo):
+  - `guardian/models.py`: `ReporteMensual` guarda los números tal como se verificaron, quién los verificó y en qué paso está el envío;
+  - `guardian/reportes.py`: arma el mes con los retiros, decide si se puede verificar, construye el documento para la policy y hace los pasos en Guardian;
+  - pantalla **Reportes** (`/registro/reportes/`, solo administración): meses por verificar con sus números y un botón **Verificar** que pide confirmación; abajo, los verificados con su estado;
+  - `python manage.py guardian_enviar`: la bandeja de salida prevista en la Etapa 0. Manda lo verificado y reintenta lo que falló; pensado para correr por cron;
+  - `impacto/calculos.py`: `emisiones_evitadas()`, el factor provisorio de CO2e.
+
+## Decisiones de Ramón (06/10)
+
+1. Mientras CarboSur no dé factores, las tCO2e salen de un **factor provisorio**, marcado SUPUESTO.
+2. **Un reporte por restaurante por mes.**
+3. Lo verifica **una persona de Eggologic**.
+4. El alta de R-001 **queda como está**, con el nombre comercial. Las altas nuevas van solo con el código.
+
+## Cómo funciona el reporte mensual
+
+1. **Durante el mes** no cambia nada: el chofer carga retiros y la planta los clasifica.
+2. **Cuando el mes termina**, en **Reportes** aparece una fila por restaurante con sus retiros, los kg orgánicos (restos vegetales + residuos de plato) y el CO2e evitado provisorio. Una fila no se puede verificar si:
+   - el mes todavía no terminó;
+   - hay retiros de ese mes sin clasificar;
+   - los kg no llegan a 0,01 tCO2e (unos 29 kg);
+   - el restaurante no tiene usuario en Guardian.
+3. **Una persona de Eggologic revisa y toca Verificar.** Desde ese momento los números quedan fijos en el reporte, aunque después se corrija un retiro.
+4. **`guardian_enviar` hace los dos pasos de la policy:**
+   1. como el restaurante (rol PPE), envía el Ground Entity Report, vinculado al proyecto validado;
+   2. como Proponente, lo aprueba (`approve_ppe_report_btn`, `Button_0`). Eso mintea FGET por la reducción neta a la cuenta del restaurante.
+
+   Antes de cada paso se fija en Guardian si ya está hecho, así un corte a mitad de camino no duplica nada. Si algo falla, el reporte queda donde estaba, con el error a la vista en la pantalla, y la próxima vuelta reintenta.
+
+**Qué va a Guardian** (público): el nombre de la actividad con el código y el mes (`Retiros de residuo orgánico R-001 2026-09`), el tipo de actividad, un flujo sin proyecto (restaurante → disposición final) y uno con proyecto (restaurante → alimento animal), los dos con los kg orgánicos del mes, las cuatro cifras de tCO2e y el período. Nunca el nombre, la dirección ni el contacto del restaurante.
+
+**Ejemplo.** Un restaurante con 600 kg orgánicos en setiembre: 600 × 0,70 × 0,5 / 1000 = 0,21 tCO2e evitadas, y se mintean 0,21 FGET a su cuenta.
 
 ## Hallazgos
 
@@ -49,7 +81,7 @@ El formulario de alta del restaurante (`create_new_ppe`) se completó con el nom
 - La policy no deja corregir un alta aprobada. Si el Proponente la revoca, vuelve a "esperando aprobación" con el mismo documento.
 - Para registrarlo como `R-001` habría que crear otro usuario de Guardian para el restaurante.
 
-Los reportes del restaurante no van a llevar el nombre en ningún caso: solo el código.
+Los reportes del restaurante no van a llevar el nombre en ningún caso: solo el código. Ramón decidió dejar el alta como está (06/10).
 
 ### 2. Sin proyecto validado no hay reportes
 
@@ -94,39 +126,55 @@ Los cuatro van en tCO2e. `field7` es lo que se mintea en FGET cuando el Proponen
 
 La policy publicada es la del hackathon sin cambios: no calcula nada (H1 del análisis) y FGET queda medido en tCO2e (H2). CarboSur todavía no dio factores, y la Etapa 2 dejó las emisiones afuera a propósito.
 
+Resuelto con un factor provisorio (decisión 1). Las emisiones solo se muestran en la pantalla de administración, marcadas como provisorias; los clientes y restaurantes no las ven.
+
 ## SUPUESTOS
 
 1. Las credenciales de cada restaurante se llaman `GUARDIAN_<código sin guion>_EMAIL` y `_PASSWORD` (`R-001` → `GUARDIAN_R001_…`), como las que cargó Ramón.
 2. Los períodos de acreditación y monitoreo del proyecto cubren un año de piloto (05/10/2026 a 30/09/2027).
 3. Metodología declarada en el proyecto: FLW Standard (FLW Protocol, 2016), con VM0046 de Verra como referencia para la cuantificación. Lo valida CarboSur.
+4. **Factor provisorio de CO2e:** kg orgánicos × 0,70 (factor conservador del doc de julio) × 0,5 kg de CO2e por kg que no va a disposición final. Emisiones del proyecto y fugas en 0. Se redondea hacia abajo a 2 decimales, que son los de FGET.
+5. En la policy, el restaurante es una actividad de tipo `Consumption`, y el destino sin Eggologic es la disposición final (relleno sanitario).
+6. Las masas van en kg húmedos. El schema pide "Dry Matter Content (Mass)" sin unidad; el factor de humedad lo define CarboSur (H8).
+7. Hay un solo proyecto validado (Nodo 1), y todos los reportes se vinculan a él.
+8. Solo la administración ve **Reportes** y verifica.
+9. Un mes se puede verificar recién cuando terminó y con todos sus retiros clasificados. Los meses se cuentan en hora de Montevideo.
+
+## Para que Marcel revise (al final)
+
+- `guardian/reportes.py`: `enviar()` y su idempotencia. Antes de cada paso busca el reporte en la grilla de Guardian por el nombre de la actividad (código + mes).
+- `guardian/reportes.py`: `documento()`, que es exactamente lo que queda público.
+- `impacto/calculos.py`: `emisiones_evitadas()`, el factor provisorio.
+- Dos casos borde conocidos:
+  - si Guardian procesa el envío en segundo plano, la aprobación puede fallar una vez con "todavía no aparece" y salir bien en la vuelta siguiente;
+  - si un corte pasa justo después de enviar y antes de que Guardian muestre el reporte, la vuelta siguiente podría enviarlo dos veces.
+- Un retiro de un mes ya verificado se puede seguir editando: el reporte guarda los números verificados, pero la app no avisa la diferencia.
+- FGET se mintea por tCO2e provisorias. Si FGET va a ser Eggos, Eggos queda medido en carbono (H2 del análisis): sigue pendiente.
 
 ## Preguntas para Ramón
 
-1. **Alta de R-001.** ¿Se deja como está o se crea otro usuario de Guardian registrado como `R-001`? Recomendación: dejarla, porque el documento ya es público y no se borra. Desde ahora, cada alta se hace solo con el código.
-2. ~~**Proyecto.** ¿Cargás el Project Description vos desde MGS?~~ Resuelto: Ramón lo cargó y lo validó desde MGS el 06/10.
-3. **tCO2e.** Hasta que CarboSur dé los factores, ¿qué se manda en esos campos?
-   - a) Un factor provisorio en `impacto/calculos.py`, marcado SUPUESTO. Permite mostrar el mint en la demo, pero el número es inventado y queda en un registro público, aunque sea testnet.
-   - b) Adaptar la policy para que calcule y mintee por kg (`customLogicBlock`) y volver a publicarla. Es lo que recomienda el análisis, pero lleva trabajo en Guardian y crea tokens nuevos otra vez.
-   - c) Mandar 0 y no mintear hasta tener los factores. Hay que probar si Guardian acepta un mint de 0.
-
-   Recomendación: a) para la demo del 19/10, si tenés un factor de referencia (del doc de julio o del brief VM0046), y b) después.
-4. **Frecuencia.** ¿Un reporte por retiro, o uno por restaurante por mes? Recomendación: uno por mes. Es como el FLW Standard pide el inventario (por período), y cada reporte necesita una verificación del Proponente.
-5. **Verificación.** ¿Quién verifica los reportes? Recomendación: una persona de Eggologic, con un botón en la app. La app llama a Guardian como Proponente. Así la verificación no es automática.
+1. **Primer envío real.** Todo está probado con un Guardian simulado. El primer envío a Guardian publica un reporte de R-001 que no se puede borrar y mintea FGET. ¿Con qué datos lo hacemos: retiros reales de setiembre, o un reporte de prueba?
+2. **Cron.** `guardian_enviar` tiene que correr cada tantos minutos en el servidor. Depende del hosting, que falta elegir. Hasta entonces se puede correr a mano.
+3. **Otros restaurantes.** R-002 en adelante necesitan su usuario en Guardian (rol PPE, alta solo con el código) y su par de variables `GUARDIAN_R00X_*`.
 
 ## Cómo correrlo
 
 ```bash
-python manage.py guardian_estado
+python manage.py guardian_estado   # revisa la conexión, sin escribir nada
+python manage.py guardian_enviar   # manda los reportes verificados que falten (por cron)
 ```
 
-Usa las variables de entorno de Guardian (ver `.env.example`) y los restaurantes activos de la base.
+Usan las variables de entorno de Guardian (ver `.env.example`) y la base de la app. La pantalla de verificación está en **Reportes** (`/registro/reportes/`), con un usuario de administración. Con `cargar_demo`, R-001 tiene meses cerrados para probar la verificación. **Ojo:** `guardian_enviar` escribe en el Guardian real si las variables están cargadas.
 
 ## Tests
 
-`python manage.py test` corre 56 tests. Los 12 nuevos usan un Guardian falso, sin red, y cubren:
+`python manage.py test` corre 68 tests. Los de esta etapa usan un Guardian simulado, sin red, y cubren:
 
-- login y sesión;
-- envío a un bloque por tag;
-- que la contraseña no aparezca en los errores;
+- login y sesión, y que la contraseña no aparezca en los errores;
 - variables faltantes y error de conexión;
-- el comando completo: testnet, alta, código público y proyecto.
+- `guardian_estado`: testnet, alta, código público y proyecto;
+- el factor provisorio y su redondeo;
+- qué entra en el mes, y cuándo no se puede verificar (mes en curso, sin clasificar, sin usuario, pocos kg);
+- verificar una sola vez, desde la pantalla, y solo con administración;
+- que el documento lleve el código y nunca el nombre;
+- el envío completo (como restaurante y como Proponente), sin duplicar si se repite, y el error guardado cuando falla.

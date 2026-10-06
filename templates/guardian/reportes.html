@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block titulo %}Reportes mensuales · Eggologic{% endblock %}
+
+{% block contenido %}
+  <h1>Reportes mensuales</h1>
+  <p>
+    Cada mes, el residuo que entregó cada restaurante se informa al registro verificable.
+    Revisá los números y verificá: el reporte sale con el código del restaurante, nunca con su nombre.
+    Queda público y no se puede borrar.
+  </p>
+  <p class="tenue">El CO2e evitado es provisorio hasta que CarboSur defina sus factores.</p>
+
+  <h2>Por verificar</h2>
+  <div class="tabla">
+    <table>
+      <thead>
+        <tr><th>Mes</th><th>Restaurante</th><th>Retiros</th><th>kg orgánicos</th><th>CO2e evitado (t)</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for fila in por_verificar %}
+          <tr>
+            <td>{{ fila.mes|date:"F Y" }}</td>
+            <td>{{ fila.restaurante.codigo }} · {{ fila.restaurante.nombre }}</td>
+            <td class="num">{{ fila.retiros }}</td>
+            <td class="num">{{ fila.kg_organicos|floatformat:1 }}</td>
+            <td class="num">{{ fila.emisiones.neto|floatformat:2 }}</td>
+            <td>
+              {% if fila.motivo %}
+                <span class="etiqueta">{{ fila.motivo }}</span>
+              {% else %}
+                <form method="post" onsubmit="return confirm('¿Verificar {{ fila.restaurante.codigo }} de {{ fila.mes|date:"F Y" }}? El reporte se publica y no se puede borrar.')">
+                  {% csrf_token %}
+                  <input type="hidden" name="restaurante" value="{{ fila.restaurante.pk }}">
+                  <input type="hidden" name="mes" value="{{ fila.mes|date:'Y-m-d' }}">
+                  <button type="submit" class="boton">Verificar</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="tenue">No hay meses cerrados por verificar.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Verificados</h2>
+  <div class="tabla">
+    <table>
+      <thead>
+        <tr><th>Mes</th><th>Restaurante</th><th>kg orgánicos</th><th>CO2e evitado (t)</th><th>Verificó</th><th>Estado</th></tr>
+      </thead>
+      <tbody>
+        {% for reporte in verificados %}
+          <tr>
+            <td>{{ reporte.mes|date:"F Y" }}</td>
+            <td>{{ reporte.restaurante.codigo }} · {{ reporte.restaurante.nombre }}</td>
+            <td class="num">{{ reporte.kg_organicos|floatformat:1 }}</td>
+            <td class="num">{{ reporte.tco2e_neto|floatformat:2 }}</td>
+            <td>{{ reporte.verificado_por.get_full_name|default:reporte.verificado_por.username }}, {{ reporte.verificado_en|date:"d/m/Y" }}</td>
+            <td>
+              {{ reporte.get_estado_display }}
+              {% if reporte.ultimo_error %}<br><span class="error">{{ reporte.ultimo_error }}</span>{% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="tenue">Todavía no hay reportes verificados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

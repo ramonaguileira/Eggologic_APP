@@ -7,6 +7,7 @@ se reemplaza acá sin tocar el resto.
 """
 
 from datetime import date
+from decimal import ROUND_DOWN, Decimal
 
 from django.db.models import F, Sum
 from django.db.models.functions import TruncMonth
@@ -21,6 +22,26 @@ KG_ORGANICOS = F("kg_restos_vegetales") + F("kg_residuos_plato")
 
 # Niveles de los clientes según los huevos recibidos (pedidos entregados). Definidos por Ramón el 05/10.
 NIVELES = [(0, "Compra individual"), (100, "Sostenedor"), (500, "Regenerador"), (1000, "Guardián")]
+
+
+# CO2e evitado, para el reporte mensual de cada restaurante en Guardian. Provisorio hasta que
+# CarboSur dé sus factores (decisión de Ramón, 06/10).
+# SUPUESTO: kg orgánicos × 0,70 (factor conservador del doc de julio) × 0,5 kg de CO2e por kg
+# que no va a disposición final. Por ahora sin emisiones del proyecto ni fugas.
+FACTOR_CONSERVADOR = Decimal("0.70")
+KG_CO2E_POR_KG_DESVIADO = Decimal("0.5")
+CENTESIMO = Decimal("0.01")
+
+
+def emisiones_evitadas(kg_organicos):
+    """tCO2e de un reporte: línea de base, proyecto, fugas y reducción neta, con 2 decimales.
+
+    Se redondea hacia abajo: la reducción neta es lo que se mintea y no conviene inflarla.
+    """
+    linea_base = kg_organicos * FACTOR_CONSERVADOR * KG_CO2E_POR_KG_DESVIADO / 1000
+    linea_base = linea_base.quantize(CENTESIMO, rounding=ROUND_DOWN)
+    proyecto = fugas = Decimal("0.00")
+    return {"linea_base": linea_base, "proyecto": proyecto, "fugas": fugas, "neto": linea_base - proyecto - fugas}
 
 
 def factores_del_circuito():

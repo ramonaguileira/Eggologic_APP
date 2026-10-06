@@ -22,6 +22,10 @@ def clave_de_restaurante(codigo):
     return codigo.replace("-", "").upper()
 
 
+def tiene_credenciales(clave):
+    return bool(os.environ.get(f"GUARDIAN_{clave}_EMAIL") and os.environ.get(f"GUARDIAN_{clave}_PASSWORD"))
+
+
 def credenciales(clave):
     """Email y contraseña de un usuario de Guardian. clave es 'PROPONENTE' o la de un restaurante."""
     email = os.environ.get(f"GUARDIAN_{clave}_EMAIL", "")

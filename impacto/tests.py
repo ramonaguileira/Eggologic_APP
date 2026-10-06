@@ -99,3 +99,10 @@ class NivelesTests(TestCase):
         nivel = calculos.nivel_del_cliente(1500)
         self.assertIsNone(nivel["siguiente"])
         self.assertEqual(nivel["progreso"], 100)
+
+
+class EmisionesEvitadasTests(TestCase):
+    def test_factor_provisorio_redondeado_hacia_abajo(self):
+        self.assertEqual(calculos.emisiones_evitadas(Decimal("1000"))["neto"], Decimal("0.35"))
+        self.assertEqual(calculos.emisiones_evitadas(Decimal("57"))["neto"], Decimal("0.01"))  # 0,01995
+        self.assertEqual(calculos.emisiones_evitadas(Decimal("0"))["neto"], Decimal("0.00"))
