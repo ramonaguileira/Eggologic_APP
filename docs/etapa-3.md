@@ -107,6 +107,7 @@ La configuración está en `render.yaml` (Blueprint), `build.sh` y `.python-vers
 - **Sin disco:** los archivos de la web se borran cada vez que se duerme o se redeploya. Por eso **las fotos de los retiros se guardan en la base** (`captura/almacen.py`, decisión de Ramón del 06/10). La base gratis tiene 1 GB: alcanza para cientos de fotos.
 - **Sin cron:** los reportes verificados se mandan con el botón **Enviar al registro** de la pantalla Reportes. Hace lo mismo que `guardian_enviar`: si un reporte queda "Enviado, falta la aprobación", se vuelve a tocar en un minuto.
 - **Sin consola:** el primer usuario de administración lo crea `build.sh` (comando `crear_admin`) con las variables `DJANGO_SUPERUSER_*`.
+- **Diagnóstico en cada deploy:** `build.sh` corre `guardian_estado` (solo lee). El log del deploy muestra si Guardian responde, sin frenar el deploy si falla.
 
 Render da `https` en `eggologic.onrender.com` (o el dominio que asigne), que es lo que necesita el GPS del celular. Región Virginia, la más cercana a Uruguay entre las de Render (SUPUESTO).
 
