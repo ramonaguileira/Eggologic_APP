@@ -1,17 +1,21 @@
 # Infraestructura en Render (Blueprint). Pasos para crearla en docs/etapa-3.md, "Hosting en Render".
 #
-# SUPUESTO: planes pagos chicos para el piloto. La base gratis vence a los 30 días, el servicio
-# web gratis no tiene disco (las fotos de los retiros se perderían en cada deploy) y el cron no
-# tiene plan gratis. Región Virginia: la más cercana a Uruguay entre las de Render.
+# Planes gratis (decisión de Ramón, 06/10), pensados para la demo. Límites que hay que tener presentes:
+# - la base gratis vence a los 30 días de creada: antes hay que pasarla a un plan pago;
+# - la web se duerme a los 15 minutos sin uso y tarda un minuto en despertar;
+# - la web no tiene disco: las fotos de los retiros se borran cada vez que se duerme o se redeploya;
+# - no hay cron gratis: los reportes se mandan con el botón "Enviar al registro" de la pantalla Reportes.
+# Para pasar a pago: plan starter en la web con un disco (DJANGO_MEDIA_ROOT en el disco) y un
+# servicio cron que corra "python manage.py guardian_enviar" (ver el doc).
 #
 # Las credenciales de Guardian no van acá (el repo es público): se cargan en el panel, en el
-# grupo de variables eggologic-guardian, que comparten la web y el cron.
+# grupo de variables eggologic-guardian. Región Virginia: la más cercana a Uruguay en Render.
 
 databases:
   - name: eggologic-db
     databaseName: eggologic
     user: eggologic
-    plan: basic-256mb
+    plan: free
     region: virginia
 
 envVarGroups:
@@ -26,48 +30,25 @@ services:
   - type: web
     name: eggologic
     runtime: python
-    plan: starter
+    plan: free
     region: virginia
     buildCommand: ./build.sh
     startCommand: gunicorn eggologic.wsgi:application
     healthCheckPath: /ingresar/
-    disk:
-      name: fotos
-      mountPath: /var/data
-      sizeGB: 1
     envVars:
       - key: DJANGO_SECRET_KEY
         generateValue: true
       - key: DJANGO_DEBUG
         value: "False"
-      - key: DJANGO_MEDIA_ROOT
-        value: /var/data/media
       - key: TIENDA_DATOS_TRANSFERENCIA
         sync: false
-      - key: DB_NAME
-        fromDatabase: { name: eggologic-db, property: database }
-      - key: DB_USER
-        fromDatabase: { name: eggologic-db, property: user }
-      - key: DB_PASSWORD
-        fromDatabase: { name: eggologic-db, property: password }
-      - key: DB_HOST
-        fromDatabase: { name: eggologic-db, property: host }
-      - key: DB_PORT
-        fromDatabase: { name: eggologic-db, property: port }
-      - fromGroup: eggologic-guardian
-
-  # La bandeja de salida: manda a Guardian los reportes verificados y reintenta los que fallaron.
-  - type: cron
-    name: eggologic-guardian-enviar
-    runtime: python
-    plan: starter
-    region: virginia
-    schedule: "*/15 * * * *"
-    buildCommand: pip install -r requirements.txt
-    startCommand: python manage.py guardian_enviar
-    envVars:
-      - key: DJANGO_SECRET_KEY
-        fromService: { type: web, name: eggologic, envVarKey: DJANGO_SECRET_KEY }
+      # Primer usuario de administración: build.sh lo crea si no existe (en el plan gratis no hay consola).
+      - key: DJANGO_SUPERUSER_USERNAME
+        sync: false
+      - key: DJANGO_SUPERUSER_EMAIL
+        sync: false
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false
       - key: DB_NAME
         fromDatabase: { name: eggologic-db, property: database }
       - key: DB_USER

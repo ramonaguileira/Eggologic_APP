@@ -52,8 +52,8 @@
 3. Lo verifica **una persona de Eggologic**.
 4. El alta de R-001 **queda como está**, con el nombre comercial. Las altas nuevas van solo con el código.
 5. Primer envío real: **un reporte de prueba** (no datos reales).
-6. Hosting: **Render**.
-7. Otros restaurantes: lo propone Claude, como **resolución temporal** (ver "Alta de restaurantes").
+6. Hosting: **Render**, arrancando con **planes gratis** (06/10).
+7. Otros restaurantes: lo propone Claude, como **resolución temporal** (ver "Alta de restaurantes"). Ramón la confirma: **no habrá restaurantes nuevos antes del 19/10**.
 
 ## Cómo funciona el reporte mensual
 
@@ -93,25 +93,31 @@ Lo que se aprendió:
 
 ## Hosting en Render
 
-La configuración está en `render.yaml` (Blueprint), `build.sh` y `.python-version`. Crea:
+La configuración está en `render.yaml` (Blueprint), `build.sh` y `.python-version`. Arranca con planes gratis (decisión de Ramón):
 
-| Servicio | Plan (SUPUESTO) | Para qué |
+| Servicio | Plan | Para qué |
 | --- | --- | --- |
-| `eggologic` (web) | Starter, con disco de 1 GB en `/var/data` | La app. El disco guarda las fotos de los retiros |
-| `eggologic-db` (PostgreSQL) | basic-256mb | La base |
-| `eggologic-guardian-enviar` (cron, cada 15 minutos) | Starter | La bandeja de salida: corre `guardian_enviar` |
+| `eggologic` (web) | Free | La app |
+| `eggologic-db` (PostgreSQL) | Free | La base |
 
-- **Por qué no gratis:** la base gratis vence a los 30 días; el servicio web gratis no tiene disco (las fotos se perderían en cada deploy) y se duerme sin uso; el cron no tiene plan gratis (mínimo US$ 1 por mes). El costo ronda los US$ 15 por mes: confirmalo en la página de precios de Render antes de crear.
-- Región Virginia, la más cercana a Uruguay entre las de Render (SUPUESTO).
-- Render da `https` en `eggologic.onrender.com`, que es lo que necesita el GPS del celular.
+**Límites del plan gratis, a tener en cuenta para la demo:**
+
+- **La base vence a los 30 días de creada.** Antes hay que pasarla a un plan pago o se pierden los datos (hay 14 días de gracia para hacerlo).
+- **La web se duerme a los 15 minutos sin uso** y tarda alrededor de un minuto en despertar: conviene abrirla un rato antes de la demo.
+- **Sin disco: las fotos de los retiros se borran** cada vez que la web se duerme o se redeploya. Los demás datos están en la base y no se pierden.
+- **Sin cron:** los reportes verificados se mandan con el botón **Enviar al registro** de la pantalla Reportes. Hace lo mismo que `guardian_enviar`: si un reporte queda "Enviado, falta la aprobación", se vuelve a tocar en un minuto.
+- **Sin consola:** el primer usuario de administración lo crea `build.sh` (comando `crear_admin`) con las variables `DJANGO_SUPERUSER_*`.
+
+Render da `https` en `eggologic.onrender.com` (o el dominio que asigne), que es lo que necesita el GPS del celular. Región Virginia, la más cercana a Uruguay entre las de Render (SUPUESTO).
 
 **Pasos para crearlo** (los hace Ramón; este entorno no tiene acceso a Render):
 
 1. Mergear la rama a `main` (o elegir esta rama al crear el Blueprint).
-2. En Render: **New → Blueprint**, elegir el repo `Eggologic_APP`. Va a pedir `TIENDA_DATOS_TRANSFERENCIA`.
-3. En **Env Groups → eggologic-guardian**, sumar las variables de Guardian: `GUARDIAN_POLICY_ID`, `GUARDIAN_PROPONENTE_EMAIL`, `GUARDIAN_PROPONENTE_PASSWORD`, `GUARDIAN_R001_EMAIL` y `GUARDIAN_R001_PASSWORD`. Van en el grupo porque Render no las pide desde un grupo, y así la web y el cron las comparten.
-4. Cuando termine el deploy, en el **Shell** del servicio web: `python manage.py createsuperuser` y `python manage.py guardian_estado`.
-5. Entrar a `https://eggologic.onrender.com` (o el dominio que asigne Render) con ese usuario y cargar restaurantes, choferes, etc. desde la administración.
+2. En Render: **New → Blueprint**, elegir el repo `Eggologic_APP`. Va a pedir `TIENDA_DATOS_TRANSFERENCIA` y los datos del primer usuario de administración: `DJANGO_SUPERUSER_USERNAME`, `DJANGO_SUPERUSER_EMAIL` y `DJANGO_SUPERUSER_PASSWORD` (una contraseña larga).
+3. En **Env Groups → eggologic-guardian**, sumar `GUARDIAN_POLICY_ID`, `GUARDIAN_PROPONENTE_EMAIL`, `GUARDIAN_PROPONENTE_PASSWORD`, `GUARDIAN_R001_EMAIL` y `GUARDIAN_R001_PASSWORD`. Render no pide las variables de un grupo, por eso se cargan a mano. Después, **Manual Deploy** del servicio web para que las tome.
+4. Entrar con el usuario de administración y cargar desde la administración el restaurante R-001 (con su nombre real y código `R-001`), los usuarios de chofer y planta, y los productos con sus precios.
+
+**Para pasar a pago** (después de la demo): plan Starter en la web con un disco de 1 GB montado en `/var/data` y `DJANGO_MEDIA_ROOT=/var/data/media` (fotos persistentes), base basic-256mb, y un servicio cron cada 15 minutos que corra `python manage.py guardian_enviar`. Ronda los US$ 15 por mes (confirmar en Render).
 
 `python manage.py check --deploy` deja tres avisos esperables: la clave secreta local de prueba (Render genera una fuerte), la redirección a https (la hace Render) y HSTS, que conviene activar recién con el dominio definitivo.
 
@@ -201,7 +207,7 @@ Resuelto con un factor provisorio (decisión 1). Las emisiones solo se muestran 
 7. Hay un solo proyecto validado (Nodo 1), y todos los reportes se vinculan a él.
 8. Solo la administración ve **Reportes** y verifica.
 9. Un mes se puede verificar recién cuando terminó y con todos sus retiros clasificados. Los meses se cuentan en hora de Montevideo.
-10. Render con planes pagos chicos (web Starter con disco de 1 GB, PostgreSQL basic-256mb, cron Starter cada 15 minutos), en la región Virginia.
+10. Render en la región Virginia, con planes gratis para la demo (sin disco ni cron: botón "Enviar al registro").
 11. Resolución temporal para restaurantes nuevos: se cargan en la app desde el primer día, y el usuario en Guardian se crea cuando entran en serio al piloto.
 12. El usuario de Guardian de cada restaurante usa un email de Eggologic (alias), no el del restaurante.
 
@@ -212,14 +218,15 @@ Resuelto con un factor provisorio (decisión 1). Las emisiones solo se muestran 
 - `impacto/calculos.py`: `emisiones_evitadas()`, el factor provisorio.
 - Un caso borde conocido: Guardian procesa los envíos en segundo plano (confirmado en testnet). Si el cron vuelve a correr antes de que el reporte recién enviado aparezca en la grilla del restaurante, y el estado no llegó a guardarse como "enviado" (un corte justo en ese momento), podría enviarlo dos veces. Con el cron cada 15 minutos es muy improbable.
 - La policy deja el reporte original en "Waiting for Verification" aun aprobado: `enviar()` se fija en la copia `approved_entity_report` para no aprobar dos veces.
-- `eggologic/settings.py`: lo nuevo para producción (WhiteNoise, https detrás del proxy de Render, disco para las fotos, errores a la consola).
+- `eggologic/settings.py`: lo nuevo para producción (WhiteNoise, https detrás del proxy de Render, carpeta de fotos configurable, errores a la consola).
+- `cuentas/management/commands/crear_admin.py`: crea el primer administrador en el build, solo si no existe.
 - Un retiro de un mes ya verificado se puede seguir editando: el reporte guarda los números verificados, pero la app no avisa la diferencia.
 - FGET se mintea por tCO2e provisorias. Si FGET va a ser Eggos, Eggos queda medido en carbono (H2 del análisis): sigue pendiente.
 
 ## Preguntas para Ramón
 
-1. **Render:** ¿te cierran los planes pagos chicos (unos US$ 15 por mes), o preferís arrancar gratis para la demo, sabiendo que la base vence a los 30 días y las fotos no persisten?
-2. **Alta de restaurantes:** ¿confirmás la resolución temporal? ¿Hay un segundo restaurante para dar de alta antes del 19/10?
+1. **Qué muestra la demo de Guardian.** El 19/10 octubre todavía no terminó, así que no va a haber un reporte mensual real para verificar. Propuesta: mostrar la captura en vivo, la pantalla Reportes con octubre "en curso" y el reporte de prueba de setiembre ya registrado en Hedera, con su mint de FGET.
+2. **Fotos en Render gratis:** se borran cada vez que la web se duerme. ¿Alcanza para la demo, o las guardamos en la base mientras dure el plan gratis?
 
 ## Cómo correrlo
 
@@ -232,13 +239,14 @@ Usan las variables de entorno de Guardian (ver `.env.example`) y la base de la a
 
 ## Tests
 
-`python manage.py test` corre 69 tests. Los de esta etapa usan un Guardian simulado, sin red, y cubren:
+`python manage.py test` corre 71 tests. Los de esta etapa usan un Guardian simulado, sin red, y cubren:
 
 - login y sesión, y que la contraseña no aparezca en los errores;
 - variables faltantes y error de conexión;
 - `guardian_estado`: testnet, alta, código público y proyecto;
 - el factor provisorio y su redondeo;
 - qué entra en el mes, y cuándo no se puede verificar (mes en curso, sin clasificar, sin usuario, pocos kg);
-- verificar una sola vez, desde la pantalla, y solo con administración;
+- verificar una sola vez, desde la pantalla, y solo con administración; el botón **Enviar al registro**;
+- `crear_admin`: crea el administrador una sola vez y solo con las variables;
 - que el documento lleve el código y nunca el nombre;
 - el envío completo (como restaurante y como Proponente), sin duplicar si se repite, la espera sin error cuando el reporte todavía no aparece, y el error guardado cuando falla.

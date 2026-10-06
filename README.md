@@ -64,4 +64,4 @@ Necesita las variables `GUARDIAN_*` (ver `.env.example`).
 
 ## Hosting
 
-La app va en Render: `render.yaml` crea la web, la base y el cron. Los pasos están en [docs/etapa-3.md](docs/etapa-3.md#hosting-en-render).
+La app va en Render, con planes gratis para la demo: `render.yaml` crea la web y la base. Los pasos, los límites del plan gratis y cómo pasar a pago están en [docs/etapa-3.md](docs/etapa-3.md#hosting-en-render).

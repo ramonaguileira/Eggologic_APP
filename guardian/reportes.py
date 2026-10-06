@@ -172,6 +172,28 @@ def enviar(reporte):
         reporte.save(update_fields=["estado", "registrado_en", "ultimo_error"])
 
 
+def enviar_pendientes():
+    """Avanza todos los reportes que todavía no están registrados.
+
+    Lo usan el comando guardian_enviar (por cron) y el botón de la pantalla Reportes (en Render
+    gratis no hay cron). Devuelve una lista de (reporte, error o None).
+    """
+    resultados = []
+    pendientes = ReporteMensual.objects.exclude(estado=ReporteMensual.Estado.REGISTRADO)
+    for reporte in pendientes.select_related("restaurante"):
+        try:
+            enviar(reporte)
+        except ErrorGuardian as error:
+            # Queda donde estaba: la próxima vuelta retoma desde el paso que falló.
+            reporte.intentos += 1
+            reporte.ultimo_error = str(error)
+            reporte.save(update_fields=["intentos", "ultimo_error"])
+            resultados.append((reporte, str(error)))
+        else:
+            resultados.append((reporte, None))
+    return resultados
+
+
 def _buscar(bloque, nombre, tipo, estado=None):
     """El documento de una grilla de Guardian con ese nombre de actividad y tipo, o None."""
     for doc in bloque.get("data", []):

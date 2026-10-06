@@ -332,6 +332,17 @@ class PantallaDeReportesTests(TestCase):
         self.client.force_login(operador)
         self.assertEqual(self.client.get(reverse("guardian:reportes")).status_code, 403)
 
+    def test_enviar_al_registro_desde_la_pantalla(self):
+        verificar(self.huerta, self.mes_pasado, self.admin)
+        self.client.force_login(self.admin)
+        self.assertContains(self.client.get(reverse("guardian:reportes")), "Enviar al registro")
+        self.assertEqual(self.client.get(reverse("guardian:enviar_al_registro")).status_code, 405)
+        with guardian_falso(GuardianFalso(proyectos=["Validated"])):
+            respuesta = self.client.post(reverse("guardian:enviar_al_registro"), follow=True)
+        self.assertContains(respuesta, "Registrados: 1.")
+        self.assertEqual(ReporteMensual.objects.get().estado, ReporteMensual.Estado.REGISTRADO)
+        self.assertNotContains(respuesta, "Enviar al registro</button>")
+
     def test_verificar_desde_la_pantalla(self):
         self.client.force_login(self.admin)
         respuesta = self.client.get(reverse("guardian:reportes"))

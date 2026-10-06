@@ -1,3 +1,8 @@
+import os
+from io import StringIO
+from unittest.mock import patch
+
+from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 
@@ -75,3 +80,16 @@ class PermisosTests(TestCase):
     def test_carbosur_no_puede_cargar_retiros(self):
         self.client.force_login(crear_usuario(Usuario.Rol.CARBOSUR))
         self.assertEqual(self.client.get(reverse("captura:retiro_nuevo")).status_code, 403)
+
+
+class CrearAdminTests(TestCase):
+    def test_crea_el_admin_una_sola_vez_y_solo_con_las_variables(self):
+        call_command("crear_admin", stdout=StringIO())
+        self.assertFalse(Usuario.objects.exists())
+        variables = {"DJANGO_SUPERUSER_USERNAME": "ramon", "DJANGO_SUPERUSER_PASSWORD": "clave-larga-de-prueba-123"}
+        with patch.dict(os.environ, variables):
+            call_command("crear_admin", stdout=StringIO())
+            call_command("crear_admin", stdout=StringIO())
+        admin = Usuario.objects.get()
+        self.assertTrue(admin.is_superuser and admin.es_admin())
+        self.assertTrue(admin.check_password("clave-larga-de-prueba-123"))

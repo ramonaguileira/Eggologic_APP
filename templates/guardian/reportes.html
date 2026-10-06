@@ -48,7 +48,18 @@
     </table>
   </div>
 
-  <h2>Verificados</h2>
+  <div class="encabezado">
+    <h2>Verificados</h2>
+    {% if hay_por_enviar %}
+      <form method="post" action="{% url 'guardian:enviar_al_registro' %}">
+        {% csrf_token %}
+        <button type="submit" class="boton">Enviar al registro</button>
+      </form>
+    {% endif %}
+  </div>
+  {% if hay_por_enviar %}
+    <p class="tenue">El registro tarda un poco en procesar cada envío: si un reporte queda "Enviado, falta la aprobación", volvé a tocar Enviar en un minuto.</p>
+  {% endif %}
   <div class="tabla">
     <table>
       <thead>
