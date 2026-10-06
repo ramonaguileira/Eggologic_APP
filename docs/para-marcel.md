@@ -8,7 +8,7 @@ Una app Django convencional (vistas como funciones, HTML desde el servidor, poca
 
 | App | Qué hace |
 | --- | --- |
-| `cuentas/` | Usuarios con rol, restaurantes con código público (`R-001`), clientes; permisos por rol (`cuentas/permisos.py`) |
+| `cuentas/` | Usuarios con rol, restaurantes con código público (`R-001`), clientes; permisos por rol: chofer, planta y granja ven solo su tarea (`cuentas/models.py`, `cuentas/permisos.py`) |
 | `captura/` | Retiros (kg, foto, GPS; la planta clasifica después), lotes BSF, granja, panel, CSV para CarboSur e informe del circuito |
 | `tienda/` | Productos y pedidos (pago contra entrega o transferencia) |
 | `impacto/` | "Mi impacto" de clientes y restaurantes; **todas las fórmulas** en `impacto/calculos.py` |

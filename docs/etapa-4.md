@@ -10,6 +10,12 @@
 2. **Las fotos se guardan en la base** mientras Render sea gratis. Quizás se pague Render al terminar el plan gratis.
 3. No habrá restaurantes nuevos antes del 19/10.
 
+## Ajustes del 06/10, al poner la app en línea
+
+- **Roles por tarea** (pedido de Ramón): el chofer solo carga retiros (entra directo al formulario y vuelve a él después de guardar); la planta clasifica retiros y lleva los lotes; la granja solo hace su registro diario. "Operador de campo" queda para quien hace todo, y CarboSur sigue viendo todo sin editar.
+- **Productos reales:** Quincena (15 huevos) a $160 y Maple (30) a $310.
+- **El informe lleva el nombre de los restaurantes** (decisión de Ramón).
+
 ## Qué se construyó
 
 - **Informe del circuito** (`/captura/informe/`, menú **Informe**). Lo ven administración, operadores y CarboSur. Elige un período (por defecto, desde el primer retiro hasta hoy) y muestra:
@@ -36,7 +42,7 @@ Igual que antes. Con `cargar_demo`, entrar como `carbosur` o `admin` y abrir **I
 
 ## Tests
 
-`python manage.py test` corre 76 tests. Los nuevos cubren:
+`python manage.py test` corre 83 tests. Los nuevos cubren:
 
 - el informe: el resumen del período, la línea de base (calculada solo con los retiros que la informaron) y la trazabilidad de un lote hasta los huevos;
 - que CarboSur vea el informe con código y nombre de cada restaurante, y que un cliente no entre;

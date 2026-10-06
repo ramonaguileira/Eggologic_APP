@@ -45,7 +45,7 @@ Ver la sección "Correr la app en tu computadora" del [README](../README.md).
 
 ## SUPUESTOS
 
-1. Un solo rol "operador" para chofer, planta y granja.
+1. ~~Un solo rol "operador" para chofer, planta y granja.~~ Cambiado por pedido de Ramón (06/10): roles chofer, planta y granja, cada uno con su tarea. "Operador de campo" queda para quien hace todo.
 2. La clasificación (impropios, vegetales, plato) puede sumar menos que lo levantado (merma), pero nunca más.
 3. Un retiro entra entero a un solo lote.
 4. Los neonatos se miden en gramos.

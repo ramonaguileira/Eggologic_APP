@@ -5,7 +5,7 @@
 {% block contenido %}
   <div class="encabezado">
     <h1>Lotes de bioconversión</h1>
-    {% if user.puede_capturar %}<a class="boton" href="{% url 'captura:lote_nuevo' %}">+ Nuevo lote</a>{% endif %}
+    {% if user.puede_clasificar %}<a class="boton" href="{% url 'captura:lote_nuevo' %}">+ Nuevo lote</a>{% endif %}
   </div>
   <p class="tenue">Últimos 50. Todos los datos están en <a href="{% url 'captura:exportar_lotes' %}">lotes.csv</a>.</p>
 
@@ -35,7 +35,7 @@
             {% else %}
               <td colspan="4"><span class="etiqueta">En curso</span></td>
             {% endif %}
-            <td>{% if user.puede_capturar %}<a href="{% url 'captura:lote_editar' lote.pk %}">Editar</a>{% endif %}</td>
+            <td>{% if user.puede_clasificar %}<a href="{% url 'captura:lote_editar' lote.pk %}">Editar</a>{% endif %}</td>
           </tr>
         {% empty %}
           <tr><td colspan="11" class="tenue">Todavía no hay lotes.</td></tr>

@@ -5,7 +5,7 @@
 {% block contenido %}
   <div class="encabezado">
     <h1>Granja</h1>
-    {% if user.puede_capturar %}<a class="boton" href="{% url 'captura:granja_nuevo' %}">+ Registro del día</a>{% endif %}
+    {% if user.puede_cargar_granja %}<a class="boton" href="{% url 'captura:granja_nuevo' %}">+ Registro del día</a>{% endif %}
   </div>
   <p class="tenue">Últimos 50 días con registro. Todos los datos están en <a href="{% url 'captura:exportar_granja' %}">granja.csv</a>.</p>
 
@@ -21,7 +21,7 @@
             <td class="num">{{ registro.huevos }}</td>
             <td class="num">{{ registro.kg_larvas|floatformat:1 }}</td>
             <td>{{ registro.lote_id|default:"—" }}</td>
-            <td>{% if user.puede_capturar %}<a href="{% url 'captura:granja_editar' registro.pk %}">Editar</a>{% endif %}</td>
+            <td>{% if user.puede_cargar_granja %}<a href="{% url 'captura:granja_editar' registro.pk %}">Editar</a>{% endif %}</td>
           </tr>
         {% empty %}
           <tr><td colspan="5" class="tenue">Todavía no hay registros.</td></tr>

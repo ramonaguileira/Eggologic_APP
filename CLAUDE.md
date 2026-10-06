@@ -30,7 +30,7 @@ App piloto de Eggologic (Nodo 1, Maldonado): registra el circuito residuo de res
 
 ## Estructura
 
-- `cuentas/`: usuarios con rol, restaurantes (con código público) y clientes.
+- `cuentas/`: usuarios con rol, restaurantes (con código público) y clientes. Cada persona de campo ve solo su tarea (Ramón, 06/10): chofer (solo retiros), planta (clasificación y lotes), granja (registro diario); operador hace todo el campo; CarboSur ve todo sin editar.
 - `captura/`:
   - retiros: el chofer carga kg, foto y GPS automático; la planta clasifica después;
   - lotes BSF, granja;

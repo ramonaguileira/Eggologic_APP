@@ -40,7 +40,10 @@ python manage.py runserver
 
 Después abrí <http://127.0.0.1:8000> y entrá con alguno de los usuarios que crea `cargar_demo`. Todos usan la contraseña que elegiste:
 
-- `operador`: carga retiros, lotes y granja;
+- `operador`: hace todas las tareas de campo (retiros, clasificación, lotes y granja) y ve el panel;
+- `chofer`: solo carga retiros;
+- `planta`: clasifica retiros y lleva los lotes;
+- `granja`: solo el registro diario de la granja;
 - `carbosur`: solo ve y exporta;
 - `cliente`: compra huevos y ve su impacto;
 - `restaurante`: lo mismo, más lo que entregó (La Huerta);

@@ -252,3 +252,45 @@ class InformeVistaTests(DatosDePrueba):
         cliente = Usuario.objects.create_user(username="cliente", password="clave-de-prueba-123", rol=Usuario.Rol.CLIENTE)
         self.client.force_login(cliente)
         self.assertEqual(self.client.get(reverse("captura:informe")).status_code, 403)
+
+
+class AccesoPorRolTests(DatosDePrueba):
+    """Cada persona de campo ve solo su tarea (pedido de Ramón, 06/10)."""
+
+    def entra(self, rol, nombre_url, *args):
+        usuario = Usuario.objects.create_user(username=f"u-{rol}", password="clave-de-prueba-123", rol=rol)
+        self.client.force_login(usuario)
+        return self.client.get(reverse(nombre_url, args=args)).status_code == 200
+
+    def test_el_chofer_solo_carga_retiros(self):
+        retiro = self.crear_retiro("50")
+        self.assertTrue(self.entra(Usuario.Rol.CHOFER, "captura:retiro_nuevo"))
+        for nombre_url, args in [
+            ("captura:panel", []), ("captura:retiros", []), ("captura:lotes", []), ("captura:granja", []),
+            ("captura:informe", []), ("captura:exportar_retiros", []), ("captura:retiro_clasificar", [retiro.pk]),
+            ("captura:lote_nuevo", []), ("captura:granja_nuevo", []),
+        ]:
+            self.assertEqual(self.client.get(reverse(nombre_url, args=args)).status_code, 403, nombre_url)
+
+    def test_el_chofer_vuelve_al_formulario_despues_de_guardar(self):
+        chofer = Usuario.objects.create_user(username="chofer", password="clave-de-prueba-123", rol=Usuario.Rol.CHOFER)
+        self.client.force_login(chofer)
+        foto = SimpleUploadedFile("retiro.jpg", b"\xff\xd8\xff foto", content_type="image/jpeg")
+        respuesta = self.client.post(
+            reverse("captura:retiro_nuevo"), {"restaurante": self.restaurante.pk, "kg_levantados": "20", "foto": foto}
+        )
+        self.assertRedirects(respuesta, reverse("captura:retiro_nuevo"))
+
+    def test_la_planta_clasifica_y_lleva_lotes_pero_no_la_granja(self):
+        retiro = self.crear_retiro("50")
+        self.assertTrue(self.entra(Usuario.Rol.PLANTA, "captura:retiro_clasificar", retiro.pk))
+        for nombre_url in ["captura:retiros", "captura:lotes", "captura:lote_nuevo"]:
+            self.assertEqual(self.client.get(reverse(nombre_url)).status_code, 200, nombre_url)
+        for nombre_url in ["captura:granja", "captura:retiro_nuevo", "captura:panel", "captura:informe"]:
+            self.assertEqual(self.client.get(reverse(nombre_url)).status_code, 403, nombre_url)
+
+    def test_la_granja_solo_carga_la_granja(self):
+        self.assertTrue(self.entra(Usuario.Rol.GRANJA, "captura:granja_nuevo"))
+        self.assertEqual(self.client.get(reverse("captura:granja")).status_code, 200)
+        for nombre_url in ["captura:retiros", "captura:lotes", "captura:retiro_nuevo", "captura:panel"]:
+            self.assertEqual(self.client.get(reverse(nombre_url)).status_code, 403, nombre_url)

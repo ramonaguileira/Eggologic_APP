@@ -5,11 +5,11 @@
 {% block contenido %}
   <h1>Panel de campo</h1>
 
-  {% if user.puede_capturar %}
+  {% if user.puede_retirar or user.puede_clasificar or user.puede_cargar_granja %}
     <div class="atajos">
-      <a class="boton" href="{% url 'captura:retiro_nuevo' %}">+ Retiro</a>
-      <a class="boton" href="{% url 'captura:lote_nuevo' %}">+ Lote</a>
-      <a class="boton" href="{% url 'captura:granja_nuevo' %}">+ Granja</a>
+      {% if user.puede_retirar %}<a class="boton" href="{% url 'captura:retiro_nuevo' %}">+ Retiro</a>{% endif %}
+      {% if user.puede_clasificar %}<a class="boton" href="{% url 'captura:lote_nuevo' %}">+ Lote</a>{% endif %}
+      {% if user.puede_cargar_granja %}<a class="boton" href="{% url 'captura:granja_nuevo' %}">+ Granja</a>{% endif %}
     </div>
   {% endif %}
 
@@ -39,7 +39,7 @@
         <li>
           <strong>{{ lote }}</strong>:
           {{ lote.kg_residuo|floatformat:1 }} kg de residuo, {{ lote.bandejas }} bandeja{{ lote.bandejas|pluralize }}.
-          {% if user.puede_capturar %}<a href="{% url 'captura:lote_editar' lote.pk %}">Registrar cosecha</a>{% endif %}
+          {% if user.puede_clasificar %}<a href="{% url 'captura:lote_editar' lote.pk %}">Registrar cosecha</a>{% endif %}
         </li>
       {% endfor %}
     </ul>
