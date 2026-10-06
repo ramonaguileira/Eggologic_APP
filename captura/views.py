@@ -1,5 +1,5 @@
 import csv
-from datetime import timedelta
+from datetime import date, timedelta
 
 from django.contrib import messages
 from django.db.models import Count, F, Q, Sum
@@ -10,6 +10,8 @@ from django.utils.formats import number_format
 
 from cuentas.models import Usuario
 from cuentas.permisos import requiere
+from guardian.models import ReporteMensual
+from impacto import calculos
 
 from .forms import LoteForm, RegistroGranjaForm, RetiroChoferForm, RetiroClasificacionForm
 from .models import Lote, RegistroGranja, Retiro
@@ -47,6 +49,30 @@ def panel(request):
         "lotes_en_curso": Lote.objects.filter(fecha_cosecha=None).prefetch_related("retiros"),
     }
     return render(request, "captura/panel.html", contexto)
+
+
+@requiere(Usuario.puede_ver_datos)
+def informe(request):
+    """Informe del circuito entre dos fechas, para ANDE y CarboSur. Se imprime o se guarda como
+    PDF desde el navegador. Por defecto, desde el primer retiro hasta hoy."""
+    hoy = timezone.localdate()
+    primero = Retiro.objects.order_by("fecha").first()
+    desde = _fecha(request.GET.get("desde")) or (timezone.localtime(primero.fecha).date() if primero else hoy)
+    hasta = _fecha(request.GET.get("hasta")) or hoy
+    contexto = calculos.informe(desde, hasta)
+    contexto.update({
+        "desde": desde,
+        "hasta": hasta,
+        "reportes": ReporteMensual.objects.filter(mes__range=(desde.replace(day=1), hasta)).select_related("restaurante"),
+    })
+    return render(request, "captura/informe.html", contexto)
+
+
+def _fecha(texto):
+    try:
+        return date.fromisoformat(texto or "")
+    except ValueError:
+        return None
 
 
 # --- Listas -------------------------------------------------------------------

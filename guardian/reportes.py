@@ -161,15 +161,18 @@ def enviar(reporte):
         grilla = proponente.bloque("entity_report_grid_pp")
         # La policy deja el original en "Waiting for Verification" aun después de aprobado: lo que
         # dice si ya se aprobó es la copia approved_entity_report. Aprobar dos veces mintearía dos veces.
-        if not _buscar(grilla, nombre, "approved_entity_report"):
-            pendiente = _buscar(grilla, nombre, "entity_report", "Waiting for Verification")
-            if pendiente is None:
+        doc = _buscar(grilla, nombre, "approved_entity_report")
+        if doc is None:
+            doc = _buscar(grilla, nombre, "entity_report", "Waiting for Verification")
+            if doc is None:
                 return  # todavía no aparece: no es un error
-            proponente.enviar("approve_ppe_report_btn", {"tag": "Button_0", "document": pendiente})
+            proponente.enviar("approve_ppe_report_btn", {"tag": "Button_0", "document": doc})
         reporte.estado = ReporteMensual.Estado.REGISTRADO
         reporte.registrado_en = timezone.now()
+        reporte.topic_hcs = doc.get("topicId") or ""
+        reporte.mensaje_hcs = doc.get("messageId") or ""
         reporte.ultimo_error = ""
-        reporte.save(update_fields=["estado", "registrado_en", "ultimo_error"])
+        reporte.save(update_fields=["estado", "registrado_en", "topic_hcs", "mensaje_hcs", "ultimo_error"])
 
 
 def enviar_pendientes():

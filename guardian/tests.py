@@ -103,7 +103,10 @@ class GuardianFalso:
 
 
 def reporte_en_guardian(campos, tipo, estado):
-    return {"type": tipo, "option": {"status": estado}, "document": {"credentialSubject": [campos]}}
+    return {
+        "type": tipo, "option": {"status": estado}, "document": {"credentialSubject": [campos]},
+        "topicId": "0.0.999", "messageId": "1791000000.000000001",
+    }
 
 
 @override_settings(GUARDIAN_URL=URL, GUARDIAN_POLICY_ID="policy-1")
@@ -278,6 +281,7 @@ class ReporteMensualTests(TestCase):
         self.assertEqual([tag for tag, _ in posts], ["add_entity_report_btn", "approve_ppe_report_btn"])
         self.assertEqual(posts[0][1]["ref"]["id"], "proyecto-1")
         self.assertEqual(posts[1][1]["tag"], "Button_0")
+        self.assertEqual(reporte.enlace_publico, "https://hashscan.io/testnet/transaction/1791000000.000000001")
 
     def test_enviar_de_nuevo_no_duplica_el_reporte(self):
         self.retiro(self.huerta, date(2026, 8, 3), "1000")

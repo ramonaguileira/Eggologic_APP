@@ -30,6 +30,9 @@ class ReporteMensual(models.Model):
     verificado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
     verificado_en = models.DateTimeField(auto_now_add=True)
     registrado_en = models.DateTimeField(null=True, blank=True)
+    # Dónde quedó el reporte en Hedera: topic de HCS y timestamp de consenso del mensaje.
+    topic_hcs = models.CharField("topic de HCS", max_length=30, blank=True)
+    mensaje_hcs = models.CharField("mensaje en HCS", max_length=40, blank=True)
     intentos = models.PositiveIntegerField("intentos fallidos", default=0)
     ultimo_error = models.TextField("último error", blank=True)
 
@@ -43,3 +46,11 @@ class ReporteMensual(models.Model):
 
     def __str__(self):
         return f"{self.restaurante.codigo} {self.mes:%m/%Y}"
+
+    @property
+    def enlace_publico(self):
+        """El mensaje del reporte en HashScan, el explorador público de Hedera (testnet)."""
+        # SUPUESTO: HashScan abre una transacción por su timestamp de consenso. Probarlo en el navegador.
+        if not self.mensaje_hcs:
+            return ""
+        return f"https://hashscan.io/testnet/transaction/{self.mensaje_hcs}"

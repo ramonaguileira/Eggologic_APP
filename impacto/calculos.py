@@ -9,7 +9,7 @@ se reemplaza acá sin tocar el resto.
 from datetime import date
 from decimal import ROUND_DOWN, Decimal
 
-from django.db.models import F, Sum
+from django.db.models import Count, F, Q, Sum
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
 from django.utils.formats import date_format
@@ -155,3 +155,74 @@ def impacto_de_entregas(restaurante, factores):
         "huevos_equivalentes": int(kg_organicos / factores["kg_residuo_por_huevo"]) if factores else None,
         "por_mes": serie_mensual(_por_mes(retiros, "fecha", "kg_levantados")),
     }
+
+
+# --- Informe del circuito (Etapa 4, entregables ANDE) ---------------------------
+
+
+def informe(desde, hasta):
+    """Números del circuito entre dos fechas, inclusive: resumen, línea de base por restaurante
+    y trazabilidad por lote.
+
+    Va a salir de la app (ANDE, CarboSur): identifica a los restaurantes solo por su código.
+    """
+    retiros = Retiro.objects.filter(fecha__date__range=(desde, hasta))
+    totales = retiros.aggregate(
+        cantidad=Count("id"),
+        levantado=Sum("kg_levantados"),
+        levantado_clasificado=Sum("kg_levantados", filter=Q(kg_impropios__isnull=False)),
+        impropios=Sum("kg_impropios"),
+        organicos=Sum(KG_ORGANICOS),
+    )
+    cosecha = Lote.objects.filter(fecha_cosecha__range=(desde, hasta)).aggregate(
+        cantidad=Count("id"), larvas=Sum("kg_larvas"), frass=Sum("kg_frass")
+    )
+    granja = RegistroGranja.objects.filter(fecha__range=(desde, hasta)).aggregate(
+        huevos=Sum("huevos"), larvas=Sum("kg_larvas")
+    )
+    clasificado = totales["levantado_clasificado"]
+    resumen = {
+        "retiros": totales["cantidad"],
+        "kg_levantados": totales["levantado"] or 0,
+        "kg_organicos": totales["organicos"] or 0,
+        "pct_impropios": totales["impropios"] * 100 / clasificado if clasificado else None,
+        "lotes_cosechados": cosecha["cantidad"],
+        "kg_larvas": cosecha["larvas"] or 0,
+        "kg_frass": cosecha["frass"] or 0,
+        "huevos": granja["huevos"] or 0,
+        "kg_larvas_a_gallinas": granja["larvas"] or 0,
+        "tco2e_provisorio": emisiones_evitadas(totales["organicos"] or Decimal("0"))["neto"],
+    }
+
+    restaurantes = list(
+        retiros.order_by("restaurante__codigo")
+        .values("restaurante__codigo")
+        .annotate(
+            retiros=Count("id"),
+            levantado=Sum("kg_levantados"),
+            organicos=Sum(KG_ORGANICOS),
+            con_linea_base=Count("id", filter=Q(kg_no_ingresa__isnull=False)),
+            levantado_con_linea_base=Sum("kg_levantados", filter=Q(kg_no_ingresa__isnull=False)),
+            no_ingresa=Sum("kg_no_ingresa"),
+        )
+    )
+    for fila in restaurantes:
+        # SUPUESTO: el % que entra a Eggologic se calcula solo con los retiros que informaron la
+        # línea de base (kg que el restaurante descartó por otra vía).
+        total = (fila["levantado_con_linea_base"] or 0) + (fila["no_ingresa"] or 0)
+        fila["pct_a_eggologic"] = fila["levantado_con_linea_base"] * 100 / total if fila["con_linea_base"] and total else None
+
+    lotes = []
+    for lote in Lote.objects.filter(fecha_inicio__range=(desde, hasta)).prefetch_related(
+        "retiros__restaurante", "registros_granja"
+    ).order_by("fecha_inicio", "id"):
+        registros = lote.registros_granja.all()
+        lotes.append({
+            "lote": lote,
+            "retiros": len(lote.retiros.all()),
+            "restaurantes": sorted({retiro.restaurante.codigo for retiro in lote.retiros.all()}),
+            # SUPUESTO: los huevos de un día se atribuyen al lote del que salieron las larvas de ese día.
+            "huevos": sum(registro.huevos for registro in registros),
+            "kg_larvas_a_gallinas": sum((registro.kg_larvas for registro in registros), Decimal("0")),
+        })
+    return {"resumen": resumen, "restaurantes": restaurantes, "lotes": lotes}

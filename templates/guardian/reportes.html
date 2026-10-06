@@ -75,6 +75,7 @@
             <td>{{ reporte.verificado_por.get_full_name|default:reporte.verificado_por.username }}, {{ reporte.verificado_en|date:"d/m/Y" }}</td>
             <td>
               {{ reporte.get_estado_display }}
+              {% if reporte.enlace_publico %}<br><a href="{{ reporte.enlace_publico }}" target="_blank" rel="noopener">Ver en el registro público</a>{% endif %}
               {% if reporte.ultimo_error %}<br><span class="error">{{ reporte.ultimo_error }}</span>{% endif %}
             </td>
           </tr>

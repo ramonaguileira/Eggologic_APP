@@ -252,3 +252,15 @@ form input[type="radio"] { width: auto; margin-right: 0.4rem; }
   .atajos { display: flex; gap: 0.75rem; }
   .productos { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* Informe: al imprimir o guardar como PDF solo queda el contenido. */
+.periodo { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.5rem 1rem; margin-bottom: 1rem; }
+.periodo label { display: flex; flex-direction: column; font-size: 0.9rem; }
+@media print {
+  .barra, .no-imprimir { display: none; }
+  body { background: #fff; }
+  .contenido { max-width: none; padding: 0; }
+  .tabla { overflow: visible; border: 0; }
+  table { font-size: 0.8rem; }
+  a { color: inherit; text-decoration: none; }
+}

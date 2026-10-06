@@ -34,13 +34,16 @@ App piloto de Eggologic (Nodo 1, Maldonado): registra el circuito residuo de res
 - `captura/`:
   - retiros: el chofer carga kg, foto y GPS automático; la planta clasifica después;
   - lotes BSF, granja;
-  - panel y exportación CSV para CarboSur.
+  - panel y exportación CSV para CarboSur;
+  - informe del circuito (trazabilidad, línea de base, números para ANDE), solo con códigos de restaurante;
+  - fotos de los retiros guardadas en la base (`captura/almacen.py`).
 - `tienda/`: productos y pedidos (pago contra entrega o transferencia).
 - `impacto/`: "Mi impacto" de clientes y restaurantes. Todas las fórmulas están en `impacto/calculos.py`, incluido el factor provisorio de CO2e.
 - `guardian/`: cliente de la API de MGS, reporte mensual por restaurante (lo verifica una persona en **Reportes**) y los comandos `guardian_estado` y `guardian_enviar`.
 - `docs/`:
   - propuesta aprobada (`etapa-0-propuesta.md`);
   - un doc por etapa;
+  - guion de la demo del 19/10 (`demo-19-10.md`) y guía de revisión para Marcel (`para-marcel.md`);
   - análisis de la policy FLW (`guardian/analisis-policy-flw.md`).
 
 ## Comandos
@@ -64,8 +67,10 @@ python manage.py guardian_enviar   # manda a Guardian los reportes verificados (
 | 0 | Propuesta | Aprobada |
 | 1 | Captura | Aprobada |
 | 2 | Tienda e impacto | Para revisar |
-| 3 | Guardian | Para revisar; envío de prueba hecho, falta crear Render |
-| 4 | Entregables ANDE (demo 19/10/2026) | Pendiente |
+| 3 | Guardian | Para revisar; envío de prueba hecho |
+| 4 | Entregables ANDE (demo 19/10/2026) | Para revisar |
+
+Todas las etapas pasan a la revisión de Marcel (`docs/para-marcel.md`).
 
 **Etapa 3 (Guardian).** Usa estas variables de entorno, cargadas según el instructivo que tiene Ramón:
 

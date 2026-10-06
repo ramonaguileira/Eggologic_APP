@@ -1,10 +1,11 @@
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
-from captura.models import RegistroGranja, Retiro
+from captura.models import Lote, RegistroGranja, Retiro
 from cuentas.models import Restaurante, Usuario
 from tienda.models import ItemPedido, Pedido, Producto
 
@@ -106,3 +107,49 @@ class EmisionesEvitadasTests(TestCase):
         self.assertEqual(calculos.emisiones_evitadas(Decimal("1000"))["neto"], Decimal("0.35"))
         self.assertEqual(calculos.emisiones_evitadas(Decimal("57"))["neto"], Decimal("0.01"))  # 0,01995
         self.assertEqual(calculos.emisiones_evitadas(Decimal("0"))["neto"], Decimal("0.00"))
+
+
+class InformeTests(TestCase):
+    def setUp(self):
+        operador = Usuario.objects.create_user(username="operador", password="clave-de-prueba-123", rol=Usuario.Rol.OPERADOR)
+        r001 = Restaurante.objects.create(nombre="La Huerta", codigo="R-001")
+        r002 = Restaurante.objects.create(nombre="Parrilla", codigo="R-002")
+
+        def retiro(restaurante, dia, levantado, impropios, vegetales, plato, no_ingresa=None, mes=8):
+            return Retiro.objects.create(
+                restaurante=restaurante, registrado_por=operador, fecha=timezone.make_aware(datetime(2026, mes, dia, 12)),
+                kg_levantados=Decimal(levantado), kg_impropios=Decimal(impropios),
+                kg_restos_vegetales=Decimal(vegetales), kg_residuos_plato=Decimal(plato),
+                kg_no_ingresa=None if no_ingresa is None else Decimal(no_ingresa),
+            )
+
+        con_linea_base = retiro(r001, 3, "110", "10", "60", "40", no_ingresa="50")
+        retiro(r001, 10, "60", "0", "30", "30")
+        de_r002 = retiro(r002, 5, "55", "5", "25", "25", no_ingresa="0")
+        retiro(r001, 2, "999", "0", "500", "499", mes=9)  # fuera del período
+        self.lote = Lote.objects.create(
+            registrado_por=operador, fecha_inicio=date(2026, 8, 12), bandejas=4, g_neonatos=Decimal("10"),
+            fecha_cosecha=date(2026, 8, 30), kg_larvas=Decimal("20"), kg_frass=Decimal("50"),
+        )
+        Retiro.objects.filter(pk__in=[con_linea_base.pk, de_r002.pk]).update(lote=self.lote)
+        RegistroGranja.objects.create(
+            registrado_por=operador, fecha=date(2026, 8, 31), huevos=100, kg_larvas=Decimal("5"), lote=self.lote
+        )
+        self.datos = calculos.informe(date(2026, 8, 1), date(2026, 8, 31))
+
+    def test_resumen_del_periodo(self):
+        resumen = self.datos["resumen"]
+        self.assertEqual((resumen["retiros"], resumen["kg_levantados"], resumen["kg_organicos"]), (3, Decimal("225"), Decimal("210")))
+        self.assertAlmostEqual(float(resumen["pct_impropios"]), 15 / 225 * 100, places=2)
+        self.assertEqual((resumen["lotes_cosechados"], resumen["kg_larvas"], resumen["huevos"]), (1, Decimal("20"), 100))
+        self.assertEqual(resumen["tco2e_provisorio"], Decimal("0.07"))  # 210 × 0,70 × 0,5 / 1000 = 0,0735
+
+    def test_linea_base_solo_con_los_retiros_que_la_informaron(self):
+        r001, r002 = self.datos["restaurantes"]
+        self.assertEqual((r001["restaurante__codigo"], r001["retiros"], r001["con_linea_base"]), ("R-001", 2, 1))
+        self.assertAlmostEqual(float(r001["pct_a_eggologic"]), 110 / 160 * 100)
+        self.assertEqual(r002["pct_a_eggologic"], 100)
+
+    def test_trazabilidad_del_lote_hasta_los_huevos(self):
+        (fila,) = self.datos["lotes"]
+        self.assertEqual((fila["retiros"], fila["restaurantes"], fila["huevos"]), (2, ["R-001", "R-002"], 100))

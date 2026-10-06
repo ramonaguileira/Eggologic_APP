@@ -12,7 +12,9 @@ El diseño vive en el [Plano de arquitectura: app/dapp Eggologic en Hedera](http
 | 1 | [Captura: retiros, lotes BSF, granja y exportación para CarboSur](docs/etapa-1.md) | Aprobada |
 | 2 | [Tienda de huevos e impacto con gráficas; foto y GPS en los retiros](docs/etapa-2.md) | Lista, para revisar |
 | 3 | [Guardian: policy FLW, reportes por restaurante, tokens en testnet](docs/etapa-3.md) | Lista, para revisar |
-| 4 | Entregables ANDE (demostrable 19/10/2026) | Pendiente |
+| 4 | [Entregables ANDE: informe del circuito, trazabilidad y línea de base](docs/etapa-4.md) · [guion de la demo](docs/demo-19-10.md) | Lista, para revisar |
+
+Para la revisión final: [guía para Marcel](docs/para-marcel.md).
 
 ## Correr la app en tu computadora
 

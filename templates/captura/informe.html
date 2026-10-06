@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block titulo %}Informe del circuito · Eggologic{% endblock %}
+
+{% block contenido %}
+  <div class="encabezado">
+    <h1>Informe del circuito</h1>
+    <button type="button" class="boton no-imprimir" onclick="window.print()">Imprimir o guardar como PDF</button>
+  </div>
+  <p>
+    Eggologic · Nodo 1, Maldonado. Del {{ desde|date:"d/m/Y" }} al {{ hasta|date:"d/m/Y" }}.
+    Los restaurantes figuran solo con su código.
+  </p>
+
+  <form method="get" class="periodo no-imprimir">
+    <label>Desde <input type="date" name="desde" value="{{ desde|date:'Y-m-d' }}"></label>
+    <label>Hasta <input type="date" name="hasta" value="{{ hasta|date:'Y-m-d' }}"></label>
+    <button type="submit" class="boton">Ver</button>
+  </form>
+
+  <h2>El circuito en números</h2>
+  <div class="cifras">
+    <div class="cifra"><strong>{{ resumen.retiros }}</strong><span>retiros</span></div>
+    <div class="cifra"><strong>{{ resumen.kg_levantados|floatformat:1 }}</strong><span>kg levantados</span></div>
+    <div class="cifra"><strong>{{ resumen.kg_organicos|floatformat:1 }}</strong><span>kg orgánicos a bioconversión</span></div>
+    <div class="cifra"><strong>{% if resumen.pct_impropios is not None %}{{ resumen.pct_impropios|floatformat:1 }} %{% else %}—{% endif %}</strong><span>de impropios</span></div>
+    <div class="cifra"><strong>{{ resumen.lotes_cosechados }}</strong><span>lotes BSF cosechados</span></div>
+    <div class="cifra"><strong>{{ resumen.kg_larvas|floatformat:1 }}</strong><span>kg de larvas</span></div>
+    <div class="cifra"><strong>{{ resumen.kg_frass|floatformat:1 }}</strong><span>kg de frass</span></div>
+    <div class="cifra"><strong>{{ resumen.kg_larvas_a_gallinas|floatformat:1 }}</strong><span>kg de larvas a las gallinas</span></div>
+    <div class="cifra"><strong>{{ resumen.huevos }}</strong><span>huevos producidos</span></div>
+    <div class="cifra"><strong>{{ resumen.tco2e_provisorio|floatformat:2 }}</strong><span>t de CO2e evitadas (provisorio)</span></div>
+  </div>
+  <p class="tenue">El CO2e evitado es provisorio hasta que CarboSur defina sus factores.</p>
+
+  <h2>Por restaurante y línea de base</h2>
+  <p class="tenue">
+    La línea de base es lo que el restaurante descartó por otra vía (basura común), informado en cada retiro.
+    El porcentaje que entra a Eggologic se calcula solo con los retiros que la informaron.
+  </p>
+  <div class="tabla">
+    <table>
+      <thead>
+        <tr><th>Restaurante</th><th>Retiros</th><th>kg levantados</th><th>kg orgánicos</th><th>Con línea de base</th><th>kg por otra vía</th><th>% a Eggologic</th></tr>
+      </thead>
+      <tbody>
+        {% for fila in restaurantes %}
+          <tr>
+            <td>{{ fila.restaurante__codigo }}</td>
+            <td class="num">{{ fila.retiros }}</td>
+            <td class="num">{{ fila.levantado|floatformat:1 }}</td>
+            <td class="num">{{ fila.organicos|default:0|floatformat:1 }}</td>
+            <td class="num">{{ fila.con_linea_base }}</td>
+            <td class="num">{{ fila.no_ingresa|default:0|floatformat:1 }}</td>
+            <td class="num">{% if fila.pct_a_eggologic is not None %}{{ fila.pct_a_eggologic|floatformat:0 }} %{% else %}—{% endif %}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="7" class="tenue">No hay retiros en el período.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Trazabilidad por lote</h2>
+  <p class="tenue">De qué restaurantes salió el residuo de cada lote BSF, qué rindió (kg de larva cada 100 kg de residuo) y cuántos huevos produjeron las gallinas con sus larvas.</p>
+  <div class="tabla">
+    <table>
+      <thead>
+        <tr><th>Lote</th><th>Inicio</th><th>Cosecha</th><th>Retiros</th><th>Restaurantes</th><th>kg residuo</th><th>kg larvas</th><th>Rendimiento</th><th>Huevos</th></tr>
+      </thead>
+      <tbody>
+        {% for fila in lotes %}
+          <tr>
+            <td>N.º {{ fila.lote.pk }}</td>
+            <td>{{ fila.lote.fecha_inicio|date:"d/m" }}</td>
+            <td>{{ fila.lote.fecha_cosecha|date:"d/m"|default:"En curso" }}</td>
+            <td class="num">{{ fila.retiros }}</td>
+            <td>{{ fila.restaurantes|join:", "|default:"—" }}</td>
+            <td class="num">{{ fila.lote.kg_residuo|floatformat:1 }}</td>
+            <td class="num">{{ fila.lote.kg_larvas|floatformat:1|default:"—" }}</td>
+            <td class="num">{{ fila.lote.rendimiento|floatformat:1|default:"—" }}</td>
+            <td class="num">{{ fila.huevos }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="9" class="tenue">No hay lotes que hayan empezado en el período.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Registro verificable</h2>
+  <p class="tenue">Reportes mensuales verificados por Eggologic y registrados en la notaría digital del impacto (Hedera, a través de Guardian).</p>
+  <div class="tabla">
+    <table>
+      <thead>
+        <tr><th>Mes</th><th>Restaurante</th><th>kg orgánicos</th><th>CO2e evitado (t)</th><th>Estado</th></tr>
+      </thead>
+      <tbody>
+        {% for reporte in reportes %}
+          <tr>
+            <td>{{ reporte.mes|date:"F Y" }}</td>
+            <td>{{ reporte.restaurante.codigo }}</td>
+            <td class="num">{{ reporte.kg_organicos|floatformat:1 }}</td>
+            <td class="num">{{ reporte.tco2e_neto|floatformat:2 }}</td>
+            <td>
+              {{ reporte.get_estado_display }}
+              {% if reporte.enlace_publico %}· <a href="{{ reporte.enlace_publico }}" target="_blank" rel="noopener">Ver en el registro público</a>{% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="tenue">Todavía no hay reportes verificados en el período.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
