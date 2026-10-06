@@ -1,0 +1,81 @@
+# Infraestructura en Render (Blueprint). Pasos para crearla en docs/etapa-3.md, "Hosting en Render".
+#
+# SUPUESTO: planes pagos chicos para el piloto. La base gratis vence a los 30 días, el servicio
+# web gratis no tiene disco (las fotos de los retiros se perderían en cada deploy) y el cron no
+# tiene plan gratis. Región Virginia: la más cercana a Uruguay entre las de Render.
+#
+# Las credenciales de Guardian no van acá (el repo es público): se cargan en el panel, en el
+# grupo de variables eggologic-guardian, que comparten la web y el cron.
+
+databases:
+  - name: eggologic-db
+    databaseName: eggologic
+    user: eggologic
+    plan: basic-256mb
+    region: virginia
+
+envVarGroups:
+  - name: eggologic-guardian
+    envVars:
+      - key: GUARDIAN_URL
+        value: https://guardianservice.app/api/v1
+      # En el panel se suman GUARDIAN_POLICY_ID, GUARDIAN_PROPONENTE_EMAIL,
+      # GUARDIAN_PROPONENTE_PASSWORD y un par GUARDIAN_R00X_EMAIL / _PASSWORD por restaurante.
+
+services:
+  - type: web
+    name: eggologic
+    runtime: python
+    plan: starter
+    region: virginia
+    buildCommand: ./build.sh
+    startCommand: gunicorn eggologic.wsgi:application
+    healthCheckPath: /ingresar/
+    disk:
+      name: fotos
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_MEDIA_ROOT
+        value: /var/data/media
+      - key: TIENDA_DATOS_TRANSFERENCIA
+        sync: false
+      - key: DB_NAME
+        fromDatabase: { name: eggologic-db, property: database }
+      - key: DB_USER
+        fromDatabase: { name: eggologic-db, property: user }
+      - key: DB_PASSWORD
+        fromDatabase: { name: eggologic-db, property: password }
+      - key: DB_HOST
+        fromDatabase: { name: eggologic-db, property: host }
+      - key: DB_PORT
+        fromDatabase: { name: eggologic-db, property: port }
+      - fromGroup: eggologic-guardian
+
+  # La bandeja de salida: manda a Guardian los reportes verificados y reintenta los que fallaron.
+  - type: cron
+    name: eggologic-guardian-enviar
+    runtime: python
+    plan: starter
+    region: virginia
+    schedule: "*/15 * * * *"
+    buildCommand: pip install -r requirements.txt
+    startCommand: python manage.py guardian_enviar
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        fromService: { type: web, name: eggologic, envVarKey: DJANGO_SECRET_KEY }
+      - key: DB_NAME
+        fromDatabase: { name: eggologic-db, property: database }
+      - key: DB_USER
+        fromDatabase: { name: eggologic-db, property: user }
+      - key: DB_PASSWORD
+        fromDatabase: { name: eggologic-db, property: password }
+      - key: DB_HOST
+        fromDatabase: { name: eggologic-db, property: host }
+      - key: DB_PORT
+        fromDatabase: { name: eggologic-db, property: port }
+      - fromGroup: eggologic-guardian

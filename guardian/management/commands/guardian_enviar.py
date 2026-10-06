@@ -20,6 +20,9 @@ class Command(BaseCommand):
                 reporte.save(update_fields=["intentos", "ultimo_error"])
                 self.stdout.write(self.style.WARNING(f"{reporte}: {error}"))
             else:
-                self.stdout.write(self.style.SUCCESS(f"{reporte}: registrado"))
+                if reporte.estado == ReporteMensual.Estado.REGISTRADO:
+                    self.stdout.write(self.style.SUCCESS(f"{reporte}: registrado"))
+                else:
+                    self.stdout.write(f"{reporte}: {reporte.get_estado_display().lower()}; sigue en la próxima vuelta")
         if not pendientes.exists():
             self.stdout.write("No quedan reportes por enviar.")

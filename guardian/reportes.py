@@ -138,7 +138,9 @@ def enviar(reporte):
     """Hace en Guardian los pasos que le faltan al reporte.
 
     Se puede repetir: antes de cada paso se fija si ya está hecho, así un corte a mitad de
-    camino no duplica el reporte ni la aprobación.
+    camino no duplica el reporte ni la aprobación. Guardian procesa cada envío en segundo
+    plano: el reporte recién enviado tarda en aparecerle al Proponente, y la aprobación queda
+    para la vuelta siguiente (probado en testnet el 06/10).
     """
     nombre = nombre_de_actividad(reporte)
 
@@ -151,15 +153,18 @@ def enviar(reporte):
             # SUPUESTO: hay un solo proyecto validado (Nodo 1). Se manda la fila entera, como la interfaz.
             restaurante.enviar("add_entity_report_btn", {"document": documento(reporte), "ref": proyectos[0]})
         reporte.estado = ReporteMensual.Estado.ENVIADO
-        reporte.save(update_fields=["estado"])
+        reporte.ultimo_error = ""
+        reporte.save(update_fields=["estado", "ultimo_error"])
 
     if reporte.estado == ReporteMensual.Estado.ENVIADO:
         proponente = Sesion("PROPONENTE")
         grilla = proponente.bloque("entity_report_grid_pp")
+        # La policy deja el original en "Waiting for Verification" aun después de aprobado: lo que
+        # dice si ya se aprobó es la copia approved_entity_report. Aprobar dos veces mintearía dos veces.
         if not _buscar(grilla, nombre, "approved_entity_report"):
             pendiente = _buscar(grilla, nombre, "entity_report", "Waiting for Verification")
             if pendiente is None:
-                raise ErrorGuardian("El reporte todavía no aparece para aprobar. Se reintenta en la próxima vuelta.")
+                return  # todavía no aparece: no es un error
             proponente.enviar("approve_ppe_report_btn", {"tag": "Button_0", "document": pendiente})
         reporte.estado = ReporteMensual.Estado.REGISTRADO
         reporte.registrado_en = timezone.now()

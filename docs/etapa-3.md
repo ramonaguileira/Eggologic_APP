@@ -1,7 +1,7 @@
 # Etapa 3 — Guardian
 
 - **Fecha:** 05/10/2026
-- **Estado:** lista para revisar (06/10). Falta el primer envío real a Guardian, que espera el OK de Ramón (ver "Preguntas").
+- **Estado:** lista para revisar (06/10). Envío de prueba real hecho en testnet; falta crear los servicios en Render.
 
 ## Qué se verificó (05/10)
 
@@ -51,6 +51,9 @@
 2. **Un reporte por restaurante por mes.**
 3. Lo verifica **una persona de Eggologic**.
 4. El alta de R-001 **queda como está**, con el nombre comercial. Las altas nuevas van solo con el código.
+5. Primer envío real: **un reporte de prueba** (no datos reales).
+6. Hosting: **Render**.
+7. Otros restaurantes: lo propone Claude, como **resolución temporal** (ver "Alta de restaurantes").
 
 ## Cómo funciona el reporte mensual
 
@@ -65,11 +68,70 @@
    1. como el restaurante (rol PPE), envía el Ground Entity Report, vinculado al proyecto validado;
    2. como Proponente, lo aprueba (`approve_ppe_report_btn`, `Button_0`). Eso mintea FGET por la reducción neta a la cuenta del restaurante.
 
-   Antes de cada paso se fija en Guardian si ya está hecho, así un corte a mitad de camino no duplica nada. Si algo falla, el reporte queda donde estaba, con el error a la vista en la pantalla, y la próxima vuelta reintenta.
+   Antes de cada paso se fija en Guardian si ya está hecho, así un corte a mitad de camino no duplica nada. Guardian procesa cada envío en segundo plano, así que el reporte recién enviado tarda en aparecerle al Proponente: la aprobación queda para la vuelta siguiente del cron, sin marcarlo como error. Si algo falla de verdad, el reporte queda donde estaba, con el error a la vista en la pantalla, y la próxima vuelta reintenta.
 
 **Qué va a Guardian** (público): el nombre de la actividad con el código y el mes (`Retiros de residuo orgánico R-001 2026-09`), el tipo de actividad, un flujo sin proyecto (restaurante → disposición final) y uno con proyecto (restaurante → alimento animal), los dos con los kg orgánicos del mes, las cuatro cifras de tCO2e y el período. Nunca el nombre, la dirección ni el contacto del restaurante.
 
 **Ejemplo.** Un restaurante con 600 kg orgánicos en setiembre: 600 × 0,70 × 0,5 / 1000 = 0,21 tCO2e evitadas, y se mintean 0,21 FGET a su cuenta.
+
+## Envío de prueba real (06/10)
+
+Con el OK de Ramón se mandó a la policy un reporte de R-001 con datos ficticios, usando las mismas funciones que `guardian_enviar`. Al nombre de la actividad se le agregó el prefijo `PRUEBA ·` desde un script aparte (no está en el código de la app), para que no choque con el reporte real de setiembre: la app busca los reportes por ese nombre.
+
+| Qué | Resultado |
+| --- | --- |
+| Reporte | "PRUEBA · Retiros de residuo orgánico R-001 2026-09": 600 kg orgánicos, 0,21 tCO2e |
+| Vuelta 1 (como restaurante) | Enviado en 2 s. Guardian lo procesó en segundo plano: el Proponente todavía no lo veía |
+| Vuelta 2 (como Proponente) | Aprobado en 1 s |
+| Registro en HCS | Topic `0.0.10880108`: reporte (`1791251261.916613122`), aprobación (`1791251311.571836104`) y mint (`1791251314.211543374`) |
+| Mint | **0,21 FGET** (`0.0.10879391`) en la cuenta de R-001, confirmado en el mirror node de testnet. El supply total de FGET pasó de 0 a 0,21 |
+
+Lo que se aprendió:
+
+- Guardian procesa los envíos en segundo plano. La aprobación no puede ir en la misma vuelta que el envío: queda para la siguiente, y eso ya no se marca como error.
+- **La policy deja el reporte original en "Waiting for Verification" aunque ya esté aprobado** (el bloque que aprueba no le cambia el estado). En la interfaz de MGS el Proponente lo sigue viendo como pendiente: **no hay que aprobar reportes desde MGS**, porque se mintearía dos veces. La app se fija en la copia aprobada (`approved_entity_report`) antes de aprobar.
+
+## Hosting en Render
+
+La configuración está en `render.yaml` (Blueprint), `build.sh` y `.python-version`. Crea:
+
+| Servicio | Plan (SUPUESTO) | Para qué |
+| --- | --- | --- |
+| `eggologic` (web) | Starter, con disco de 1 GB en `/var/data` | La app. El disco guarda las fotos de los retiros |
+| `eggologic-db` (PostgreSQL) | basic-256mb | La base |
+| `eggologic-guardian-enviar` (cron, cada 15 minutos) | Starter | La bandeja de salida: corre `guardian_enviar` |
+
+- **Por qué no gratis:** la base gratis vence a los 30 días; el servicio web gratis no tiene disco (las fotos se perderían en cada deploy) y se duerme sin uso; el cron no tiene plan gratis (mínimo US$ 1 por mes). El costo ronda los US$ 15 por mes: confirmalo en la página de precios de Render antes de crear.
+- Región Virginia, la más cercana a Uruguay entre las de Render (SUPUESTO).
+- Render da `https` en `eggologic.onrender.com`, que es lo que necesita el GPS del celular.
+
+**Pasos para crearlo** (los hace Ramón; este entorno no tiene acceso a Render):
+
+1. Mergear la rama a `main` (o elegir esta rama al crear el Blueprint).
+2. En Render: **New → Blueprint**, elegir el repo `Eggologic_APP`. Va a pedir `TIENDA_DATOS_TRANSFERENCIA`.
+3. En **Env Groups → eggologic-guardian**, sumar las variables de Guardian: `GUARDIAN_POLICY_ID`, `GUARDIAN_PROPONENTE_EMAIL`, `GUARDIAN_PROPONENTE_PASSWORD`, `GUARDIAN_R001_EMAIL` y `GUARDIAN_R001_PASSWORD`. Van en el grupo porque Render no las pide desde un grupo, y así la web y el cron las comparten.
+4. Cuando termine el deploy, en el **Shell** del servicio web: `python manage.py createsuperuser` y `python manage.py guardian_estado`.
+5. Entrar a `https://eggologic.onrender.com` (o el dominio que asigne Render) con ese usuario y cargar restaurantes, choferes, etc. desde la administración.
+
+`python manage.py check --deploy` deja tres avisos esperables: la clave secreta local de prueba (Render genera una fuerte), la redirección a https (la hace Render) y HSTS, que conviene activar recién con el dominio definitivo.
+
+## Alta de restaurantes (resolución temporal, 06/10)
+
+Propuesta de Claude, a confirmar:
+
+- **Cada restaurante se carga en la app desde el primer día** (código `R-00X`), y sus retiros se capturan normalmente.
+- **Su usuario en Guardian se crea cuando entra en serio al piloto.** Mientras no lo tenga, sus meses quedan en **Reportes** como "Sin usuario en el registro": no se pierde nada. Cuando se crea el usuario, se verifican los meses atrasados, que siguen en la lista.
+- **Para la demo del 19/10 alcanza con R-001.** Si hay un segundo restaurante activo, conviene darlo de alta antes, para mostrar que sumar uno no requiere volver a publicar la policy.
+- Las credenciales en variables de entorno alcanzan para los pocos restaurantes del piloto. Para muchos restaurantes hará falta otra forma de guardarlas; queda para después.
+
+**Pasos para dar de alta un restaurante en Guardian:**
+
+1. Desde la cuenta de administración del tenant de MGS, invitar un usuario nuevo con un email de Eggologic (un alias tipo `r002@…`), no el del restaurante: Eggologic custodia la cuenta.
+2. Darle el rol de permisos `Default policy user` y asignarle la policy.
+3. Entrar con ese usuario, elegir el rol `Project_Participating_Entity` y completar el alta **solo con el código** (`R-002`) y el tipo "Restaurante".
+4. Con `Eggologic_Proponente`, aprobar el alta.
+5. Sumar `GUARDIAN_R002_EMAIL` y `GUARDIAN_R002_PASSWORD` al grupo `eggologic-guardian` de Render (y al entorno de Claude Code, si se va a probar desde acá).
+6. Correr `python manage.py guardian_estado`: tiene que mostrar el alta aprobada y sin aviso de nombre.
 
 ## Hallazgos
 
@@ -139,23 +201,25 @@ Resuelto con un factor provisorio (decisión 1). Las emisiones solo se muestran 
 7. Hay un solo proyecto validado (Nodo 1), y todos los reportes se vinculan a él.
 8. Solo la administración ve **Reportes** y verifica.
 9. Un mes se puede verificar recién cuando terminó y con todos sus retiros clasificados. Los meses se cuentan en hora de Montevideo.
+10. Render con planes pagos chicos (web Starter con disco de 1 GB, PostgreSQL basic-256mb, cron Starter cada 15 minutos), en la región Virginia.
+11. Resolución temporal para restaurantes nuevos: se cargan en la app desde el primer día, y el usuario en Guardian se crea cuando entran en serio al piloto.
+12. El usuario de Guardian de cada restaurante usa un email de Eggologic (alias), no el del restaurante.
 
 ## Para que Marcel revise (al final)
 
 - `guardian/reportes.py`: `enviar()` y su idempotencia. Antes de cada paso busca el reporte en la grilla de Guardian por el nombre de la actividad (código + mes).
 - `guardian/reportes.py`: `documento()`, que es exactamente lo que queda público.
 - `impacto/calculos.py`: `emisiones_evitadas()`, el factor provisorio.
-- Dos casos borde conocidos:
-  - si Guardian procesa el envío en segundo plano, la aprobación puede fallar una vez con "todavía no aparece" y salir bien en la vuelta siguiente;
-  - si un corte pasa justo después de enviar y antes de que Guardian muestre el reporte, la vuelta siguiente podría enviarlo dos veces.
+- Un caso borde conocido: Guardian procesa los envíos en segundo plano (confirmado en testnet). Si el cron vuelve a correr antes de que el reporte recién enviado aparezca en la grilla del restaurante, y el estado no llegó a guardarse como "enviado" (un corte justo en ese momento), podría enviarlo dos veces. Con el cron cada 15 minutos es muy improbable.
+- La policy deja el reporte original en "Waiting for Verification" aun aprobado: `enviar()` se fija en la copia `approved_entity_report` para no aprobar dos veces.
+- `eggologic/settings.py`: lo nuevo para producción (WhiteNoise, https detrás del proxy de Render, disco para las fotos, errores a la consola).
 - Un retiro de un mes ya verificado se puede seguir editando: el reporte guarda los números verificados, pero la app no avisa la diferencia.
 - FGET se mintea por tCO2e provisorias. Si FGET va a ser Eggos, Eggos queda medido en carbono (H2 del análisis): sigue pendiente.
 
 ## Preguntas para Ramón
 
-1. **Primer envío real.** Todo está probado con un Guardian simulado. El primer envío a Guardian publica un reporte de R-001 que no se puede borrar y mintea FGET. ¿Con qué datos lo hacemos: retiros reales de setiembre, o un reporte de prueba?
-2. **Cron.** `guardian_enviar` tiene que correr cada tantos minutos en el servidor. Depende del hosting, que falta elegir. Hasta entonces se puede correr a mano.
-3. **Otros restaurantes.** R-002 en adelante necesitan su usuario en Guardian (rol PPE, alta solo con el código) y su par de variables `GUARDIAN_R00X_*`.
+1. **Render:** ¿te cierran los planes pagos chicos (unos US$ 15 por mes), o preferís arrancar gratis para la demo, sabiendo que la base vence a los 30 días y las fotos no persisten?
+2. **Alta de restaurantes:** ¿confirmás la resolución temporal? ¿Hay un segundo restaurante para dar de alta antes del 19/10?
 
 ## Cómo correrlo
 
@@ -168,7 +232,7 @@ Usan las variables de entorno de Guardian (ver `.env.example`) y la base de la a
 
 ## Tests
 
-`python manage.py test` corre 68 tests. Los de esta etapa usan un Guardian simulado, sin red, y cubren:
+`python manage.py test` corre 69 tests. Los de esta etapa usan un Guardian simulado, sin red, y cubren:
 
 - login y sesión, y que la contraseña no aparezca en los errores;
 - variables faltantes y error de conexión;
@@ -177,4 +241,4 @@ Usan las variables de entorno de Guardian (ver `.env.example`) y la base de la a
 - qué entra en el mes, y cuándo no se puede verificar (mes en curso, sin clasificar, sin usuario, pocos kg);
 - verificar una sola vez, desde la pantalla, y solo con administración;
 - que el documento lleve el código y nunca el nombre;
-- el envío completo (como restaurante y como Proponente), sin duplicar si se repite, y el error guardado cuando falla.
+- el envío completo (como restaurante y como Proponente), sin duplicar si se repite, la espera sin error cuando el reporte todavía no aparece, y el error guardado cuando falla.

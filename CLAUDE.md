@@ -64,7 +64,7 @@ python manage.py guardian_enviar   # manda a Guardian los reportes verificados (
 | 0 | Propuesta | Aprobada |
 | 1 | Captura | Aprobada |
 | 2 | Tienda e impacto | Para revisar |
-| 3 | Guardian | Para revisar; falta el primer envío real |
+| 3 | Guardian | Para revisar; envío de prueba hecho, falta crear Render |
 | 4 | Entregables ANDE (demo 19/10/2026) | Pendiente |
 
 **Etapa 3 (Guardian).** Usa estas variables de entorno, cargadas según el instructivo que tiene Ramón:
@@ -103,7 +103,12 @@ Cosas de MGS que aprendimos:
 - La policy no deja corregir un alta aprobada: si se revoca, vuelve a "esperando aprobación" con el mismo documento.
 - El restaurante solo puede enviar reportes cuando hay un proyecto validado. El proyecto "Eggologic · FLW Nodo 1 (Maldonado)" quedó validado el 06/10/2026.
 - Al validar un proyecto, Guardian guarda una copia (`approved_project`) además del original (`project`).
+- Guardian procesa los envíos en segundo plano: un reporte recién enviado tarda en aparecerle al Proponente.
+- La policy deja el reporte del restaurante en "Waiting for Verification" aunque ya esté aprobado. **No aprobar reportes desde MGS**: se mintearía dos veces. La app se fija en la copia `approved_entity_report`.
+- Envío de prueba real hecho el 06/10: "PRUEBA · … R-001 2026-09", 0,21 FGET minteados a R-001.
 
 **Reporte mensual (decisiones de Ramón, 06/10).** Un reporte por restaurante por mes. Lo verifica una persona de Eggologic, y la app lo manda como el restaurante y lo aprueba como Proponente, lo que mintea FGET. Las tCO2e usan un factor provisorio hasta que CarboSur dé el suyo. Detalle en `docs/etapa-3.md`.
 
-**Hosting.** Netlify no puede correr Django, así que falta elegir un hosting de Python con `https` (el GPS del celular lo necesita).
+**Hosting: Render** (decisión de Ramón, 06/10). Configuración en `render.yaml`: web con disco para las fotos, PostgreSQL y un cron cada 15 minutos para `guardian_enviar`. Las credenciales de Guardian van en el grupo de variables `eggologic-guardian` del panel, nunca en el repo. Pasos en `docs/etapa-3.md`.
+
+**Restaurantes nuevos (resolución temporal, 06/10).** Se cargan en la app desde el primer día; el usuario en Guardian se crea cuando entran en serio al piloto, con el alta solo con el código. Mientras tanto sus meses esperan en **Reportes**.

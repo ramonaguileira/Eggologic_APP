@@ -289,6 +289,19 @@ class ReporteMensualTests(TestCase):
         tags = [ruta.split("/")[3] for metodo, ruta, _ in guardian.pedidos if metodo == "POST" and "tag" in ruta]
         self.assertEqual(tags, ["approve_ppe_report_btn"])
 
+    def test_si_el_reporte_todavia_no_aparece_espera_sin_error(self):
+        # Guardian procesa el envío en segundo plano: el Proponente puede no verlo todavía.
+        self.retiro(self.huerta, date(2026, 8, 3), "1000")
+        reporte = verificar(self.huerta, AGOSTO, self.admin, HOY)
+        reporte.estado = ReporteMensual.Estado.ENVIADO
+        reporte.save()
+        salida = StringIO()
+        with guardian_falso(GuardianFalso(proyectos=["Validated"])):  # el Proponente no ve ningún reporte
+            call_command("guardian_enviar", stdout=salida)
+        reporte.refresh_from_db()
+        self.assertEqual((reporte.estado, reporte.intentos, reporte.ultimo_error), (ReporteMensual.Estado.ENVIADO, 0, ""))
+        self.assertIn("sigue en la próxima vuelta", salida.getvalue())
+
     def test_si_falla_el_comando_guarda_el_error_y_el_reporte_sigue_en_cola(self):
         self.retiro(self.huerta, date(2026, 8, 3), "1000")
         reporte = verificar(self.huerta, AGOSTO, self.admin, HOY)

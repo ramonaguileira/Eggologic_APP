@@ -61,3 +61,7 @@ Necesita las variables `GUARDIAN_*` (ver `.env.example`).
 - `python manage.py guardian_estado` revisa la conexión con Guardian sin escribir nada.
 - En **Reportes** (`/registro/reportes/`, usuario de administración) se verifica el reporte mensual de cada restaurante.
 - `python manage.py guardian_enviar` manda a Guardian los reportes verificados y reintenta los que fallaron. Va por cron en el servidor. Ojo: escribe en el Guardian real.
+
+## Hosting
+
+La app va en Render: `render.yaml` crea la web, la base y el cron. Los pasos están en [docs/etapa-3.md](docs/etapa-3.md#hosting-en-render).
