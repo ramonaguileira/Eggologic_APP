@@ -69,7 +69,7 @@ python manage.py guardian_enviar   # manda a Guardian los reportes verificados (
 | 2 | Tienda e impacto | Para revisar |
 | 3 | Guardian | Para revisar; envío de prueba hecho |
 | 4 | Entregables ANDE (demo 19/10/2026) | Para revisar |
-| 5 | Experiencia de cliente y restaurante (más simple, clara y estética en el celular) | Después de la respuesta de Marcel |
+| 5 | Experiencia de cliente y restaurante: más simple, clara y estética en el celular; que el cliente se arregle solo (recuperar contraseña por email, entrar con el email, registro más corto) | Después de la respuesta de Marcel |
 
 Todas las etapas pasan a la revisión de Marcel (`docs/para-marcel.md`).
 
