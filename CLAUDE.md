@@ -30,16 +30,20 @@ App piloto de Eggologic (Nodo 1, Maldonado): registra el circuito residuo de res
 
 ## Estructura
 
-- `cuentas/`: usuarios con rol, restaurantes (con código público) y clientes.
+- `cuentas/`: usuarios con rol, restaurantes (con código público) y clientes. Cada persona de campo ve solo su tarea (Ramón, 06/10): chofer (solo retiros), planta (clasificación y lotes), granja (registro diario); operador hace todo el campo; CarboSur ve todo sin editar.
 - `captura/`:
   - retiros: el chofer carga kg, foto y GPS automático; la planta clasifica después;
   - lotes BSF, granja;
-  - panel y exportación CSV para CarboSur.
+  - panel y exportación CSV para CarboSur;
+  - informe del circuito (trazabilidad, línea de base, números para ANDE), con código y nombre de cada restaurante (no va a Guardian);
+  - fotos de los retiros guardadas en la base (`captura/almacen.py`).
 - `tienda/`: productos y pedidos (pago contra entrega o transferencia).
-- `impacto/`: "Mi impacto" de clientes y restaurantes. Todas las fórmulas están en `impacto/calculos.py`.
+- `impacto/`: "Mi impacto" de clientes y restaurantes. Todas las fórmulas están en `impacto/calculos.py`, incluido el factor provisorio de CO2e.
+- `guardian/`: cliente de la API de MGS, reporte mensual por restaurante (lo verifica una persona en **Reportes**) y los comandos `guardian_estado` y `guardian_enviar`.
 - `docs/`:
   - propuesta aprobada (`etapa-0-propuesta.md`);
   - un doc por etapa;
+  - guion de la demo del 19/10 (`demo-19-10.md`) y guía de revisión para Marcel (`para-marcel.md`);
   - análisis de la policy FLW (`guardian/analisis-policy-flw.md`);
   - respuestas sobre la API de Guardian/MGS (`guardian/respuestas-api-mgs.md`).
 
@@ -53,17 +57,22 @@ python manage.py migrate
 python manage.py cargar_demo --password "<contraseña de prueba>"
 python manage.py test
 python manage.py runserver
+python manage.py guardian_estado   # revisa la conexión con Guardian sin escribir nada
+python manage.py guardian_enviar   # manda a Guardian los reportes verificados (escribe en el Guardian real)
 ```
 
-## Estado (05/10/2026)
+## Estado (06/10/2026)
 
 | Etapa | Contenido | Estado |
 | --- | --- | --- |
 | 0 | Propuesta | Aprobada |
 | 1 | Captura | Aprobada |
 | 2 | Tienda e impacto | Para revisar |
-| 3 | Guardian | Configuración lista; falta el código |
-| 4 | Entregables ANDE (demo 19/10/2026) | Pendiente |
+| 3 | Guardian | Para revisar; envío de prueba hecho |
+| 4 | Entregables ANDE (demo 19/10/2026) | Para revisar |
+| 5 | Experiencia de cliente y restaurante: más simple, clara y estética en el celular; que el cliente se arregle solo (recuperar contraseña por email, entrar con el email, registro más corto) | Después de la respuesta de Marcel |
+
+Todas las etapas pasan a la revisión de Marcel (`docs/para-marcel.md`).
 
 **Etapa 3 (Guardian).** Usa estas variables de entorno, cargadas según el instructivo que tiene Ramón:
 
@@ -90,7 +99,7 @@ Lo que Ramón dejó hecho en Guardian (MGS 1.6.1), según el instructivo, el 05/
   | --- | --- |
   | `Eggologic_Proponente` | Project_Proponent |
   | `Eggologic_vvb` | VVB (CarboSur) |
-  | `Eggologic_r001` | Project_Participating_Entity, nombre `R-001` |
+  | `Eggologic_r001` | Project_Participating_Entity. El alta quedó con el nombre comercial, no `R-001` (ver `docs/etapa-3.md`) |
 
 - El Proponente aprobó al restaurante y el Standard Registry aprobó al VVB.
 - Red del entorno: `guardianservice.app` y `testnet.mirrornode.hedera.com` permitidos.
@@ -105,5 +114,15 @@ Cosas de MGS que aprendimos:
 
 - Las invitaciones se mandan desde la cuenta de administrador del tenant, no desde el Standard Registry.
 - Un usuario sin el rol `Default policy user` recibe "Access Restricted" y errores 403.
+- La policy no deja corregir un alta aprobada: si se revoca, vuelve a "esperando aprobación" con el mismo documento.
+- El restaurante solo puede enviar reportes cuando hay un proyecto validado. El proyecto "Eggologic · FLW Nodo 1 (Maldonado)" quedó validado el 06/10/2026.
+- Al validar un proyecto, Guardian guarda una copia (`approved_project`) además del original (`project`).
+- Guardian procesa los envíos en segundo plano: un reporte recién enviado tarda en aparecerle al Proponente.
+- La policy deja el reporte del restaurante en "Waiting for Verification" aunque ya esté aprobado. **No aprobar reportes desde MGS**: se mintearía dos veces. La app se fija en la copia `approved_entity_report`.
+- Envío de prueba real hecho el 06/10: "PRUEBA · … R-001 2026-09", 0,21 FGET minteados a R-001.
 
-**Hosting.** Netlify no puede correr Django, así que falta elegir un hosting de Python con `https` (el GPS del celular lo necesita).
+**Reporte mensual (decisiones de Ramón, 06/10).** Un reporte por restaurante por mes. Lo verifica una persona de Eggologic, y la app lo manda como el restaurante y lo aprueba como Proponente, lo que mintea FGET. Las tCO2e usan un factor provisorio hasta que CarboSur dé el suyo. Detalle en `docs/etapa-3.md`.
+
+**Hosting: Render, planes gratis** (decisiones de Ramón, 06/10). Configuración en `render.yaml`: web y PostgreSQL gratis. Sin cron (los reportes se mandan con el botón **Enviar al registro** de Reportes) y sin disco: las fotos de los retiros se guardan en la base (`captura/almacen.py`). En línea en https://eggologic.onrender.com desde el 06/10. **La base gratis vence el 04/11/2026**: antes hay que pasarla a pago o exportar un respaldo. El primer admin lo crea `build.sh` con `crear_admin`. Las credenciales de Guardian van en el grupo de variables `eggologic-guardian` del panel, nunca en el repo. Pasos y cómo pasar a pago en `docs/etapa-3.md`.
+
+**Restaurantes nuevos (resolución temporal, 06/10).** Se cargan en la app desde el primer día; el usuario en Guardian se crea cuando entran en serio al piloto, con el alta solo con el código. Mientras tanto sus meses esperan en **Reportes**. No habrá restaurantes nuevos antes del 19/10.

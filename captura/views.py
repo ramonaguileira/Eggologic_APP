@@ -1,5 +1,5 @@
 import csv
-from datetime import timedelta
+from datetime import date, timedelta
 
 from django.contrib import messages
 from django.db.models import Count, F, Q, Sum
@@ -10,6 +10,8 @@ from django.utils.formats import number_format
 
 from cuentas.models import Usuario
 from cuentas.permisos import requiere
+from guardian.models import ReporteMensual
+from impacto import calculos
 
 from .forms import LoteForm, RegistroGranjaForm, RetiroChoferForm, RetiroClasificacionForm
 from .models import Lote, RegistroGranja, Retiro
@@ -49,22 +51,46 @@ def panel(request):
     return render(request, "captura/panel.html", contexto)
 
 
+@requiere(Usuario.puede_ver_datos)
+def informe(request):
+    """Informe del circuito entre dos fechas, para ANDE y CarboSur. Se imprime o se guarda como
+    PDF desde el navegador. Por defecto, desde el primer retiro hasta hoy."""
+    hoy = timezone.localdate()
+    primero = Retiro.objects.order_by("fecha").first()
+    desde = _fecha(request.GET.get("desde")) or (timezone.localtime(primero.fecha).date() if primero else hoy)
+    hasta = _fecha(request.GET.get("hasta")) or hoy
+    contexto = calculos.informe(desde, hasta)
+    contexto.update({
+        "desde": desde,
+        "hasta": hasta,
+        "reportes": ReporteMensual.objects.filter(mes__range=(desde.replace(day=1), hasta)).select_related("restaurante"),
+    })
+    return render(request, "captura/informe.html", contexto)
+
+
+def _fecha(texto):
+    try:
+        return date.fromisoformat(texto or "")
+    except ValueError:
+        return None
+
+
 # --- Listas -------------------------------------------------------------------
 
 
-@requiere(Usuario.puede_ver_datos)
+@requiere(Usuario.puede_ver_retiros_y_lotes)
 def retiros(request):
     lista = Retiro.objects.select_related("restaurante", "lote")[:CANTIDAD_EN_LISTAS]
     return render(request, "captura/retiros.html", {"retiros": lista})
 
 
-@requiere(Usuario.puede_ver_datos)
+@requiere(Usuario.puede_ver_retiros_y_lotes)
 def lotes(request):
     lista = Lote.objects.prefetch_related("retiros")[:CANTIDAD_EN_LISTAS]
     return render(request, "captura/lotes.html", {"lotes": lista})
 
 
-@requiere(Usuario.puede_ver_datos)
+@requiere(Usuario.puede_ver_granja)
 def granja(request):
     lista = RegistroGranja.objects.select_related("lote")[:CANTIDAD_EN_LISTAS]
     return render(request, "captura/granja.html", {"registros": lista})
@@ -83,15 +109,15 @@ def _formulario(request, clase_form, instancia, titulo, volver_a, plantilla="cap
     return render(request, plantilla, {"form": form, "titulo": titulo, "volver_a": volver_a})
 
 
-@requiere(Usuario.puede_capturar)
+@requiere(Usuario.puede_retirar)
 def retiro_nuevo(request):
     retiro = Retiro(registrado_por=request.user)
-    return _formulario(
-        request, RetiroChoferForm, retiro, "Nuevo retiro", "captura:retiros", "captura/retiro_nuevo.html"
-    )
+    # El chofer no ve la lista de retiros: después de guardar vuelve al formulario vacío.
+    volver_a = "captura:retiros" if request.user.puede_ver_retiros_y_lotes() else "captura:retiro_nuevo"
+    return _formulario(request, RetiroChoferForm, retiro, "Nuevo retiro", volver_a, "captura/retiro_nuevo.html")
 
 
-@requiere(Usuario.puede_capturar)
+@requiere(Usuario.puede_clasificar)
 def retiro_clasificar(request, pk):
     retiro = get_object_or_404(Retiro.objects.select_related("restaurante"), pk=pk)
     kg = number_format(retiro.kg_levantados, 1)
@@ -99,7 +125,7 @@ def retiro_clasificar(request, pk):
     return _formulario(request, RetiroClasificacionForm, retiro, titulo, "captura:retiros")
 
 
-@requiere(Usuario.puede_ver_datos)
+@requiere(Usuario.puede_ver_retiros_y_lotes)
 def retiro_foto(request, pk):
     """Las fotos no se publican por URL: solo las ve quien tiene acceso a los datos de campo."""
     retiro = get_object_or_404(Retiro, pk=pk)
@@ -108,25 +134,25 @@ def retiro_foto(request, pk):
     return FileResponse(retiro.foto.open("rb"))
 
 
-@requiere(Usuario.puede_capturar)
+@requiere(Usuario.puede_clasificar)
 def lote_nuevo(request):
     lote = Lote(registrado_por=request.user)
     return _formulario(request, LoteForm, lote, "Nuevo lote", "captura:lotes")
 
 
-@requiere(Usuario.puede_capturar)
+@requiere(Usuario.puede_clasificar)
 def lote_editar(request, pk):
     lote = get_object_or_404(Lote, pk=pk)
     return _formulario(request, LoteForm, lote, f"Lote N.º {pk}", "captura:lotes")
 
 
-@requiere(Usuario.puede_capturar)
+@requiere(Usuario.puede_cargar_granja)
 def granja_nuevo(request):
     registro = RegistroGranja(registrado_por=request.user)
     return _formulario(request, RegistroGranjaForm, registro, "Registro de granja", "captura:granja")
 
 
-@requiere(Usuario.puede_capturar)
+@requiere(Usuario.puede_cargar_granja)
 def granja_editar(request, pk):
     registro = get_object_or_404(RegistroGranja, pk=pk)
     return _formulario(request, RegistroGranjaForm, registro, "Registro de granja", "captura:granja")

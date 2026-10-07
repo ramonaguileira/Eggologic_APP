@@ -5,8 +5,11 @@ from django.db import models
 class Usuario(AbstractUser):
     class Rol(models.TextChoices):
         ADMIN = "admin", "Administración"
-        # SUPUESTO: un solo rol para chofer, planta BSF y granja.
-        OPERADOR = "operador", "Operador de campo"
+        # Cada persona de campo ve solo lo suyo (pedido de Ramón, 06/10).
+        CHOFER = "chofer", "Chofer (solo carga retiros)"
+        PLANTA = "planta", "Planta (clasifica retiros y lleva los lotes)"
+        GRANJA = "granja", "Granja (registro diario)"
+        OPERADOR = "operador", "Operador de campo (todas las tareas de campo)"
         RESTAURANTE = "restaurante", "Restaurante"
         CLIENTE = "cliente", "Cliente"
         CARBOSUR = "carbosur", "CarboSur (solo lectura)"
@@ -16,12 +19,25 @@ class Usuario(AbstractUser):
     def es_admin(self):
         return self.is_superuser or self.rol == self.Rol.ADMIN
 
-    def puede_capturar(self):
-        return self.es_admin() or self.rol == self.Rol.OPERADOR
+    def puede_retirar(self):
+        return self.es_admin() or self.rol in (self.Rol.CHOFER, self.Rol.OPERADOR)
+
+    def puede_clasificar(self):
+        """Clasificar retiros y llevar los lotes BSF: el trabajo de la planta."""
+        return self.es_admin() or self.rol in (self.Rol.PLANTA, self.Rol.OPERADOR)
+
+    def puede_cargar_granja(self):
+        return self.es_admin() or self.rol in (self.Rol.GRANJA, self.Rol.OPERADOR)
 
     def puede_ver_datos(self):
-        """Ver los registros de campo y exportarlos (sin poder editarlos)."""
-        return self.puede_capturar() or self.rol == self.Rol.CARBOSUR
+        """Panel, informe, exportaciones y todos los registros de campo."""
+        return self.es_admin() or self.rol in (self.Rol.OPERADOR, self.Rol.CARBOSUR)
+
+    def puede_ver_retiros_y_lotes(self):
+        return self.puede_ver_datos() or self.puede_clasificar()
+
+    def puede_ver_granja(self):
+        return self.puede_ver_datos() or self.puede_cargar_granja()
 
     def puede_comprar(self):
         return self.rol in (self.Rol.CLIENTE, self.Rol.RESTAURANTE)

@@ -186,3 +186,14 @@ class RegistroGranja(RegistroBase):
 
     def __str__(self):
         return f"Granja {date_format(self.fecha, 'd/m/Y')}"
+
+
+class Archivo(models.Model):
+    """Contenido de un archivo subido (hoy, las fotos de los retiros). Lo usa captura.almacen."""
+
+    nombre = models.CharField(max_length=255, unique=True)
+    contenido = models.BinaryField()
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.nombre

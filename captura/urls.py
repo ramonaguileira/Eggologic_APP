@@ -6,6 +6,7 @@ app_name = "captura"
 
 urlpatterns = [
     path("", views.panel, name="panel"),
+    path("informe/", views.informe, name="informe"),
     path("retiros/", views.retiros, name="retiros"),
     path("retiros/nuevo/", views.retiro_nuevo, name="retiro_nuevo"),
     path("retiros/<int:pk>/clasificar/", views.retiro_clasificar, name="retiro_clasificar"),

@@ -7,7 +7,7 @@ from django.core.exceptions import PermissionDenied
 def requiere(chequeo):
     """Exige estar logueado y que chequeo(usuario) sea verdadero; si no, responde 403.
 
-    Uso: @requiere(Usuario.puede_capturar)
+    Uso: @requiere(Usuario.puede_retirar)
     """
 
     def decorador(vista):

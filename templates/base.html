@@ -12,16 +12,22 @@
     <a class="marca" href="{% url 'inicio' %}">🥚 Eggologic</a>
     {% if user.is_authenticated %}
       <nav class="menu">
-        {% if user.puede_ver_datos %}
-          <a href="{% url 'captura:panel' %}">Panel</a>
+        {% if user.puede_ver_datos %}<a href="{% url 'captura:panel' %}">Panel</a>{% endif %}
+        {% if user.puede_ver_retiros_y_lotes %}
           <a href="{% url 'captura:retiros' %}">Retiros</a>
           <a href="{% url 'captura:lotes' %}">Lotes</a>
-          <a href="{% url 'captura:granja' %}">Granja</a>
+        {% elif user.puede_retirar %}
+          <a href="{% url 'captura:retiro_nuevo' %}">Nuevo retiro</a>
         {% endif %}
+        {% if user.puede_ver_granja %}<a href="{% url 'captura:granja' %}">Granja</a>{% endif %}
+        {% if user.puede_ver_datos %}<a href="{% url 'captura:informe' %}">Informe</a>{% endif %}
         {% if user.puede_comprar %}
           <a href="{% url 'impacto:mi_impacto' %}">Mi impacto</a>
           <a href="{% url 'tienda:tienda' %}">Tienda</a>
           <a href="{% url 'tienda:mis_pedidos' %}">Mis pedidos</a>
+        {% endif %}
+        {% if user.es_admin %}
+          <a href="{% url 'guardian:reportes' %}">Reportes</a>
         {% endif %}
         {% if user.is_staff %}
           <a href="{% url 'admin:tienda_pedido_changelist' %}">Pedidos</a>

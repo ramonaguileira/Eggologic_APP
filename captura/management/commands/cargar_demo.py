@@ -11,11 +11,10 @@ from cuentas.models import Cliente, Restaurante, Usuario
 from tienda.models import ItemPedido, Pedido, Producto
 
 RESTAURANTES = [("R-001", "La Huerta"), ("R-002", "Parrilla del Puerto"), ("R-003", "Café Botánico")]
-# SUPUESTO: productos y precios de ejemplo, se cambian desde la administración.
+# Productos y precios reales (Ramón, 06/10). Se cambian desde la administración.
 PRODUCTOS = [
-    ("Media docena", "6 huevos de gallinas regenerativas.", 6, "150"),
-    ("Docena", "12 huevos de gallinas regenerativas.", 12, "280"),
-    ("Maple", "30 huevos, ideal para familias y cocinas.", 30, "650"),
+    ("Quincena", "15 huevos de gallinas regenerativas.", 15, "160"),
+    ("Maple", "30 huevos, ideal para familias y cocinas.", 30, "310"),
 ]
 DIAS = 120
 
@@ -42,6 +41,8 @@ class Command(BaseCommand):
 
         self.crear_usuario("admin", Usuario.Rol.ADMIN, password, superusuario=True)
         operador = self.crear_usuario("operador", Usuario.Rol.OPERADOR, password)
+        for rol in (Usuario.Rol.CHOFER, Usuario.Rol.PLANTA, Usuario.Rol.GRANJA):
+            self.crear_usuario(rol, rol, password)
         self.crear_usuario("carbosur", Usuario.Rol.CARBOSUR, password)
         restaurantes = [
             Restaurante.objects.get_or_create(codigo=codigo, defaults={"nombre": nombre})[0]
@@ -52,7 +53,7 @@ class Command(BaseCommand):
         self.cargar_tienda(password, restaurantes[0])
 
         self.stdout.write(self.style.SUCCESS(
-            f"Listo: usuarios admin, operador, carbosur, cliente y restaurante; "
+            f"Listo: usuarios admin, operador, chofer, planta, granja, carbosur, cliente y restaurante; "
             f"{Retiro.objects.count()} retiros, {Lote.objects.count()} lotes, "
             f"{RegistroGranja.objects.count()} días de granja y {Pedido.objects.count()} pedidos."
         ))

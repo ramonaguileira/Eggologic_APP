@@ -9,8 +9,15 @@ from .forms import RegistroClienteForm
 @login_required
 def inicio(request):
     """Lleva a cada usuario a su pantalla según el rol."""
-    if request.user.puede_ver_datos():
+    usuario = request.user
+    if usuario.puede_ver_datos():
         return redirect("captura:panel")
+    if usuario.puede_clasificar():
+        return redirect("captura:retiros")
+    if usuario.puede_cargar_granja():
+        return redirect("captura:granja")
+    if usuario.puede_retirar():
+        return redirect("captura:retiro_nuevo")
     return redirect("impacto:mi_impacto")
 
 
