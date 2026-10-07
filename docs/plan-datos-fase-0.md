@@ -1,14 +1,15 @@
 # Plan de datos — Fase 0: ajustes rápidos
 
 - **Fecha:** 07/10/2026
-- **Estado:** para revisar. Hecha en la rama `claude/eggologic-dapp-architecture-2duov2`. Todavía no está en Render (ver "Preguntas").
+- **Estado:** para revisar. Publicada en Render el 07/10 con el OK de Ramón: la rama `claude/eggologic-dapp-architecture-2duov2` se unió a `claude/peaceful-bardeen-4k285s`, que es la que publica Render.
 - **Base:** la auditoría de datos y el plan de implementación (docs de Claude que tiene Ramón). La Fase 0 no agrega datos nuevos: corrige lo que la auditoría encontró y es rápido de arreglar.
 
 ## Decisiones de Ramón (07/10)
 
-1. **El pesaje se hace en la planta**, con balanza. El chofer anota solo el restaurante y la cantidad de bultos. Esto cambia la Fase 1, no la Fase 0.
-2. **Balanza:** DingQi DQEH01301, de plataforma, 300 kg. Faltan su resolución, el certificado de calibración y la tara de la bolsa (Fase 1).
+1. **El pesaje se hace en la planta**, con balanza. El chofer anota solo el restaurante y la cantidad de bultos, y sigue sacando la foto del retiro. Esto cambia la Fase 1, no la Fase 0.
+2. **Balanza:** DingQi DQEH01301, de plataforma, 300 kg. Faltan su resolución y el certificado de calibración (Fase 1).
 3. **Render:** la base pasa a un plan pago antes del 04/11/2026. El cambio se hace en el panel de Render; el código no cambia.
+4. **Contenedor:** cajón de leche, de 2,2 kg vacío. La tara de un retiro es la cantidad de cajones por 2,2 kg. En la Fase 1 conviene pesar algunos cajones con la balanza para verificar ese peso.
 
 ## Qué se hizo
 
@@ -65,6 +66,8 @@ Nuevos:
 - `captura.tests.CargarDemoTests`: `cargar_demo` corre entero y crea un usuario de cada rol.
 - `guardian.tests`: la pantalla Reportes dice "Revisado" y no "Verificado". Los tests anteriores usan los nombres nuevos.
 
+Las dos migraciones se probaron en PostgreSQL 16, como en Render, sobre una base con el esquema anterior y datos cargados. El reporte conservó quién lo revisó y cuándo, y el lote con retiros quedó protegido. Los 93 tests pasan también en PostgreSQL.
+
 También se probó en el navegador, con los datos de `cargar_demo`:
 
 - la exportación de setiembre de R-001 bajó 15 retiros, con la hora y la zona;
@@ -88,10 +91,10 @@ También se probó en el navegador, con los datos de `cargar_demo`:
 
 ## Preguntas
 
-1. **Pasar la Fase 0 a Render.** Render publica la rama `claude/peaceful-bardeen-4k285s`: lo que entra ahí sale en línea solo. La Fase 0 está en esta rama, que ya tiene todo lo de Render. Para publicarla hay dos caminos:
-   - unir esta rama a `claude/peaceful-bardeen-4k285s`, desde GitHub o pidiéndomelo;
-   - cambiar en Render la rama que se publica.
+Respondidas por Ramón el 07/10:
 
-   El error del informe está hoy en línea, así que conviene publicarla antes del 19/10.
-2. **Fase 1:** ¿el chofer sigue sacando la foto del retiro, o la foto pasa al pesaje en la planta?
-3. **Fase 1:** ¿qué bolsa o contenedor se usa, y cuánto pesa vacío? Con eso se calcula la tara.
+1. **Publicar en Render:** sí. Se unió la rama a `claude/peaceful-bardeen-4k285s`.
+2. **Foto del retiro:** la sigue sacando el chofer.
+3. **Contenedor:** cajón de leche de 2,2 kg.
+
+No quedan preguntas abiertas de la Fase 0.

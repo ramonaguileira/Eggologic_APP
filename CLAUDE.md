@@ -70,7 +70,7 @@ python manage.py guardian_enviar   # manda a Guardian los reportes revisados (es
 | 2 | Tienda e impacto | Para revisar |
 | 3 | Guardian | Para revisar; envío de prueba hecho |
 | 4 | Entregables ANDE (demo 19/10/2026) | Para revisar |
-| Datos | Plan de datos tras la auditoría (fases 0 a 5, hasta marzo de 2027) | Fase 0 para revisar (`docs/plan-datos-fase-0.md`); falta publicarla en Render |
+| Datos | Plan de datos tras la auditoría (fases 0 a 5, hasta marzo de 2027) | Fase 0 para revisar y publicada en Render (`docs/plan-datos-fase-0.md`) |
 | 5 | Experiencia de cliente y restaurante: más simple, clara y estética en el celular; que el cliente se arregle solo (recuperar contraseña por email, entrar con el email, registro más corto) | Después de la respuesta de Marcel |
 
 Todas las etapas pasan a la revisión de Marcel (`docs/para-marcel.md`).
@@ -126,6 +126,6 @@ Cosas de MGS que aprendimos:
 
 **Hosting: Render, planes gratis** (decisiones de Ramón, 06/10). Configuración en `render.yaml`: web y PostgreSQL gratis. Sin cron (los reportes se mandan con el botón **Enviar al registro** de Reportes) y sin disco: las fotos de los retiros se guardan en la base (`captura/almacen.py`). En línea en https://eggologic.onrender.com desde el 06/10. **La base gratis vence el 04/11/2026**: antes hay que pasarla a pago o exportar un respaldo. El primer admin lo crea `build.sh` con `crear_admin`. Las credenciales de Guardian van en el grupo de variables `eggologic-guardian` del panel, nunca en el repo. Pasos y cómo pasar a pago en `docs/etapa-3.md`.
 
-**Plan de datos (decisiones de Ramón, 07/10).** El pesaje se hace en la planta, con una balanza DingQi DQEH01301 de plataforma de 300 kg. El chofer anota solo el restaurante y la cantidad de bultos. La base de Render pasa a un plan pago antes del 04/11/2026. En la app, la revisión de Eggologic se dice "revisado"; "verificado" queda para la verificación externa (UNIT).
+**Plan de datos (decisiones de Ramón, 07/10).** El pesaje se hace en la planta, con una balanza DingQi DQEH01301 de plataforma de 300 kg. El chofer anota solo el restaurante y la cantidad de bultos, y sigue sacando la foto. Los bultos son cajones de leche de 2,2 kg vacíos: la tara es la cantidad de cajones por 2,2 kg. La base de Render pasa a un plan pago antes del 04/11/2026. En la app, la revisión de Eggologic se dice "revisado"; "verificado" queda para la verificación externa (UNIT).
 
 **Restaurantes nuevos (resolución temporal, 06/10).** Se cargan en la app desde el primer día; el usuario en Guardian se crea cuando entran en serio al piloto, con el alta solo con el código. Mientras tanto sus meses esperan en **Reportes**. No habrá restaurantes nuevos antes del 19/10.
