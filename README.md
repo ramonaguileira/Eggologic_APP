@@ -64,8 +64,8 @@ python manage.py test
 Necesita las variables `GUARDIAN_*` (ver `.env.example`).
 
 - `python manage.py guardian_estado` revisa la conexión con Guardian sin escribir nada.
-- En **Reportes** (`/registro/reportes/`, usuario de administración) se verifica el reporte mensual de cada restaurante.
-- `python manage.py guardian_enviar` manda a Guardian los reportes verificados y reintenta los que fallaron. Va por cron en el servidor. Ojo: escribe en el Guardian real.
+- En **Reportes** (`/registro/reportes/`, usuario de administración) se revisa el reporte mensual de cada restaurante.
+- `python manage.py guardian_enviar` manda a Guardian los reportes revisados y reintenta los que fallaron. Va por cron en el servidor. Ojo: escribe en el Guardian real.
 
 ## Hosting
 

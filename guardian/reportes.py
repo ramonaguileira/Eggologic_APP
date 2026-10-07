@@ -1,4 +1,4 @@
-"""Reporte mensual de cada restaurante: se arma con sus retiros, lo verifica una persona de
+"""Reporte mensual de cada restaurante: se arma con sus retiros, lo revisa una persona de
 Eggologic y se manda a la policy FLW.
 
 En Guardian son dos pasos. El restaurante envía su Ground Entity Report (rol PPE) y el
@@ -36,7 +36,7 @@ def periodo(mes):
 
 
 def revisar(restaurante, mes, hoy=None):
-    """Números del mes de un restaurante y, si todavía no se puede verificar, el motivo."""
+    """Números del mes de un restaurante y, si todavía no se puede dar por revisado, el motivo."""
     hoy = hoy or timezone.localdate()
     desde, hasta = periodo(mes)
     totales = Retiro.objects.filter(restaurante=restaurante, fecha__date__range=(desde, hasta)).aggregate(
@@ -70,7 +70,7 @@ def revisar(restaurante, mes, hoy=None):
     }
 
 
-def meses_por_verificar(hoy=None):
+def meses_por_revisar(hoy=None):
     """Cada restaurante y mes con retiros que todavía no tiene reporte, del más nuevo al más viejo."""
     hoy = hoy or timezone.localdate()
     pares = list(
@@ -80,23 +80,23 @@ def meses_por_verificar(hoy=None):
         .values_list("restaurante", "mes")
         .distinct()
     )
-    verificados = set(ReporteMensual.objects.values_list("restaurante", "mes"))
+    revisados = set(ReporteMensual.objects.values_list("restaurante", "mes"))
     restaurantes = Restaurante.objects.in_bulk({restaurante for restaurante, _ in pares})
     filas = [
         revisar(restaurantes[restaurante], mes, hoy)
         for restaurante, mes in pares
-        if (restaurante, mes) not in verificados
+        if (restaurante, mes) not in revisados
     ]
     return sorted(filas, key=lambda fila: (-fila["mes"].toordinal(), fila["restaurante"].codigo))
 
 
-def verificar(restaurante, mes, usuario, hoy=None):
+def dar_por_revisado(restaurante, mes, usuario, hoy=None):
     """Una persona de Eggologic revisó los números: el reporte queda en cola para Guardian."""
     revision = revisar(restaurante, mes, hoy)
     if revision["motivo"]:
         raise ValidationError(revision["motivo"])
     if ReporteMensual.objects.filter(restaurante=restaurante, mes=mes).exists():
-        raise ValidationError("Ese mes ya está verificado.")
+        raise ValidationError("Ese mes ya está revisado.")
     emisiones = revision["emisiones"]
     return ReporteMensual.objects.create(
         restaurante=restaurante,
@@ -107,7 +107,7 @@ def verificar(restaurante, mes, usuario, hoy=None):
         tco2e_proyecto=emisiones["proyecto"],
         tco2e_fugas=emisiones["fugas"],
         tco2e_neto=emisiones["neto"],
-        verificado_por=usuario,
+        revisado_por=usuario,
     )
 
 

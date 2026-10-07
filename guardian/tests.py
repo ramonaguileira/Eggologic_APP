@@ -17,7 +17,7 @@ from cuentas.models import Restaurante, Usuario
 
 from .cliente import ErrorGuardian, Sesion, clave_de_restaurante
 from .models import ReporteMensual
-from .reportes import documento, enviar, meses_por_verificar, revisar, verificar
+from .reportes import dar_por_revisado, documento, enviar, meses_por_revisar, revisar
 
 URL = "https://guardian.prueba/api/v1"
 VARIABLES = {
@@ -239,38 +239,38 @@ class ReporteMensualTests(TestCase):
         self.assertEqual(revision["emisiones"]["neto"], Decimal("0.35"))  # 1000 × 0,70 × 0,5 / 1000
         self.assertEqual(revision["motivo"], "")
 
-    def test_no_se_verifica_un_mes_abierto_ni_con_retiros_sin_clasificar(self):
+    def test_no_se_revisa_un_mes_abierto_ni_con_retiros_sin_clasificar(self):
         self.retiro(self.huerta, date(2026, 10, 2))
         self.assertEqual(revisar(self.huerta, date(2026, 10, 1), HOY)["motivo"], "Mes en curso")
         self.retiro(self.huerta, date(2026, 8, 3))
         self.retiro(self.huerta, date(2026, 8, 4), clasificado=False)
         self.assertEqual(revisar(self.huerta, AGOSTO, HOY)["motivo"], "Faltan clasificar 1")
 
-    def test_no_se_verifica_sin_usuario_en_guardian_ni_con_muy_pocos_kg(self):
+    def test_no_se_revisa_sin_usuario_en_guardian_ni_con_muy_pocos_kg(self):
         self.retiro(self.parrilla, date(2026, 8, 3))
         self.assertEqual(revisar(self.parrilla, AGOSTO, HOY)["motivo"], "Sin usuario en el registro")
         self.retiro(self.huerta, date(2026, 8, 3), "20")  # 0,007 tCO2e: no llega a 0,01
         self.assertEqual(revisar(self.huerta, AGOSTO, HOY)["motivo"], "Muy pocos kg")
 
-    def test_meses_por_verificar_saca_el_mes_en_curso_y_los_verificados(self):
+    def test_meses_por_revisar_saca_el_mes_en_curso_y_los_revisados(self):
         self.retiro(self.huerta, date(2026, 8, 3))
         self.retiro(self.huerta, date(2026, 9, 3))
         self.retiro(self.huerta, date(2026, 10, 3))
-        verificar(self.huerta, AGOSTO, self.admin, HOY)
-        meses = [(fila["restaurante"].codigo, fila["mes"]) for fila in meses_por_verificar(HOY)]
+        dar_por_revisado(self.huerta, AGOSTO, self.admin, HOY)
+        meses = [(fila["restaurante"].codigo, fila["mes"]) for fila in meses_por_revisar(HOY)]
         self.assertEqual(meses, [("R-001", date(2026, 9, 1))])
 
-    def test_verificar_guarda_los_numeros_una_sola_vez(self):
+    def test_dar_por_revisado_guarda_los_numeros_una_sola_vez(self):
         self.retiro(self.huerta, date(2026, 8, 3), "1000")
-        reporte = verificar(self.huerta, AGOSTO, self.admin, HOY)
+        reporte = dar_por_revisado(self.huerta, AGOSTO, self.admin, HOY)
         self.assertEqual((reporte.retiros, reporte.kg_organicos, reporte.tco2e_neto), (1, Decimal("1000"), Decimal("0.35")))
         self.assertEqual(reporte.estado, ReporteMensual.Estado.EN_COLA)
-        with self.assertRaisesMessage(Exception, "ya está verificado"):
-            verificar(self.huerta, AGOSTO, self.admin, HOY)
+        with self.assertRaisesMessage(Exception, "ya está revisado"):
+            dar_por_revisado(self.huerta, AGOSTO, self.admin, HOY)
 
     def test_el_documento_lleva_el_codigo_y_nunca_el_nombre(self):
         self.retiro(self.huerta, date(2026, 8, 3), "1000")
-        doc = documento(verificar(self.huerta, AGOSTO, self.admin, HOY))
+        doc = documento(dar_por_revisado(self.huerta, AGOSTO, self.admin, HOY))
         self.assertEqual(doc["field0"], "Retiros de residuo orgánico R-001 2026-08")
         self.assertEqual(doc["field7"], 0.35)
         self.assertEqual(doc["field8"], {"field0": "2026-08-01", "field1": "2026-08-31"})
@@ -278,7 +278,7 @@ class ReporteMensualTests(TestCase):
 
     def test_enviar_manda_el_reporte_como_restaurante_y_lo_aprueba_como_proponente(self):
         self.retiro(self.huerta, date(2026, 8, 3), "1000")
-        reporte = verificar(self.huerta, AGOSTO, self.admin, HOY)
+        reporte = dar_por_revisado(self.huerta, AGOSTO, self.admin, HOY)
         guardian = GuardianFalso(proyectos=["Validated"])
         with guardian_falso(guardian):
             enviar(reporte)
@@ -291,7 +291,7 @@ class ReporteMensualTests(TestCase):
 
     def test_enviar_de_nuevo_no_duplica_el_reporte(self):
         self.retiro(self.huerta, date(2026, 8, 3), "1000")
-        reporte = verificar(self.huerta, AGOSTO, self.admin, HOY)
+        reporte = dar_por_revisado(self.huerta, AGOSTO, self.admin, HOY)
         guardian = GuardianFalso(proyectos=["Validated"])
         guardian.reportes.append(reporte_en_guardian(documento(reporte), "entity_report", "Waiting for Verification"))
         with guardian_falso(guardian):
@@ -302,7 +302,7 @@ class ReporteMensualTests(TestCase):
     def test_si_el_reporte_todavia_no_aparece_espera_sin_error(self):
         # Guardian procesa el envío en segundo plano: el Proponente puede no verlo todavía.
         self.retiro(self.huerta, date(2026, 8, 3), "1000")
-        reporte = verificar(self.huerta, AGOSTO, self.admin, HOY)
+        reporte = dar_por_revisado(self.huerta, AGOSTO, self.admin, HOY)
         reporte.estado = ReporteMensual.Estado.ENVIADO
         reporte.save()
         salida = StringIO()
@@ -314,7 +314,7 @@ class ReporteMensualTests(TestCase):
 
     def test_si_falla_el_comando_guarda_el_error_y_el_reporte_sigue_en_cola(self):
         self.retiro(self.huerta, date(2026, 8, 3), "1000")
-        reporte = verificar(self.huerta, AGOSTO, self.admin, HOY)
+        reporte = dar_por_revisado(self.huerta, AGOSTO, self.admin, HOY)
         with guardian_falso(GuardianFalso(proyectos=[])):  # sin proyecto validado
             call_command("guardian_enviar", stdout=StringIO())
         reporte.refresh_from_db()
@@ -343,7 +343,7 @@ class PantallaDeReportesTests(TestCase):
         self.assertEqual(self.client.get(reverse("guardian:reportes")).status_code, 403)
 
     def test_enviar_al_registro_desde_la_pantalla(self):
-        verificar(self.huerta, self.mes_pasado, self.admin)
+        dar_por_revisado(self.huerta, self.mes_pasado, self.admin)
         self.client.force_login(self.admin)
         self.assertContains(self.client.get(reverse("guardian:reportes")), "Enviar al registro")
         self.assertEqual(self.client.get(reverse("guardian:enviar_al_registro")).status_code, 405)
@@ -353,7 +353,7 @@ class PantallaDeReportesTests(TestCase):
         self.assertEqual(ReporteMensual.objects.get().estado, ReporteMensual.Estado.REGISTRADO)
         self.assertNotContains(respuesta, "Enviar al registro</button>")
 
-    def test_verificar_desde_la_pantalla(self):
+    def test_dar_por_revisado_desde_la_pantalla(self):
         self.client.force_login(self.admin)
         respuesta = self.client.get(reverse("guardian:reportes"))
         self.assertContains(respuesta, "R-001 · La Huerta")
@@ -362,4 +362,14 @@ class PantallaDeReportesTests(TestCase):
         )
         self.assertContains(respuesta, "queda en cola")
         reporte = ReporteMensual.objects.get()
-        self.assertEqual((reporte.mes, reporte.verificado_por), (self.mes_pasado, self.admin))
+        self.assertEqual((reporte.mes, reporte.revisado_por), (self.mes_pasado, self.admin))
+
+    def test_la_pantalla_dice_revisado_y_no_verificado(self):
+        # "Verificado" queda para la verificación externa (UNIT): la revisión de Eggologic no lo usa.
+        dar_por_revisado(self.huerta, self.mes_pasado, self.admin)
+        self.client.force_login(self.admin)
+        respuesta = self.client.get(reverse("guardian:reportes"))
+        self.assertContains(respuesta, "Revisado, por enviar")
+        # "Registro verificable" sí queda: es el nombre acordado para el registro en Hedera.
+        self.assertNotContains(respuesta, "Verific")
+        self.assertNotContains(respuesta, "verificad")

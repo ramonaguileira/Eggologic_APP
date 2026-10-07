@@ -116,7 +116,7 @@ class Command(BaseCommand):
             )[0]
             for orden, (nombre, descripcion, huevos, precio) in enumerate(PRODUCTOS)
         ]
-        media_docena, docena, maple = productos
+        quincena, maple = productos
 
         cliente = self.crear_usuario("cliente", Usuario.Rol.CLIENTE, password, nombre="Lucía")
         Cliente.objects.get_or_create(
@@ -125,9 +125,9 @@ class Command(BaseCommand):
         )
         # Un pedido cada diez días; el último todavía no se entregó.
         for dias_atras in range(DIAS - 5, 0, -10):
-            producto = docena if dias_atras % 20 else maple
+            producto = quincena if dias_atras % 20 else maple
             estado = Pedido.Estado.ENTREGADO if dias_atras > 10 else Pedido.Estado.RECIBIDO
-            self.crear_pedido(cliente, [(producto, 1), (media_docena, dias_atras % 3)], dias_atras, estado)
+            self.crear_pedido(cliente, [(producto, 1 + dias_atras % 3)], dias_atras, estado)
 
         usuario_restaurante = self.crear_usuario(
             "restaurante", Usuario.Rol.RESTAURANTE, password, nombre=restaurante.nombre

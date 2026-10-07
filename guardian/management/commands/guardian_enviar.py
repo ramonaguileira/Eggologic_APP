@@ -5,7 +5,7 @@ from guardian.reportes import enviar_pendientes
 
 
 class Command(BaseCommand):
-    help = "Manda a Guardian los reportes mensuales verificados que falten. Pensado para correr por cron."
+    help = "Manda a Guardian los reportes mensuales revisados que falten. Pensado para correr por cron."
 
     def handle(self, *args, **opciones):
         resultados = enviar_pendientes()

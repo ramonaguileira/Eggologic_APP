@@ -41,7 +41,7 @@ python manage.py runserver
 ## Integración con Guardian
 
 - **Roles:** cada restaurante es una entidad participante (rol PPE) con su propio usuario de Guardian, custodiado por Eggologic. Eggologic es el Proponente; CarboSur, el VVB.
-- **Reporte mensual:** una persona de Eggologic lo verifica en **Reportes**. Después la app lo envía como el restaurante (`add_entity_report_btn`, vinculado al proyecto validado) y lo aprueba como Proponente (`approve_ppe_report_btn`), lo que mintea FGET a la cuenta del restaurante.
+- **Reporte mensual:** una persona de Eggologic lo revisa en **Reportes**. Después la app lo envía como el restaurante (`add_entity_report_btn`, vinculado al proyecto validado) y lo aprueba como Proponente (`approve_ppe_report_btn`), lo que mintea FGET a la cuenta del restaurante.
 - **Idempotencia:** antes de cada paso, `enviar()` busca el reporte en la grilla de Guardian por el nombre de la actividad (código + mes).
 - **Comportamientos de MGS que se aprendieron en testnet:**
   - Guardian procesa los envíos en segundo plano: la aprobación queda para la vuelta siguiente.
@@ -68,7 +68,7 @@ python manage.py runserver
 
   `render.yaml` explica cómo pasar a pago.
 - **Credenciales por restaurante en variables de entorno:** alcanza para el piloto, pero no escala.
-- Un retiro de un mes ya verificado se puede seguir editando. El reporte guarda los números verificados, pero la app no avisa la diferencia.
+- Un retiro de un mes ya revisado se puede seguir editando. El reporte guarda los números revisados, pero la app no avisa la diferencia.
 - **Caso borde del envío:** si hay un corte justo después de enviar y antes de guardar el estado, la vuelta siguiente podría enviar dos veces.
 - El enlace a HashScan por timestamp de consenso no se pudo probar desde el entorno de desarrollo.
 
@@ -76,6 +76,6 @@ python manage.py runserver
 
 - Solo FLW Standard (sin EWD-RB), sin Groups, sin gemelo digital, solo testnet.
 - Un usuario de Guardian por fuente, custodiado por Eggologic.
-- Un reporte por restaurante por mes, verificado por una persona.
+- Un reporte por restaurante por mes, revisado por una persona.
 - Fotos en la base mientras Render sea gratis.
 - Nivel D afuera: incentivos a escala, emisión del CIN y modelo no custodial.

@@ -72,8 +72,10 @@ class Retiro(RegistroBase):
     no_ingresa_estimado = models.BooleanField("ese dato es una estimación", default=False)
 
     # SUPUESTO: un retiro entra entero a un solo lote. Se asigna desde el formulario del lote.
+    # PROTECT: un lote con retiros no se puede borrar, porque se perdería la trazabilidad. Para
+    # corregir un lote mal armado, primero se sacan sus retiros desde el formulario del lote.
     lote = models.ForeignKey(
-        "Lote", on_delete=models.SET_NULL, null=True, blank=True, related_name="retiros", editable=False
+        "Lote", on_delete=models.PROTECT, null=True, blank=True, related_name="retiros", editable=False
     )
 
     class Meta:
@@ -171,7 +173,7 @@ class RegistroGranja(RegistroBase):
     kg_larvas = campo_kg("larvas para las gallinas (kg)")
     lote = models.ForeignKey(
         Lote,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="registros_granja",

@@ -6,7 +6,7 @@
   <h1>Reportes mensuales</h1>
   <p>
     Cada mes, el residuo que entregó cada restaurante se informa al registro verificable.
-    Revisá los números y verificá: el reporte sale con el código del restaurante, nunca con su nombre.
+    Revisá los números y dalos por revisados: el reporte sale con el código del restaurante, nunca con su nombre.
     Queda público y no se puede borrar.
   </p>
   <p class="tenue">
@@ -14,14 +14,14 @@
     Un restaurante sin usuario en el registro sigue sumando retiros: sus meses esperan acá hasta que se cree el usuario.
   </p>
 
-  <h2>Por verificar</h2>
+  <h2>Por revisar</h2>
   <div class="tabla">
     <table>
       <thead>
         <tr><th>Mes</th><th>Restaurante</th><th>Retiros</th><th>kg orgánicos</th><th>CO2e evitado (t)</th><th></th></tr>
       </thead>
       <tbody>
-        {% for fila in por_verificar %}
+        {% for fila in por_revisar %}
           <tr>
             <td>{{ fila.mes|date:"F Y" }}</td>
             <td>{{ fila.restaurante.codigo }} · {{ fila.restaurante.nombre }}</td>
@@ -32,24 +32,24 @@
               {% if fila.motivo %}
                 <span class="etiqueta">{{ fila.motivo }}</span>
               {% else %}
-                <form method="post" onsubmit="return confirm('¿Verificar {{ fila.restaurante.codigo }} de {{ fila.mes|date:"F Y" }}? El reporte se publica y no se puede borrar.')">
+                <form method="post" onsubmit="return confirm('¿Dar por revisado {{ fila.restaurante.codigo }} de {{ fila.mes|date:"F Y" }}? El reporte se publica y no se puede borrar.')">
                   {% csrf_token %}
                   <input type="hidden" name="restaurante" value="{{ fila.restaurante.pk }}">
                   <input type="hidden" name="mes" value="{{ fila.mes|date:'Y-m-d' }}">
-                  <button type="submit" class="boton">Verificar</button>
+                  <button type="submit" class="boton">Dar por revisado</button>
                 </form>
               {% endif %}
             </td>
           </tr>
         {% empty %}
-          <tr><td colspan="6" class="tenue">No hay meses cerrados por verificar.</td></tr>
+          <tr><td colspan="6" class="tenue">No hay meses cerrados por revisar.</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 
   <div class="encabezado">
-    <h2>Verificados</h2>
+    <h2>Revisados</h2>
     {% if hay_por_enviar %}
       <form method="post" action="{% url 'guardian:enviar_al_registro' %}">
         {% csrf_token %}
@@ -63,16 +63,16 @@
   <div class="tabla">
     <table>
       <thead>
-        <tr><th>Mes</th><th>Restaurante</th><th>kg orgánicos</th><th>CO2e evitado (t)</th><th>Verificó</th><th>Estado</th></tr>
+        <tr><th>Mes</th><th>Restaurante</th><th>kg orgánicos</th><th>CO2e evitado (t)</th><th>Revisó</th><th>Estado</th></tr>
       </thead>
       <tbody>
-        {% for reporte in verificados %}
+        {% for reporte in revisados %}
           <tr>
             <td>{{ reporte.mes|date:"F Y" }}</td>
             <td>{{ reporte.restaurante.codigo }} · {{ reporte.restaurante.nombre }}</td>
             <td class="num">{{ reporte.kg_organicos|floatformat:1 }}</td>
             <td class="num">{{ reporte.tco2e_neto|floatformat:2 }}</td>
-            <td>{{ reporte.verificado_por.get_full_name|default:reporte.verificado_por.username }}, {{ reporte.verificado_en|date:"d/m/Y" }}</td>
+            <td>{{ reporte.revisado_por.get_full_name|default:reporte.revisado_por.username }}, {{ reporte.revisado_en|date:"d/m/Y" }}</td>
             <td>
               {{ reporte.get_estado_display }}
               {% if reporte.enlace_publico %}<br><a href="{{ reporte.enlace_publico }}" target="_blank" rel="noopener">Ver en el registro público</a>{% endif %}
@@ -80,7 +80,7 @@
             </td>
           </tr>
         {% empty %}
-          <tr><td colspan="6" class="tenue">Todavía no hay reportes verificados.</td></tr>
+          <tr><td colspan="6" class="tenue">Todavía no hay reportes revisados.</td></tr>
         {% endfor %}
       </tbody>
     </table>

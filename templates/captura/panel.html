@@ -48,9 +48,20 @@
   {% endif %}
 
   <h2>Exportar para CarboSur</h2>
-  <p>
-    <a href="{% url 'captura:exportar_retiros' %}">retiros.csv</a> ·
-    <a href="{% url 'captura:exportar_lotes' %}">lotes.csv</a> ·
-    <a href="{% url 'captura:exportar_granja' %}">granja.csv</a>
-  </p>
+  <form method="get" class="periodo">
+    <label>Desde <input type="date" name="desde" id="exportar-desde"></label>
+    <label>Hasta <input type="date" name="hasta" id="exportar-hasta"></label>
+    <label>Restaurante
+      <select name="restaurante" id="exportar-restaurante">
+        <option value="">Todos</option>
+        {% for restaurante in restaurantes %}
+          <option value="{{ restaurante.codigo }}">{{ restaurante.codigo }} · {{ restaurante.nombre }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button type="submit" class="boton" formaction="{% url 'captura:exportar_retiros' %}">retiros.csv</button>
+    <button type="submit" class="boton" formaction="{% url 'captura:exportar_lotes' %}">lotes.csv</button>
+    <button type="submit" class="boton" formaction="{% url 'captura:exportar_granja' %}">granja.csv</button>
+  </form>
+  <p class="tenue">Sin fechas sale todo el historial. La granja es una sola para todos los restaurantes: su archivo se filtra solo por fecha.</p>
 {% endblock %}

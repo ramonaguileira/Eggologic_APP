@@ -2,6 +2,7 @@
 
 - **Fecha:** 05/10/2026
 - **Estado:** lista para revisar (06/10). Envío de prueba real hecho en testnet; falta crear los servicios en Render.
+- **Cambio posterior (07/10, Fase 0 del plan de datos):** donde este doc dice "verificar" un reporte, la app ahora dice "revisar". El botón **Verificar** pasó a ser **Dar por revisado**, y los campos `verificado_por`/`verificado_en`, `revisado_por`/`revisado_en`. "Verificado" queda para la verificación externa (UNIT). Ver `docs/plan-datos-fase-0.md`.
 
 ## Qué se verificó (05/10)
 

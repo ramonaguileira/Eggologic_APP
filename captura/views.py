@@ -1,4 +1,5 @@
 import csv
+import re
 from datetime import date, timedelta
 
 from django.contrib import messages
@@ -8,7 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.formats import number_format
 
-from cuentas.models import Usuario
+from cuentas.models import Restaurante, Usuario
 from cuentas.permisos import requiere
 from guardian.models import ReporteMensual
 from impacto import calculos
@@ -47,6 +48,7 @@ def panel(request):
         "granja": granja,
         "sin_clasificar": Retiro.objects.filter(kg_impropios=None).count(),
         "lotes_en_curso": Lote.objects.filter(fecha_cosecha=None).prefetch_related("retiros"),
+        "restaurantes": Restaurante.objects.order_by("codigo"),
     }
     return render(request, "captura/panel.html", contexto)
 
@@ -57,8 +59,8 @@ def informe(request):
     PDF desde el navegador. Por defecto, desde el primer retiro hasta hoy."""
     hoy = timezone.localdate()
     primero = Retiro.objects.order_by("fecha").first()
-    desde = _fecha(request.GET.get("desde")) or (timezone.localtime(primero.fecha).date() if primero else hoy)
-    hasta = _fecha(request.GET.get("hasta")) or hoy
+    desde = _leer_fecha(request.GET.get("desde")) or (timezone.localtime(primero.fecha).date() if primero else hoy)
+    hasta = _leer_fecha(request.GET.get("hasta")) or hoy
     contexto = calculos.informe(desde, hasta)
     contexto.update({
         "desde": desde,
@@ -68,7 +70,8 @@ def informe(request):
     return render(request, "captura/informe.html", contexto)
 
 
-def _fecha(texto):
+def _leer_fecha(texto):
+    """La fecha de un campo del formulario (AAAA-MM-DD), o None si no vino o no es válida."""
     try:
         return date.fromisoformat(texto or "")
     except ValueError:
@@ -167,18 +170,41 @@ def _numero(valor):
     return "" if valor is None else str(valor).replace(".", ",")
 
 
-def _fecha(valor):
+def _celda_fecha(valor):
+    """Fecha, o fecha y hora con la zona (2026-09-01 11:00-03:00), para que no haya dudas al verificar.
+
+    SUPUESTO: formato ISO con la zona. Excel lo muestra como texto, pero no se presta a confusión."""
     if valor is None:
         return ""
     if hasattr(valor, "hour"):
-        return timezone.localtime(valor).strftime("%Y-%m-%d %H:%M")
-    return valor.strftime("%Y-%m-%d")
+        return timezone.localtime(valor).isoformat(sep=" ", timespec="minutes")
+    return valor.isoformat()
+
+
+def _texto(valor):
+    """Un texto libre que empieza con =, +, - o @ se escapa con un apóstrofo: si no, Excel lo ejecuta
+    como fórmula."""
+    if valor and valor[0] in "=+-@\t\r":
+        return "'" + valor
+    return valor
+
+
+def _filtros(request):
+    """Período y restaurante pedidos en la dirección (?desde=…&hasta=…&restaurante=R-001). Lo que no
+    viene no filtra: sin nada, sale todo el historial."""
+    codigo = re.sub(r"[^A-Za-z0-9-]", "", request.GET.get("restaurante", ""))
+    return _leer_fecha(request.GET.get("desde")), _leer_fecha(request.GET.get("hasta")), codigo
+
+
+def _nombre_archivo(base, desde, hasta, codigo=""):
+    partes = [base] + [fecha.isoformat() for fecha in (desde, hasta) if fecha] + ([codigo] if codigo else [])
+    return "_".join(partes) + ".csv"
 
 
 def _respuesta_csv(nombre_archivo, encabezados, filas):
     respuesta = HttpResponse(content_type="text/csv; charset=utf-8")
     respuesta["Content-Disposition"] = f'attachment; filename="{nombre_archivo}"'
-    respuesta.write("﻿")
+    respuesta.write("\ufeff")
     escritor = csv.writer(respuesta, delimiter=";")
     escritor.writerow(encabezados)
     escritor.writerows(filas)
@@ -187,12 +213,20 @@ def _respuesta_csv(nombre_archivo, encabezados, filas):
 
 @requiere(Usuario.puede_ver_datos)
 def exportar_retiros(request):
+    desde, hasta, codigo = _filtros(request)
+    retiros = Retiro.objects.select_related("restaurante").order_by("fecha")
+    if desde:
+        retiros = retiros.filter(fecha__date__gte=desde)
+    if hasta:
+        retiros = retiros.filter(fecha__date__lte=hasta)
+    if codigo:
+        retiros = retiros.filter(restaurante__codigo=codigo)
     filas = (
         [
             r.pk,
-            _fecha(r.fecha),
+            _celda_fecha(r.fecha),
             r.restaurante.codigo,
-            r.restaurante.nombre,
+            _texto(r.restaurante.nombre),
             _numero(r.kg_levantados),
             _numero(r.kg_impropios),
             _numero(r.kg_restos_vegetales),
@@ -203,9 +237,9 @@ def exportar_retiros(request):
             _numero(r.latitud),
             _numero(r.longitud),
             "sí" if r.foto else "no",
-            r.observaciones,
+            _texto(r.observaciones),
         ]
-        for r in Retiro.objects.select_related("restaurante").order_by("fecha")
+        for r in retiros
     )
     encabezados = [
         "retiro",
@@ -224,25 +258,35 @@ def exportar_retiros(request):
         "tiene_foto",
         "observaciones",
     ]
-    return _respuesta_csv("retiros.csv", encabezados, filas)
+    return _respuesta_csv(_nombre_archivo("retiros", desde, hasta, codigo), encabezados, filas)
 
 
 @requiere(Usuario.puede_ver_datos)
 def exportar_lotes(request):
+    """Lotes que empezaron en el período. Con un restaurante, los lotes donde entró residuo suyo; las
+    columnas muestran el lote completo, con los retiros de todos los restaurantes."""
+    desde, hasta, codigo = _filtros(request)
+    lotes = Lote.objects.prefetch_related("retiros").order_by("fecha_inicio", "id")
+    if desde:
+        lotes = lotes.filter(fecha_inicio__gte=desde)
+    if hasta:
+        lotes = lotes.filter(fecha_inicio__lte=hasta)
+    if codigo:
+        lotes = lotes.filter(retiros__restaurante__codigo=codigo).distinct()
     filas = (
         [
             lote.pk,
-            _fecha(lote.fecha_inicio),
+            _celda_fecha(lote.fecha_inicio),
             ",".join(str(r.pk) for r in lote.retiros.all()),
             _numero(lote.kg_residuo),
             lote.bandejas,
             _numero(lote.g_neonatos),
-            _fecha(lote.fecha_cosecha),
+            _celda_fecha(lote.fecha_cosecha),
             _numero(lote.kg_larvas),
             _numero(lote.kg_frass),
-            lote.observaciones,
+            _texto(lote.observaciones),
         ]
-        for lote in Lote.objects.prefetch_related("retiros").order_by("fecha_inicio", "id")
+        for lote in lotes
     )
     encabezados = [
         "lote",
@@ -256,14 +300,21 @@ def exportar_lotes(request):
         "kg_frass",
         "observaciones",
     ]
-    return _respuesta_csv("lotes.csv", encabezados, filas)
+    return _respuesta_csv(_nombre_archivo("lotes", desde, hasta, codigo), encabezados, filas)
 
 
 @requiere(Usuario.puede_ver_datos)
 def exportar_granja(request):
+    """La granja es una sola para todos los restaurantes: se filtra solo por fecha."""
+    desde, hasta, _ = _filtros(request)
+    registros = RegistroGranja.objects.order_by("fecha")
+    if desde:
+        registros = registros.filter(fecha__gte=desde)
+    if hasta:
+        registros = registros.filter(fecha__lte=hasta)
     filas = (
-        [_fecha(g.fecha), g.huevos, _numero(g.kg_larvas), g.lote_id or "", g.observaciones]
-        for g in RegistroGranja.objects.order_by("fecha")
+        [_celda_fecha(g.fecha), g.huevos, _numero(g.kg_larvas), g.lote_id or "", _texto(g.observaciones)]
+        for g in registros
     )
     encabezados = ["fecha", "huevos", "kg_larvas", "lote", "observaciones"]
-    return _respuesta_csv("granja.csv", encabezados, filas)
+    return _respuesta_csv(_nombre_archivo("granja", desde, hasta), encabezados, filas)

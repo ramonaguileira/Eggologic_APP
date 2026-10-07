@@ -5,15 +5,17 @@ from cuentas.models import Restaurante
 
 
 class ReporteMensual(models.Model):
-    """Reporte de un restaurante para un mes, verificado por una persona de Eggologic.
+    """Reporte de un restaurante para un mes, revisado por una persona de Eggologic.
 
-    Guarda los números tal como se verificaron. El comando guardian_enviar lo manda a Guardian:
+    Guarda los números tal como se revisaron. El comando guardian_enviar lo manda a Guardian:
     primero como el restaurante (Ground Entity Report) y después lo aprueba como Proponente,
     que es lo que dispara el mint.
     """
 
+    # "Revisado" y no "verificado": verificado queda reservado para la verificación externa
+    # (UNIT, ISO 14064-3). Nada se muestra como verificado antes de eso.
     class Estado(models.TextChoices):
-        EN_COLA = "en_cola", "Verificado, por enviar"
+        EN_COLA = "en_cola", "Revisado, por enviar"
         ENVIADO = "enviado", "Enviado, falta la aprobación"
         REGISTRADO = "registrado", "Registrado"
 
@@ -27,8 +29,8 @@ class ReporteMensual(models.Model):
     tco2e_neto = models.DecimalField("tCO2e evitadas (neto)", max_digits=10, decimal_places=2)
 
     estado = models.CharField(max_length=20, choices=Estado.choices, default=Estado.EN_COLA)
-    verificado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
-    verificado_en = models.DateTimeField(auto_now_add=True)
+    revisado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
+    revisado_en = models.DateTimeField(auto_now_add=True)
     registrado_en = models.DateTimeField(null=True, blank=True)
     # Dónde quedó el reporte en Hedera: topic de HCS y timestamp de consenso del mensaje.
     topic_hcs = models.CharField("topic de HCS", max_length=30, blank=True)

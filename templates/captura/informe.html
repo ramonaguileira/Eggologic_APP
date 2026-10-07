@@ -10,12 +10,19 @@
   <p>
     Eggologic · Nodo 1, Maldonado. Del {{ desde|date:"d/m/Y" }} al {{ hasta|date:"d/m/Y" }}.
   </p>
+  <p><strong>Estado de aseguramiento:</strong> no verificado por un tercero. Los números los mide y los revisa Eggologic.</p>
 
   <form method="get" class="periodo no-imprimir">
     <label>Desde <input type="date" name="desde" value="{{ desde|date:'Y-m-d' }}"></label>
     <label>Hasta <input type="date" name="hasta" value="{{ hasta|date:'Y-m-d' }}"></label>
     <button type="submit" class="boton">Ver</button>
   </form>
+  <p class="tenue no-imprimir">
+    Exportar este período:
+    <a href="{% url 'captura:exportar_retiros' %}?desde={{ desde|date:'Y-m-d' }}&amp;hasta={{ hasta|date:'Y-m-d' }}">retiros.csv</a> ·
+    <a href="{% url 'captura:exportar_lotes' %}?desde={{ desde|date:'Y-m-d' }}&amp;hasta={{ hasta|date:'Y-m-d' }}">lotes.csv</a> ·
+    <a href="{% url 'captura:exportar_granja' %}?desde={{ desde|date:'Y-m-d' }}&amp;hasta={{ hasta|date:'Y-m-d' }}">granja.csv</a>
+  </p>
 
   <h2>El circuito en números</h2>
   <div class="cifras">
@@ -88,7 +95,7 @@
   </div>
 
   <h2>Registro verificable</h2>
-  <p class="tenue">Reportes mensuales verificados por Eggologic y registrados en la notaría digital del impacto (Hedera, a través de Guardian).</p>
+  <p class="tenue">Reportes mensuales revisados por Eggologic y registrados en la notaría digital del impacto (Hedera, a través de Guardian).</p>
   <div class="tabla">
     <table>
       <thead>
@@ -107,7 +114,7 @@
             </td>
           </tr>
         {% empty %}
-          <tr><td colspan="5" class="tenue">Todavía no hay reportes verificados en el período.</td></tr>
+          <tr><td colspan="5" class="tenue">Todavía no hay reportes revisados en el período.</td></tr>
         {% endfor %}
       </tbody>
     </table>
