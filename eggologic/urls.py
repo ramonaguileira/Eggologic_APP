@@ -3,10 +3,11 @@ from django.contrib.auth import views as auth_views
 from django.urls import include, path
 
 from cuentas import views as cuentas_views
+from cuentas.forms import LoginForm
 
 urlpatterns = [
     path("", cuentas_views.inicio, name="inicio"),
-    path("ingresar/", auth_views.LoginView.as_view(), name="login"),
+    path("ingresar/", auth_views.LoginView.as_view(form_class=LoginForm), name="login"),
     path("salir/", auth_views.LogoutView.as_view(), name="logout"),
     path("registrarse/", cuentas_views.registrarse, name="registrarse"),
     path("captura/", include("captura.urls")),

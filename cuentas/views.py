@@ -1,9 +1,22 @@
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
-from .forms import RegistroClienteForm
+from .forms import LoginForm, RegistroClienteForm
+
+
+def ingresar(request):
+    """Login con email en lugar de username."""
+    if request.method == "POST":
+        form = LoginForm(request, data=request.POST)
+        if form.is_valid():
+            login(request, form.get_user())
+            messages.success(request, f"¡Bienvenido/a, {form.get_user().first_name}!")
+            return redirect("inicio")
+    else:
+        form = LoginForm()
+    return render(request, "registration/login.html", {"form": form})
 
 
 @login_required
