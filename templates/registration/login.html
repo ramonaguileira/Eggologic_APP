@@ -8,7 +8,7 @@
     <form method="post">
       {% csrf_token %}
       {% if form.non_field_errors %}<div class="error">{{ form.non_field_errors }}</div>{% endif %}
-      <label for="{{ form.username.id_for_label }}">Usuario</label>
+      <label for="{{ form.username.id_for_label }}">Email</label>
       {{ form.username }}
       <label for="{{ form.password.id_for_label }}">Contraseña</label>
       {{ form.password }}
