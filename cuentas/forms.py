@@ -31,8 +31,8 @@ class RegistroClienteForm(UserCreationForm):
 
 
 class LoginForm(AuthenticationForm):
-    """Formulario de login que usa email en lugar de username."""
-    username = forms.EmailField(label="Email", widget=forms.EmailInput(attrs={"autofocus": True}))
+    """Formulario de login que acepta email o username."""
+    username = forms.CharField(label="Email o Usuario", widget=forms.TextInput(attrs={"autofocus": True}))
     password = forms.CharField(label="Contraseña", strip=False, widget=forms.PasswordInput)
 
     def clean(self):
@@ -40,13 +40,30 @@ class LoginForm(AuthenticationForm):
         password = self.cleaned_data.get("password")
 
         if username is not None and password:
+            # Try to authenticate with the provided username (which could be email or actual username)
             self.user_cache = authenticate(
                 self.request, username=username, password=password
             )
             if self.user_cache is None:
-                raise self.get_invalid_login_error()
-            else:
-                self.confirm_login_allowed(self.user_cache)
+                # If authentication fails, check if the input looks like an email
+                # and try to find the user by email, then authenticate with their actual username
+                import re
+                email_pattern = re.compile(r"[^@]+@[^@]+\.[^@]+")
+                if email_pattern.match(username):
+                    try:
+                        # Find user by email
+                        usuario = Usuario.objects.get(email__iexact=username)
+                        # Authenticate with the user's username field
+                        self.user_cache = authenticate(
+                            self.request, username=usuario.username, password=password
+                        )
+                    except Usuario.DoesNotExist:
+                        pass
+
+                if self.user_cache is None:
+                    raise self.get_invalid_login_error()
+                else:
+                    self.confirm_login_allowed(self.user_cache)
 
         return self.cleaned_data
 
