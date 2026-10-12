@@ -128,4 +128,13 @@ Cosas de MGS que aprendimos:
 
 **Plan de datos (decisiones de Ramón, 07/10).** El pesaje se hace en la planta, con una balanza DingQi DQEH01301 de plataforma de 300 kg. El chofer anota solo el restaurante y la cantidad de bultos, y sigue sacando la foto. Los bultos son cajones de leche de 2,2 kg vacíos: la tara es la cantidad de cajones por 2,2 kg. La base de Render pasa a un plan pago antes del 04/11/2026. En la app, la revisión de Eggologic se dice "revisado"; "verificado" queda para la verificación externa (UNIT).
 
+**Respuestas a Marcel (decisiones de Ramón, 12/10).**
+- Durante el piloto sigue la policy actual: FGET en tCO2e. La v2 por kg, con Eggos, llega cuando CarboSur dé sus factores.
+- Mientras tanto, en la pantalla FGET se presenta como Eggos. Al migrar a la v2 se hace un mint compensatorio; la custodia es de Eggologic. `SUPUESTO`: la cifra de Eggos que ve el restaurante se calcula por kg en la app, no es el saldo de FGET en tCO2e.
+- El CIN queda para después del piloto (Nivel D).
+- La dirección de envío se pide al hacer el primer pedido, no en el registro.
+- Mails: dominio `eggologic.org`, casilla `info@eggologic.org`. Kit se usa para campañas; falta elegir el servicio de mails transaccionales.
+- Se esperan 5 restaurantes en los próximos meses: las credenciales de Guardian siguen en variables de entorno.
+- Marcel decide la rama `main` con PRs y el login con usuario o email.
+
 **Restaurantes nuevos (resolución temporal, 06/10).** Se cargan en la app desde el primer día; el usuario en Guardian se crea cuando entran en serio al piloto, con el alta solo con el código. Mientras tanto sus meses esperan en **Reportes**. No habrá restaurantes nuevos antes del 19/10.
