@@ -130,10 +130,10 @@ Cosas de MGS que aprendimos:
 
 **Respuestas a Marcel (decisiones de Ramón, 12/10).**
 - Durante el piloto sigue la policy actual: FGET en tCO2e. La v2 por kg, con Eggos, llega cuando CarboSur dé sus factores.
-- Mientras tanto, en la pantalla FGET se presenta como Eggos. Al migrar a la v2 se hace un mint compensatorio; la custodia es de Eggologic. `SUPUESTO`: la cifra de Eggos que ve el restaurante se calcula por kg en la app, no es el saldo de FGET en tCO2e.
+- Mientras tanto, en la pantalla FGET se presenta como Eggos. Al migrar a la v2 se hace un mint compensatorio; la custodia es de Eggologic. La cifra de Eggos que ve el restaurante se calcula por kg en la app, no es el saldo de FGET en tCO2e, y el mint compensatorio usa ese número (Ramón, 12/10).
 - El CIN queda para después del piloto (Nivel D).
 - La dirección de envío se pide al hacer el primer pedido, no en el registro.
-- Mails: dominio `eggologic.org`, casilla `info@eggologic.org`. Kit se usa para campañas; falta elegir el servicio de mails transaccionales.
+- Mails: dominio `eggologic.org`, casilla `info@eggologic.org` en Google Workspace. Kit se usa para campañas; falta elegir el servicio de mails transaccionales.
 - Se esperan 5 restaurantes en los próximos meses: las credenciales de Guardian siguen en variables de entorno.
 - Marcel decide la rama `main` con PRs y el login con usuario o email.
 
