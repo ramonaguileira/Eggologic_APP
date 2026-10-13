@@ -148,35 +148,14 @@ LOGGING = {
     "root": {"handlers": ["consola"], "level": "WARNING"},
 }
 
-# THis don't work
-MAILERS = {
-    "default": {
-        "BACKEND": "django.core.mail.backends.console.EmailBackend",
-    },
-}
+# EMAIL for Debug
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-# MAILERS = {
-#     "default": {
-#         "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
-#         "OPTIONS": {
-#             "host": "smtp.example.com",
-#             "port": 587,
-#             "username": "user@example.com",
-#             "password": "your-password",
-#             "use_tls": True,
-#         },
-#     },
-# }
-
-
-# This is what works
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
-
-# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-# EMAIL_HOST = "smtp.example.com"
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = "user@example.com"
-# EMAIL_HOST_PASSWORD = "your-password"
-# EMAIL_USE_TLS = True
-# DEFAULT_FROM_EMAIL = "noreply@yourdomain.com"
+# EMAIL SMTP FOR User Access Recovery
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "info@eggologic.org"
+EMAIL_HOST_PASSWORD = os.environ.get("DJANGO_EMAIL_SMTP_PASSWORD", "")
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = "noreply@eggologic.org"
