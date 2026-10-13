@@ -20,6 +20,16 @@ def _datos_de_entrega(usuario):
 
 @requiere(Usuario.puede_comprar)
 def tienda(request):
+    """Página de la tienda."""
+    try:
+        cliente = request.user.cliente
+    except Cliente.DoesNotExist:
+        return redirect("impacto:mi_impacto")
+        # Si no tiene datos de entrega, redirigir a primera entrega
+
+    if not cliente.telefono or not cliente.direccion:
+        return redirect("primera_entrega")
+
     productos = Producto.objects.filter(activo=True)
     form = PedidoForm(request.POST or None, productos=productos, initial=_datos_de_entrega(request.user))
     if request.method == "POST" and form.is_valid():
