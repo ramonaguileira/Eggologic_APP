@@ -23,8 +23,6 @@ def _datos_de_entrega(usuario):
 @requiere(Usuario.puede_comprar)
 def tienda(request):
     """Página de la tienda."""
-
-    print("def tienda")
     try:
         cliente = request.user.cliente
     except Cliente.DoesNotExist:
