@@ -137,4 +137,11 @@ Cosas de MGS que aprendimos:
 - Se esperan 5 restaurantes en los próximos meses: las credenciales de Guardian siguen en variables de entorno.
 - Marcel decide la rama `main` con PRs y el login con usuario o email.
 
+**Pendientes (14/10).** Los PR #1, #2 y #4 de Marcel (login con email, recuperar contraseña, dirección en el primer pedido) entraron a `main` el 14/10. Prioridad de Ramón: registrar los retiros de El Popu y las entregas de huevos a El Popu y a otra clienta.
+- **Pantalla "Registrar entrega"** para administración u operador: cliente o restaurante, producto, cantidad, fecha y forma de pago; queda como pedido entregado. Hoy un pedido solo lo crea el comprador desde la tienda, y desde el admin no se pueden cargar.
+- **Arreglo de la tienda para restaurantes:** desde los PR de Marcel, un restaurante que entra a la tienda da error 500 (falta importar `Cliente`, y la redirección no contempla restaurantes).
+- Falta la migración de `Cliente` (`telefono` y `direccion` opcionales), y hay 2 tests desactualizados (registro y `crear_admin`).
+- Login con email: error 500 si dos usuarios comparten email. Registro con un email ya usado: error 500.
+- Mientras no exista la Fase 1: el chofer carga en kg el neto pesado en planta (bruto − cajones × 2,2 kg), y la planta anota cajones y bruto en observaciones.
+
 **Restaurantes nuevos (resolución temporal, 06/10).** Se cargan en la app desde el primer día; el usuario en Guardian se crea cuando entran en serio al piloto, con el alta solo con el código. Mientras tanto sus meses esperan en **Reportes**. No habrá restaurantes nuevos antes del 19/10.
