@@ -30,7 +30,8 @@
           <a href="{% url 'guardian:reportes' %}">Reportes</a>
         {% endif %}
         {% if user.is_staff %}
-          <a href="{% url 'admin:tienda_pedido_changelist' %}">Pedidos</a>
+<!--          <a href="{% url 'admin:tienda_pedido_changelist' %}">Pedidos</a>-->
+          <a href="{% url 'tienda:pedidos_admin' %}">Pedidos</a>
           <a href="{% url 'admin:index' %}">Administración</a>
         {% endif %}
         <form method="post" action="{% url 'logout' %}">

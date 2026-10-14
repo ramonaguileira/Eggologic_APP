@@ -58,3 +58,47 @@ def mis_pedidos(request):
         "pendientes": [Pedido.Estado.RECIBIDO, Pedido.Estado.CONFIRMADO],
     }
     return render(request, "tienda/mis_pedidos.html", contexto)
+
+@login_required
+def pedido_entregado(request, pedido_id):
+    """Marca un pedido como entregado."""
+    pedido = get_object_or_404(Pedido, pk=pedido_id)
+
+    # Solo administradores o personal autorizado pueden marcar pedidos como entregados
+    if not (request.user.es_admin() or request.user.puede_ver_datos()):
+        raise Http404("No tienes permiso para realizar esta acción.")
+
+    if request.method == "POST":
+        pedido.estado = Pedido.Estado.ENTREGADO
+        pedido.save()
+        messages.success(request, "El pedido se marcó como entregado.")
+        return redirect("tienda:pedidos_admin")
+
+    return render(request, "tienda/pedido_entregado.html", {
+        "pedido": pedido,
+    })
+
+
+@login_required
+def pedidos_admin(request):
+    """Muestra todos los pedidos para administradores."""
+    if not (request.user.es_admin() or request.user.is_staff):
+        return redirect("tienda:mis_pedidos")
+
+    pedidos = Pedido.objects.select_related("usuario").prefetch_related("items").order_by("-creado_en")
+    return render(request, "tienda/pedidos_admin.html", {
+        "pedidos": pedidos,
+    })
+
+
+@login_required
+def pedido_admin_detalle(request, pedido_id):
+    """Muestra los detalles de un pedido específico para administradores."""
+    pedido = get_object_or_404(Pedido.objects.select_related("usuario").prefetch_related("items"), pk=pedido_id)
+
+    if not (request.user.es_admin() or request.user.is_staff):
+        return redirect("tienda:mis_pedidos")
+
+    return render(request, "tienda/pedido_admin_detalle.html", {
+        "pedido": pedido,
+    })

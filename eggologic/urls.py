@@ -4,6 +4,7 @@ from django.urls import include, path
 
 from cuentas import views as cuentas_views
 from cuentas.forms import LoginForm
+from tienda.views import pedidos_admin
 
 urlpatterns = [
     path("", cuentas_views.inicio, name="inicio"),
@@ -15,6 +16,7 @@ urlpatterns = [
     path("impacto/", include("impacto.urls")),
     path("registro/", include("guardian.urls")),
     path("admin/", admin.site.urls),
+
     path("primera-entrega/", cuentas_views.primera_entrega, name="primera_entrega"),
     # Password recovery URLs
     path("password-reset/", auth_views.PasswordResetView.as_view(
