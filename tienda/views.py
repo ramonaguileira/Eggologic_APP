@@ -1,13 +1,15 @@
 from django.conf import settings
 from django.contrib import messages
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
 
-from cuentas.models import Usuario
 from cuentas.permisos import requiere
 from impacto.calculos import factores_del_circuito
 
 from .forms import PedidoForm
 from .models import Pedido, Producto
+from cuentas.models import Cliente, Usuario
 
 
 def _datos_de_entrega(usuario):
@@ -24,9 +26,11 @@ def tienda(request):
     try:
         cliente = request.user.cliente
     except Cliente.DoesNotExist:
+        # Si no tiene Cliente, crear uno y redirigir a impacto
+        Cliente.objects.create(usuario=request.user)
         return redirect("impacto:mi_impacto")
-        # Si no tiene datos de entrega, redirigir a primera entrega
 
+    # Si no tiene datos de entrega, redirigir a primera entrega
     if not cliente.telefono or not cliente.direccion:
         return redirect("primera_entrega")
 
@@ -34,6 +38,7 @@ def tienda(request):
     form = PedidoForm(request.POST or None, productos=productos, initial=_datos_de_entrega(request.user))
     if request.method == "POST" and form.is_valid():
         pedido = form.crear_pedido(request.user)
+
         messages.success(
             request, f"¡Listo! Recibimos tu pedido N.º {pedido.pk}. Te contactamos para coordinar la entrega."
         )
