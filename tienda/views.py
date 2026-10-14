@@ -7,7 +7,7 @@ from django.db.models import Sum
 from cuentas.permisos import requiere
 from impacto.calculos import factores_del_circuito
 
-from .forms import PedidoForm
+from .forms import PedidoForm, PedidoEntregadoForm
 from .models import Pedido, Producto
 from cuentas.models import Cliente, Usuario
 
@@ -68,14 +68,21 @@ def pedido_entregado(request, pedido_id):
     if not (request.user.es_admin() or request.user.puede_ver_datos()):
         raise Http404("No tienes permiso para realizar esta acción.")
 
-    if request.method == "POST":
+    form = PedidoEntregadoForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
         pedido.estado = Pedido.Estado.ENTREGADO
+        entregado_en = form.cleaned_data["entregado_en"]
+        if entregado_en:
+            pedido.entregado_en = entregado_en
+        else:
+            pedido.entregado_en = timezone.now()
         pedido.save()
         messages.success(request, "El pedido se marcó como entregado.")
-        return redirect("tienda:pedidos_admin")
+        return redirect("tienda:mis_pedidos")
 
     return render(request, "tienda/pedido_entregado.html", {
         "pedido": pedido,
+        "form": form,
     })
 
 

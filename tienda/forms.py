@@ -72,3 +72,10 @@ class PedidoForm(forms.Form):
                 huevos_por_unidad=producto.huevos,
             )
         return pedido
+
+class PedidoEntregadoForm(forms.Form):
+    entregado_en = forms.DateTimeField(
+        label="Fecha y hora de entrega",
+        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"),
+        required=False
+    )

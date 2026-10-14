@@ -9,12 +9,17 @@
     <p>¿Estás seguro de que el pedido #{{ pedido.pk }} ya fue entregado a {{ pedido.usuario.get_full_name|default:pedido.usuario.username }}?</p>
     <p>
       <strong>Datos del pedido:</strong><br>
-      <span class="tenue">Fecha: {{ pedido.creado_en|date:"d/m/Y H:i" }}</span><br>
+      <span class="tenue">Fecha del pedido: {{ pedido.creado_en|date:"d/m/Y H:i" }}</span><br>
       <span class="tenue">Dirección: {{ pedido.direccion }}</span><br>
       <span class="tenue">Teléfono: {{ pedido.telefono }}</span>
     </p>
     <form method="post">
       {% csrf_token %}
+      <div class="campo">
+        <label for="{{ form.entregado_en.id_for_label }}">Fecha y hora de entrega</label>
+        {{ form.entregado_en }}
+        {% if form.entregado_en.errors %}<div class="error">{{ form.entregado_en.errors }}</div>{% endif %}
+      </div>
       <div class="acciones">
         <button type="submit" class="boton">Sí, marcar como entregado</button>
         <a href="{% url 'tienda:pedidos_admin' %}" class="boton no-accion">Cancelar</a>
