@@ -145,6 +145,7 @@ Cosas de MGS que aprendimos:
 - Falta la migración de `Cliente` (`telefono` y `direccion` opcionales), y hay 2 tests desactualizados (registro y `crear_admin`).
 - Login con email: error 500 si dos usuarios comparten email. Registro con un email ya usado: error 500.
 - **Pregunta abierta (Ramón, 14/10): ¿chofer y planta necesitan identidad (DID) en Guardian?** Hoy no: a Guardian solo va el reporte mensual por restaurante (usuario R-001) aprobado por el Proponente, y quién midió queda en la app. Firmar cada retiro con la identidad de quien lo midió sería un cambio de la policy (v2): decidir con CarboSur y Marcel.
+- **Pregunta abierta (Ramón, 14/10): ¿cada retiro a Guardian el mismo día, o el reporte mensual?** Hoy van por mes y por restaurante (un mint por reporte). Registrar cada retiro sería un cambio de diseño, probablemente una policy v2 que acepte registros sin mintear. Decidir con Marcel y CarboSur.
 - Usuarios en línea (14/10): `chofer`, `planta`, `granja`, `carbosur`, `ClienteTest1`, `ramon` e `info@eggologic.org`. `ramon` e `info@` comparten email: cambiar el de `ramon`. Falta el usuario Restaurante de El Popu.
 - Mientras no exista la Fase 1: el chofer carga en kg el neto pesado en planta (bruto − cajones × 2,2 kg), y la planta anota cajones y bruto en observaciones.
 
