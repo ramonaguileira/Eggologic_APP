@@ -137,6 +137,8 @@ Cosas de MGS que aprendimos:
 - Se esperan 5 restaurantes en los próximos meses: las credenciales de Guardian siguen en variables de entorno.
 - Marcel decide la rama `main` con PRs y el login con usuario o email.
 
+**En uso real desde el 14/10.** Primer retiro real de El Popu cargado por el chofer y clasificado por la planta. La web pasó a un plan pago de Render el 14/10 (en el gratis no salía el SMTP a Gmail) y la recuperación de contraseña funciona. Mañana (15/10): larvas (lotes BSF), granja y entregas de huevos a clientes.
+
 **Pendientes (14/10).** Los PR #1, #2 y #4 de Marcel (login con email, recuperar contraseña, dirección en el primer pedido) entraron a `main` el 14/10. Prioridad de Ramón: registrar los retiros de El Popu y las entregas de huevos a El Popu y a otra clienta.
 - **Pantalla "Registrar entrega"** para administración u operador: cliente o restaurante, producto, cantidad, fecha y forma de pago; queda como pedido entregado. Hoy un pedido solo lo crea el comprador desde la tienda, y desde el admin no se pueden cargar.
 - **Arreglo de la tienda para restaurantes:** desde los PR de Marcel, un restaurante que entra a la tienda da error 500 (falta importar `Cliente`, y la redirección no contempla restaurantes).
