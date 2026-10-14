@@ -17,7 +17,7 @@
       {% csrf_token %}
       <div class="acciones">
         <button type="submit" class="boton">Sí, marcar como entregado</button>
-        <a href="{% url 'tienda:mis_pedidos' %}" class="boton no-accion">Cancelar</a>
+        <a href="{% url 'tienda:pedidos_admin' %}" class="boton no-accion">Cancelar</a>
       </div>
     </form>
   </section>
