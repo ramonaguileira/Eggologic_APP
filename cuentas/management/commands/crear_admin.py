@@ -12,10 +12,10 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **opciones):
-        usuario = os.environ.get("DJANGO_SUPERUSER_USERNAME")
+        usuario = os.environ.get("DJANGO_SUPERUSER_EMAIL")
         password = os.environ.get("DJANGO_SUPERUSER_PASSWORD")
         if not usuario or not password:
-            self.stdout.write("Sin DJANGO_SUPERUSER_USERNAME o DJANGO_SUPERUSER_PASSWORD: no se crea ningún usuario.")
+            self.stdout.write("Sin DJANGO_SUPERUSER_EMAIL o DJANGO_SUPERUSER_PASSWORD: no se crea ningún usuario.")
             return
         if Usuario.objects.filter(username=usuario).exists():
             self.stdout.write(f"El usuario {usuario} ya existe.")

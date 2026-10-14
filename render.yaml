@@ -49,6 +49,8 @@ services:
         sync: false
       - key: DJANGO_SUPERUSER_PASSWORD
         sync: false
+      - key: DJANGO_EMAIL_SMTP_PASSWORD
+        sync: false
       - key: DB_NAME
         fromDatabase: { name: eggologic-db, property: database }
       - key: DB_USER
