@@ -14,6 +14,11 @@ class RegistroClienteForm(UserCreationForm):
         model = Usuario
         fields = ["first_name", "email"]
 
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if Usuario.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError("Ya existe una cuenta con este email.")
+        return email
     @transaction.atomic
     def save(self):
         usuario = super().save(commit=False)
