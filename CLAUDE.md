@@ -142,6 +142,8 @@ Cosas de MGS que aprendimos:
 - **Arreglo de la tienda para restaurantes:** desde los PR de Marcel, un restaurante que entra a la tienda da error 500 (falta importar `Cliente`, y la redirección no contempla restaurantes).
 - Falta la migración de `Cliente` (`telefono` y `direccion` opcionales), y hay 2 tests desactualizados (registro y `crear_admin`).
 - Login con email: error 500 si dos usuarios comparten email. Registro con un email ya usado: error 500.
+- **Pregunta abierta (Ramón, 14/10): ¿chofer y planta necesitan identidad (DID) en Guardian?** Hoy no: a Guardian solo va el reporte mensual por restaurante (usuario R-001) aprobado por el Proponente, y quién midió queda en la app. Firmar cada retiro con la identidad de quien lo midió sería un cambio de la policy (v2): decidir con CarboSur y Marcel.
+- Usuarios en línea (14/10): `chofer`, `planta`, `granja`, `carbosur`, `ClienteTest1`, `ramon` e `info@eggologic.org`. `ramon` e `info@` comparten email: cambiar el de `ramon`. Falta el usuario Restaurante de El Popu.
 - Mientras no exista la Fase 1: el chofer carga en kg el neto pesado en planta (bruto − cajones × 2,2 kg), y la planta anota cajones y bruto en observaciones.
 
 **Restaurantes nuevos (resolución temporal, 06/10).** Se cargan en la app desde el primer día; el usuario en Guardian se crea cuando entran en serio al piloto, con el alta solo con el código. Mientras tanto sus meses esperan en **Reportes**. No habrá restaurantes nuevos antes del 19/10.
