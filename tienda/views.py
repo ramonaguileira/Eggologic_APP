@@ -92,10 +92,21 @@ def pedidos_admin(request):
     if not (request.user.es_admin() or request.user.is_staff):
         return redirect("tienda:mis_pedidos")
 
-    pedidos = Pedido.objects.select_related("usuario").prefetch_related("items").order_by("-creado_en")
+    estado_filter = request.GET.get("estado", "RECIBIDO")
+    pedidos = Pedido.objects.all()
+
+    if estado_filter:
+        pedidos = pedidos.filter(estado=estado_filter)
+
+    pedidos = pedidos.select_related("usuario").prefetch_related("items").order_by("-creado_en")
+
+    estados_choices = Pedido.Estado.choices
     return render(request, "tienda/pedidos_admin.html", {
         "pedidos": pedidos,
+        "estado_filter": estado_filter,
+        "estados_choices": estados_choices,
     })
+
 
 
 @login_required
