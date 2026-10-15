@@ -92,7 +92,7 @@ def pedidos_admin(request):
     if not (request.user.es_admin() or request.user.is_staff):
         return redirect("tienda:mis_pedidos")
 
-    estado_filter = request.GET.get("estado", "RECIBIDO")
+    estado_filter = request.GET.get("estado", Pedido.Estado.RECIBIDO)
     pedidos = Pedido.objects.all()
 
     if estado_filter:

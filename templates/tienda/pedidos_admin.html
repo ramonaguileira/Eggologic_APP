@@ -8,7 +8,7 @@
   </div>
 
   <section class="tarjeta">
-    <form method="get" class="filtros">
+    <form>
       <label for="estado">Filtrar por estado:</label>
       <select name="estado" id="estado">
         {% for value, label in estados_choices %}
@@ -17,7 +17,6 @@
           </option>
         {% endfor %}
       </select>
-      <button type="submit" class="boton">Filtrar</button>
     </form>
   </section>
 
@@ -63,4 +62,20 @@
       <p>No hay pedidos con el filtro seleccionado.</p>
     </section>
   {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const filterSelect = document.getElementById('estado');
+
+    if (filterSelect) {
+      filterSelect.addEventListener('change', function() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('estado', this.value);
+        window.location.href = url.toString();
+      });
+    }
+  });
+</script>
 {% endblock %}
