@@ -78,7 +78,7 @@ def pedido_entregado(request, pedido_id):
             pedido.entregado_en = timezone.now()
         pedido.save()
         messages.success(request, "El pedido se marcó como entregado.")
-        return redirect("tienda:mis_pedidos")
+        return redirect("tienda:pedidos_admin")
 
     return render(request, "tienda/pedido_entregado.html", {
         "pedido": pedido,

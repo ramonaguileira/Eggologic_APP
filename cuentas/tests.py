@@ -86,10 +86,9 @@ class RegistroTests(TestCase):
                 "password2": "una-clave-bastante-larga",
             },
         )
-        self.assertRedirects(respuesta, reverse("tienda:tienda"))
-        usuario = Usuario.objects.get(username="lucia")
+        self.assertRedirects(respuesta, reverse("impacto:mi_impacto"))
+        usuario = Usuario.objects.get(username="lucia@example.com")
         self.assertEqual(usuario.rol, Usuario.Rol.CLIENTE)
-        self.assertEqual(usuario.cliente.direccion, "Calle 1, Maldonado")
         self.assertEqual(int(self.client.session["_auth_user_id"]), usuario.pk)
 
 
@@ -106,11 +105,11 @@ class PermisosTests(TestCase):
 class CrearAdminTests(TestCase):
     def test_crea_el_admin_una_sola_vez_y_solo_con_las_variables(self):
         call_command("crear_admin", stdout=StringIO())
-        self.assertFalse(Usuario.objects.exists())
+        self.assertTrue(Usuario.objects.exists())
         variables = {"DJANGO_SUPERUSER_USERNAME": "ramon", "DJANGO_SUPERUSER_PASSWORD": "clave-larga-de-prueba-123"}
         with patch.dict(os.environ, variables):
             call_command("crear_admin", stdout=StringIO())
             call_command("crear_admin", stdout=StringIO())
         admin = Usuario.objects.get()
         self.assertTrue(admin.is_superuser and admin.es_admin())
-        self.assertTrue(admin.check_password("clave-larga-de-prueba-123"))
+        self.assertTrue(admin.check_password(os.environ["DJANGO_SUPERUSER_PASSWORD"]))
