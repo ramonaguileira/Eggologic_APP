@@ -16,7 +16,7 @@
     <form method="post">
       {% csrf_token %}
       <div class="campo">
-        <label for="{{ form.entregado_en.id_for_label }}">Fecha y hora de entrega</label>
+        <label for="{{ form.entregado_en.id_for_label }}">Fecha y hora de entrega (opcional)</label>
         {{ form.entregado_en }}
         {% if form.entregado_en.errors %}<div class="error">{{ form.entregado_en.errors }}</div>{% endif %}
       </div>

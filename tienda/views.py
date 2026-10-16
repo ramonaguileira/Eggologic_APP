@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
+from django.utils import timezone
 
 from cuentas.permisos import requiere
 from impacto.calculos import factores_del_circuito
@@ -71,7 +72,7 @@ def pedido_entregado(request, pedido_id):
     form = PedidoEntregadoForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         pedido.estado = Pedido.Estado.ENTREGADO
-        entregado_en = form.cleaned_data["entregado_en"]
+        entregado_en = form.cleaned_data.get("entregado_en")
         if entregado_en:
             pedido.entregado_en = entregado_en
         else:
