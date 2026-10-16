@@ -35,10 +35,10 @@ python manage.py migrate
 python manage.py cargar_demo --password "una-contraseña-para-probar"
 
 # 4. Levantar la app
-python manage.py runserver
+python manage.py runserver 0.0.0.0:8321
 ```
 
-Después abrí <http://127.0.0.1:8000> y entrá con alguno de los usuarios que crea `cargar_demo`. Todos usan la contraseña que elegiste:
+Después abrí <http://127.0.0.1:8321> y entrá con alguno de los usuarios que crea `cargar_demo`. Todos usan la contraseña que elegiste:
 
 - `operador`: hace todas las tareas de campo (retiros, clasificación, lotes y granja) y ve el panel;
 - `chofer`: solo carga retiros;

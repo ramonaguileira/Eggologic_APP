@@ -147,3 +147,15 @@ LOGGING = {
     "handlers": {"consola": {"class": "logging.StreamHandler"}},
     "root": {"handlers": ["consola"], "level": "WARNING"},
 }
+
+# EMAIL for Debug
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# EMAIL SMTP FOR User Access Recovery
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "info@eggologic.org"
+EMAIL_HOST_PASSWORD = os.environ.get("DJANGO_EMAIL_SMTP_PASSWORD", "")
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = "noreply@eggologic.org"

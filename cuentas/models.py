@@ -78,8 +78,8 @@ class Restaurante(models.Model):
 
 class Cliente(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name="cliente")
-    telefono = models.CharField("teléfono", max_length=40)
-    direccion = models.CharField("dirección de entrega", max_length=200)
+    telefono = models.CharField("teléfono", max_length=40, blank=True)
+    direccion = models.CharField("dirección de entrega", max_length=200, blank=True)
 
     def __str__(self):
         return self.usuario.get_full_name() or self.usuario.username
