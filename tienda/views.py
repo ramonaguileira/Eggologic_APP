@@ -3,11 +3,12 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
+from django.utils import timezone
 
 from cuentas.permisos import requiere
 from impacto.calculos import factores_del_circuito
 
-from .forms import PedidoForm
+from .forms import PedidoForm, PedidoEntregadoForm
 from .models import Pedido, Producto
 from cuentas.models import Cliente, Usuario
 
@@ -68,14 +69,21 @@ def pedido_entregado(request, pedido_id):
     if not (request.user.es_admin() or request.user.puede_ver_datos()):
         raise Http404("No tienes permiso para realizar esta acción.")
 
-    if request.method == "POST":
+    form = PedidoEntregadoForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
         pedido.estado = Pedido.Estado.ENTREGADO
+        entregado_en = form.cleaned_data.get("entregado_en")
+        if entregado_en:
+            pedido.entregado_en = entregado_en
+        else:
+            pedido.entregado_en = timezone.now()
         pedido.save()
         messages.success(request, "El pedido se marcó como entregado.")
         return redirect("tienda:pedidos_admin")
 
     return render(request, "tienda/pedido_entregado.html", {
         "pedido": pedido,
+        "form": form,
     })
 
 
@@ -85,10 +93,21 @@ def pedidos_admin(request):
     if not (request.user.es_admin() or request.user.is_staff):
         return redirect("tienda:mis_pedidos")
 
-    pedidos = Pedido.objects.select_related("usuario").prefetch_related("items").order_by("-creado_en")
+    estado_filter = request.GET.get("estado", Pedido.Estado.RECIBIDO)
+    pedidos = Pedido.objects.all()
+
+    if estado_filter:
+        pedidos = pedidos.filter(estado=estado_filter)
+
+    pedidos = pedidos.select_related("usuario").prefetch_related("items").order_by("-creado_en")
+
+    estados_choices = Pedido.Estado.choices
     return render(request, "tienda/pedidos_admin.html", {
         "pedidos": pedidos,
+        "estado_filter": estado_filter,
+        "estados_choices": estados_choices,
     })
+
 
 
 @login_required

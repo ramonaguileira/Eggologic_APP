@@ -32,6 +32,7 @@ class Pedido(models.Model):
 
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="pedidos")
     creado_en = models.DateTimeField("fecha", auto_now_add=True)
+    entregado_en = models.DateTimeField("fecha de entrega", null=True, blank=True)
     estado = models.CharField(max_length=20, choices=Estado.choices, default=Estado.RECIBIDO)
     forma_pago = models.CharField("forma de pago", max_length=20, choices=FormaPago.choices)
     direccion = models.CharField("dirección de entrega", max_length=200)
