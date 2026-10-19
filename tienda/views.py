@@ -3,12 +3,13 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
+from django.db import transaction
 from django.utils import timezone
 
 from cuentas.permisos import requiere
 from impacto.calculos import factores_del_circuito
 
-from .forms import PedidoForm, PedidoEntregadoForm
+from .forms import PedidoForm, PedidoAdminForm, PedidoEntregadoForm
 from .models import Pedido, Producto
 from cuentas.models import Cliente, Usuario
 
@@ -86,6 +87,30 @@ def pedido_entregado(request, pedido_id):
         "form": form,
     })
 
+@login_required
+def pedido_nuevo_admin(request):
+    """Crea un nuevo pedido para un usuario (acción de administrador)."""
+    if not request.user.es_admin():
+        return redirect("tienda:mis_pedidos")
+
+    if request.method == "POST":
+        form = PedidoAdminForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                pedido = form.save(commit=False)
+                pedido.usuario = form.cleaned_data["usuario"]
+                pedido.save()
+                form.save_m2m()
+            messages.success(request, "Pedido creado exitosamente.")
+            return redirect("tienda:pedidos_admin")
+    else:
+        form = PedidoAdminForm()
+
+    usuarios = Usuario.objects.filter(rol=Usuario.Rol.RESTAURANTE)
+    return render(request, "tienda/pedido_nuevo_admin.html", {
+        "form": form,
+        "usuarios": usuarios,
+    })
 
 @login_required
 def pedidos_admin(request):

@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 
 from .models import ItemPedido, Pedido
+from cuentas.models import Usuario
 
 MAXIMO_POR_PRODUCTO = 50
 
@@ -79,3 +80,23 @@ class PedidoEntregadoForm(forms.Form):
         widget=forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"),
         required=False
     )
+
+class PedidoAdminForm(forms.ModelForm):
+    """Formulario para crear un pedido por un administrador."""
+    usuario = forms.ModelChoiceField(
+        label="Usuario",
+        queryset=Usuario.objects.filter(rol=Usuario.Rol.RESTAURANTE),
+        required=True
+    )
+
+    class Meta:
+        model = Pedido
+        fields = ["usuario", "direccion", "telefono", "forma_pago", "notas"]
+
+    def save(self, commit=True):
+        pedido = super().save(commit=False)
+        pedido.estado = Pedido.Estado.NUEVO
+        if commit:
+            pedido.save()
+            self.save_m2m()
+        return pedido

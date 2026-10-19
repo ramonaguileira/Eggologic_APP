@@ -1,0 +1,77 @@
+
+{% extends "base.html" %}
+
+{% block titulo %}Nuevo pedido · Eggologic{% endblock %}
+
+{% block contenido %}
+  <section class="tarjeta angosta">
+    <h1>Nuevo pedido</h1>
+    <p class="tenue">Crear un pedido para un restaurante.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="error">{{ form.non_field_errors }}</div>{% endif %}
+      {% for campo in form %}
+        <div class="campo{% if campo.errors %} con-error{% endif %}">
+          <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+          {{ campo }}
+          {% if campo.errors %}<div class="error">{{ campo.errors }}</div>{% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="boton">Crear pedido</button>
+      <a href="{% url 'tienda:pedidos_admin' %}" class="boton no-accion">Cancelar</a>
+    </form>
+  </section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const usuarioSelect = document.getElementById('id_usuario');
+    const direccionInput = document.getElementById('id_direccion');
+    const telefonoInput = document.getElementById('id_telefono');
+    const restaurantDataDiv = document.getElementById('restaurant-data');
+
+    if (usuarioSelect) {
+      // Store restaurant data in a JavaScript object for quick access
+      let restaurantData = {};
+
+      // Load restaurant data from a data attribute or fetch it
+      {% for usuario in usuarios %}
+      restaurantData['{{ usuario.pk }}'] = {
+        'direccion': '{{ usuario.restaurante.direccion|default:""|escapejs }}',
+        'telefono': '{{ usuario.restaurante.telefono|default:""|escapejs }}'
+      };
+      {% endfor %}
+
+      usuarioSelect.addEventListener('change', function() {
+        const selectedId = this.value;
+        const data = restaurantData[selectedId];
+
+        if (data) {
+          // Update the form fields
+          direccionInput.value = data.direccion;
+          telefonoInput.value = data.telefono;
+
+          // Update the display
+          if (data.direccion || data.telefono) {
+            restaurantDataDiv.innerHTML = `
+            <p><strong>Dirección:</strong> ${data.direccion || '—'}</p>
+            <p><strong>Teléfono:</strong> ${data.telefono || '—'}</p>
+          `;
+          } else {
+            restaurantDataDiv.innerHTML = '<p class="tenue">Este restaurante no tiene datos de entrega.</p>';
+          }
+        } else {
+          // Reset form fields if no data
+          direccionInput.value = '';
+          telefonoInput.value = '';
+          restaurantDataDiv.innerHTML = '<p class="tenue">No se encontraron datos para este restaurante.</p>';
+        }
+      });
+
+      // Trigger change event on page load to show initial data if a restaurant is already selected
+      usuarioSelect.dispatchEvent(new Event('change'));
+    }
+  });
+</script>
+{% endblock %}
