@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block titulo %}Todos los pedidos · Eggologic{% endblock %}
+
+{% block contenido %}
+  <div class="encabezado">
+    <h1>Todos los pedidos</h1>
+  </div>
+  
+  {% if pedidos %}
+    <div class="tabla">
+      <table>
+        <thead>
+          <tr>
+            <th>N.º</th>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Total</th>
+            <th>Pago</th>
+            <th>Estado</th>
+            <th>Entregado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pedido in pedidos %}
+            <tr>
+              <td><a href="{% url 'tienda:pedido_admin_detalle' pedido.pk %}">{{ pedido.pk }}</a></td>
+              <td>{{ pedido.creado_en|date:"d/m/Y H:i" }}</td>
+              <td>{{ pedido.usuario.get_full_name|default:pedido.usuario.username }}</td>
+              <td class="num">$ {{ pedido.total|floatformat:"0g" }}</td>
+              <td>{{ pedido.get_forma_pago_display }}</td>
+              <td><span class="estado estado-{{ pedido.estado }}">{{ pedido.get_estado_display }}</span></td>
+              <td>
+                {% if pedido.estado != pedido.Estado.ENTREGADO and user.es_admin %}
+                  <a href="{% url 'tienda:pedido_entregado' pedido.pk %}" class="boton pequeno">Marcar entregado</a>
+                {% else %}
+                  <span class="etiqueta">Entregado</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <section class="tarjeta">
+      <p>Todavía no hay pedidos.</p>
+    </section>
+  {% endif %}
+{% endblock %}

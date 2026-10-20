@@ -41,7 +41,7 @@ def registrarse(request):
         usuario = form.save()
         login(request, usuario)
         messages.success(request, f"¡Bienvenido/a, {usuario.first_name}! Ya podés hacer tu primer pedido.")
-        return redirect("tienda:tienda")
+        return redirect("impacto:mi_impacto")
     return render(request, "registration/registrarse.html", {"form": form})
 
 @login_required

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block titulo %}Pedido #{{ pedido.pk }} · Eggologic{% endblock %}
+
+{% block contenido %}
+  <div class="encabezado">
+    <h1>Pedido #{{ pedido.pk }}</h1>
+    <span class="estado estado-{{ pedido.estado }}">{{ pedido.get_estado_display }}</span>
+  </div>
+
+  <section class="tarjeta">
+    <h2>Datos del cliente</h2>
+    <p><strong>Nombre:</strong> {{ pedido.usuario.get_full_name|default:pedido.usuario.username }}</p>
+    <p><strong>Email:</strong> {{ pedido.usuario.email }}</p>
+    <p><strong>Teléfono:</strong> {{ pedido.telefono }}</p>
+    <p><strong>Dirección:</strong> {{ pedido.direccion }}</p>
+  </section>
+
+  <section class="tarjeta">
+    <h2>Items del pedido</h2>
+    <ul class="lista">
+      {% for item in pedido.items.all %}
+        <li>{{ item.cantidad }} × {{ item.producto.nombre }} — $ {{ item.subtotal|floatformat:"0g" }}</li>
+      {% endfor %}
+    </ul>
+    <p class="total"><strong>Total: $ {{ pedido.total|floatformat:"0g" }}</strong></p>
+    <p><strong>Forma de pago:</strong> {{ pedido.get_forma_pago_display }}</p>
+    {% if pedido.notas %}
+      <p><strong>Notas:</strong> {{ pedido.notas }}</p>
+    {% endif %}
+  </section>
+
+  {% if pedido.forma_pago == pedido.FormaPago.TRANSFERENCIA %}
+    {% if pedido.estado == pedido.Estado.NUEVO or pedido.estado == pedido.Estado.CONFIRMADO %}
+      <section class="tarjeta">
+        <h2>Datos de transferencia</h2>
+        <p>{{ datos_transferencia }}</p>
+      </section>
+    {% endif %}
+  {% endif %}
+
+  <div class="acciones">
+    {% if pedido.estado != pedido.Estado.ENTREGADO and user.es_admin %}
+      <a href="{% url 'tienda:pedido_entregado' pedido.pk %}" class="boton">Marcar como entregado</a>
+    {% endif %}
+    <a href="{% url 'tienda:pedidos_admin' %}" class="boton no-accion">Volver</a>
+  </div>
+{% endblock %}

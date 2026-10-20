@@ -20,8 +20,15 @@
         {% endfor %}
       </ul>
       <p><strong>Total: $ {{ pedido.total|floatformat:"0g" }}</strong> · {{ pedido.get_forma_pago_display }}</p>
+      <p class="tenue">Dirección: {{ pedido.direccion }}</p>
+      <p class="tenue">Teléfono: {{ pedido.telefono }}</p>
       {% if pedido.forma_pago == transferencia and pedido.estado in pendientes %}
         <p class="aviso">{{ datos_transferencia }}</p>
+      {% endif %}
+      {% if user.es_admin or user.puede_ver_datos %}
+        <div class="acciones">
+          <a href="{% url 'tienda:pedido_entregado' pedido.pk %}" class="boton">Marcar como entregado</a>
+        </div>
       {% endif %}
     </article>
   {% empty %}
