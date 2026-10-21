@@ -31,7 +31,7 @@
   </section>
 
   {% if pedido.forma_pago == pedido.FormaPago.TRANSFERENCIA %}
-    {% if pedido.estado == pedido.Estado.NUEVO or pedido.estado == pedido.Estado.CONFIRMADO %}
+    {% if pedido.estado == pedido.Estado.RECIBIDO or pedido.estado == pedido.Estado.CONFIRMADO %}
       <section class="tarjeta">
         <h2>Datos de transferencia</h2>
         <p>{{ datos_transferencia }}</p>

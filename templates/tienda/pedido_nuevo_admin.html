@@ -1,0 +1,126 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block titulo %}Nuevo pedido · Eggologic{% endblock %}
+
+{% block contenido %}
+<h1>Nuevo pedido</h1>
+<p class="tenue">Crear un pedido para un restaurante.</p>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="error aviso-error">{{ form.non_field_errors }}</div>{% endif %}
+
+  <div class="productos">
+    {% for producto, campo in form.campos_de_productos %}
+    <article class="producto" data-precio="{{ producto.precio|stringformat:'f' }}" data-huevos="{{ producto.huevos }}">
+      <h2>{{ producto.nombre }}</h2>
+      {% if producto.descripcion %}<p class="tenue">{{ producto.descripcion }}</p>{% endif %}
+      <p class="precio">$ {{ producto.precio|floatformat:"0g" }}</p>
+      <div class="cantidad">
+        <button type="button" class="menos" aria-label="Uno menos de {{ producto.nombre }}">−</button>
+        {{ campo }}
+        <button type="button" class="mas" aria-label="Uno más de {{ producto.nombre }}">+</button>
+      </div>
+      {% if campo.errors %}<div class="error">{{ campo.errors }}</div>{% endif %}
+    </article>
+    {% empty %}
+    <p class="tenue">Por ahora no hay productos disponibles.</p>
+    {% endfor %}
+  </div>
+
+  <div class="resumen">
+    <p class="total">Total: <strong id="total">—</strong></p>
+    {% if kg_por_huevo %}
+    <p id="rescate" class="tenue" data-kg-por-huevo="{{ kg_por_huevo|stringformat:'f' }}"></p>
+    {% endif %}
+  </div>
+
+  <section class="tarjeta">
+    <h2>Datos del restaurante</h2>
+    <div class="campo{% if form.usuario.errors %} con-error{% endif %}">
+      <label for="{{ form.usuario.id_for_label }}">{{ form.usuario.label }}</label>
+      {{ form.usuario }}
+      {% if form.usuario.errors %}<div class="error">{{ form.usuario.errors }}</div>{% endif %}
+    </div>
+    <div class="restaurant-data" id="restaurant-data">
+      {% if usuario_actual and usuario_actual.restaurante %}
+      <p><strong>Dirección:</strong> {{ usuario_actual.restaurante.direccion|default:"—" }}</p>
+      <p><strong>Teléfono:</strong> {{ usuario_actual.restaurante.telefono|default:"—" }}</p>
+      {% else %}
+      <p class="tenue">No se encontraron datos para este restaurante.</p>
+      {% endif %}
+    </div>
+    <div class="campo{% if form.direccion.errors %} con-error{% endif %}">
+      <label for="{{ form.direccion.id_for_label }}">{{ form.direccion.label }}</label>
+      {{ form.direccion }}
+      {% if form.direccion.errors %}<div class="error">{{ form.direccion.errors }}</div>{% endif %}
+    </div>
+    <div class="campo{% if form.telefono.errors %} con-error{% endif %}">
+      <label for="{{ form.telefono.id_for_label }}">{{ form.telefono.label }}</label>
+      {{ form.telefono }}
+      {% if form.telefono.errors %}<div class="error">{{ form.telefono.errors }}</div>{% endif %}
+    </div>
+    <div class="campo{% if form.forma_pago.errors %} con-error{% endif %}">
+      <label for="{{ form.forma_pago.id_for_label }}">{{ form.forma_pago.label }}</label>
+      {{ form.forma_pago }}
+      {% if form.forma_pago.errors %}<div class="error">{{ form.forma_pago.errors }}</div>{% endif %}
+    </div>
+    <div class="campo{% if form.notas.errors %} con-error{% endif %}">
+      <label for="{{ form.notas.id_for_label }}">{{ form.notas.label }}</label>
+      {{ form.notas }}
+      {% if form.notas.errors %}<div class="error">{{ form.notas.errors }}</div>{% endif %}
+    </div>
+    <p class="tenue">Te contactamos para coordinar la entrega. Por ahora no hay pago online.</p>
+    <button type="submit" class="boton">Hacer pedido</button>
+    <a href="{% url 'tienda:pedidos_admin' %}" class="boton no-accion">Cancelar</a>
+  </section>
+</form>
+
+<script src="{% static 'js/tienda.js' %}" defer></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const usuarioSelect = document.getElementById('id_usuario');
+    const direccionInput = document.getElementById('id_direccion');
+    const telefonoInput = document.getElementById('id_telefono');
+    const restaurantDataDiv = document.getElementById('restaurant-data');
+
+    if (usuarioSelect) {
+      let restaurantData = {};
+
+      {% for usuario in usuarios %}
+      restaurantData['{{ usuario.pk }}'] = {
+        'direccion': '{{ usuario.restaurante.direccion|default:""|escapejs }}',
+        'telefono': '{{ usuario.restaurante.telefono|default:""|escapejs }}'
+      };
+      {% endfor %}
+
+      usuarioSelect.addEventListener('change', function() {
+        const selectedId = this.value;
+        const data = restaurantData[selectedId];
+
+        if (data) {
+          direccionInput.value = data.direccion;
+          telefonoInput.value = data.telefono;
+
+          if (data.direccion || data.telefono) {
+            restaurantDataDiv.innerHTML = `
+                <p><strong>Dirección:</strong> ${data.direccion || '—'}</p>
+                <p><strong>Teléfono:</strong> ${data.telefono || '—'}</p>
+              `;
+          } else {
+            restaurantDataDiv.innerHTML = '<p class="tenue">Este restaurante no tiene datos de entrega.</p>';
+          }
+        } else {
+          direccionInput.value = '';
+          telefonoInput.value = '';
+          restaurantDataDiv.innerHTML = '<p class="tenue">No se encontraron datos para este restaurante.</p>';
+        }
+      });
+
+      usuarioSelect.dispatchEvent(new Event('change'));
+    }
+  });
+</script>
+{% endblock %}

@@ -5,8 +5,22 @@
 {% block contenido %}
   <div class="encabezado">
     <h1>Todos los pedidos</h1>
+    <a href="{% url 'tienda:pedido_nuevo_admin' %}" class="boton">+ Nuevo pedido</a>
   </div>
-  
+
+  <section class="tarjeta">
+    <form>
+      <label for="estado">Filtrar por estado:</label>
+      <select name="estado" id="estado">
+        {% for value, label in estados_choices %}
+          <option value="{{ value }}" {% if estado_filter == value %}selected{% endif %}>
+            {{ label }}
+          </option>
+        {% endfor %}
+      </select>
+    </form>
+  </section>
+
   {% if pedidos %}
     <div class="tabla">
       <table>
@@ -34,7 +48,9 @@
                 {% if pedido.estado != pedido.Estado.ENTREGADO and user.es_admin %}
                   <a href="{% url 'tienda:pedido_entregado' pedido.pk %}" class="boton pequeno">Marcar entregado</a>
                 {% else %}
-                  <span class="etiqueta">Entregado</span>
+                  {% if pedido.entregado_en %}
+                    <span class="tenue">Entregado el {{ pedido.entregado_en|date:"d/m/Y H:i" }}</span>
+                  {% endif %}
                 {% endif %}
               </td>
             </tr>
@@ -44,7 +60,23 @@
     </div>
   {% else %}
     <section class="tarjeta">
-      <p>Todavía no hay pedidos.</p>
+      <p>No hay pedidos con el filtro seleccionado.</p>
     </section>
   {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const filterSelect = document.getElementById('estado');
+
+    if (filterSelect) {
+      filterSelect.addEventListener('change', function() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('estado', this.value);
+        window.location.href = url.toString();
+      });
+    }
+  });
+</script>
 {% endblock %}
