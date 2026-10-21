@@ -102,7 +102,6 @@ def pedido_nuevo_admin(request):
                 pedido = form.save(commit=False)
                 pedido.usuario = form.cleaned_data["usuario"]
                 pedido.save()
-                form.save_m2m()
             messages.success(request, "Pedido creado exitosamente.")
             return redirect("tienda:pedidos_admin")
     else:
