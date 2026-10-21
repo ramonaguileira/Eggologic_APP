@@ -93,8 +93,10 @@ def pedido_nuevo_admin(request):
     if not request.user.es_admin():
         return redirect("tienda:mis_pedidos")
 
+    productos = Producto.objects.filter(activo=True)
+
     if request.method == "POST":
-        form = PedidoAdminForm(request.POST)
+        form = PedidoAdminForm(request.POST, productos=productos)
         if form.is_valid():
             with transaction.atomic():
                 pedido = form.save(commit=False)
@@ -104,13 +106,17 @@ def pedido_nuevo_admin(request):
             messages.success(request, "Pedido creado exitosamente.")
             return redirect("tienda:pedidos_admin")
     else:
-        form = PedidoAdminForm()
+        form = PedidoAdminForm(productos=productos)
 
     usuarios = Usuario.objects.filter(rol=Usuario.Rol.RESTAURANTE)
+    factores = factores_del_circuito()
+    kg_por_huevo = factores["kg_residuo_por_huevo"] if factores else None
     return render(request, "tienda/pedido_nuevo_admin.html", {
         "form": form,
         "usuarios": usuarios,
+        "kg_por_huevo": kg_por_huevo,
     })
+
 
 @login_required
 def pedidos_admin(request):
