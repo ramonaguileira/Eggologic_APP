@@ -4,12 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block titulo %}Eggologic{% endblock %}</title>
-  <link rel="icon" href="data:,">
+  <link rel="icon" href="{% static 'img/logo.svg' %}" type="image/svg+xml">
+  <link rel="icon" href="{% static 'img/favicon-32.png' %}" sizes="32x32" type="image/png">
+  {# Ícono y nombre al agregar la app a la pantalla de inicio del celular. #}
+  <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+  <link rel="manifest" href="{% static 'manifest.webmanifest' %}">
+  <meta name="theme-color" content="#2f6b3f">
+  <meta name="apple-mobile-web-app-title" content="Eggologic">
   <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
 </head>
 <body>
   <header class="barra">
-    <a class="marca" href="{% url 'inicio' %}">🥚 Eggologic</a>
+    <a class="marca" href="{% url 'inicio' %}"><img src="{% static 'img/logo.svg' %}" alt="" width="28" height="28"> Eggologic</a>
     {% if user.is_authenticated %}
       <nav class="menu">
         {% if user.puede_ver_datos %}<a href="{% url 'captura:panel' %}">Panel</a>{% endif %}

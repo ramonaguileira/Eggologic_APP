@@ -39,7 +39,8 @@ a { color: var(--verde); }
   background: var(--verde);
 }
 .barra a, .barra .enlace { color: #fff; text-decoration: none; }
-.marca { font-weight: 700; font-size: 1.15rem; }
+.marca { font-weight: 700; font-size: 1.15rem; display: inline-flex; align-items: center; gap: 0.4rem; }
+.marca img { border-radius: 7px; }
 .menu { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1rem; }
 .menu form { margin: 0; }
 .enlace { background: none; border: 0; padding: 0; font: inherit; cursor: pointer; }

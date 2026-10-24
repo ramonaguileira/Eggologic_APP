@@ -151,4 +151,11 @@ Cosas de MGS que aprendimos:
 - Usuarios en línea (14/10): `chofer`, `planta`, `granja`, `carbosur`, `ClienteTest1`, `ramon` e `info@eggologic.org`. `ramon` e `info@` comparten email: cambiar el de `ramon`. Falta el usuario Restaurante de El Popu.
 - Mientras no exista la Fase 1: el chofer carga en kg el neto pesado en planta (bruto − cajones × 2,2 kg), y la planta anota cajones y bruto en observaciones.
 
+**Hallazgos de uso real (Ramón, 24/10, tras dos semanas usando la app).** Decisiones:
+1. **Guardian diario y automático, todos los días a las 18:00** (hora de Montevideo). Se reporta todo, aunque algún dato salga mal: los errores se corrigen con un reporte de corrección, nunca editando el original. Ramón no encontró en la app dónde se enviaba a mano.
+2. **Retiro por bultos:** el chofer pesa de a un cajón (dos bolsas por cajón). Carga cada bulto con su peso, la app los suma, y al final saca una sola foto de todo y envía el retiro.
+3. **Clasificación en planta con kg y foto:** la planta pesa kg de restos vegetales, de residuos de plato y de impropios, sube una foto y envía.
+4. **Producción de huevos por período** (por ejemplo, del 1 al 30 de octubre, o 15 días), no por día. Ramón elige el período.
+5. **Varios lotes de larva por período:** al cargar la producción del período se eligen los lotes que alimentaron a las gallinas.
+
 **Restaurantes nuevos (resolución temporal, 06/10).** Se cargan en la app desde el primer día; el usuario en Guardian se crea cuando entran en serio al piloto, con el alta solo con el código. Mientras tanto sus meses esperan en **Reportes**. No habrá restaurantes nuevos antes del 19/10.
