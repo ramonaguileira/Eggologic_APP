@@ -2,6 +2,13 @@
 
 **Estado:** propuesta para que Ramón revise (13/11/2026). **No hay nada construido.** Todo lo que no confirmó Ramón está marcado `SUPUESTO`.
 
+**Decisiones de Ramón (13/11):**
+
+- El juego es **un toque de color**, no un pasatiempo: nada que deje a la gente colgada jugando. Simple, rápido y práctico.
+- **Todo Eggo tiene valor real**, y la cuenta tiene que cerrar para no perder plata (punto 5).
+- El aporte a larvas se resuelve de la forma más sencilla posible (punto 7).
+- Orden de trabajo: el que se sugiere en el punto 14.
+
 Eggo World es una app nueva para los clientes de Eggologic (personas que compran huevos y restaurantes): un mundo en pixel art donde cada uno tiene su gallina, la alimenta, cosecha, arma su maple, compra huevos, pide retiros de residuos, ve su impacto y junta y canjea Eggos. Es otra cara de la app que ya existe: usa los mismos usuarios, pedidos, retiros y fórmulas.
 
 ---
@@ -14,9 +21,11 @@ Tres principios que ordenan todo el diseño:
 
 1. **Lo real genera, el juego cosecha.** Los Eggos se ganan solo con acciones reales y verificadas (un pedido entregado, kilos clasificados, una adopción activa). El juego es la manera linda de *recibirlos*: la gallina los pone, vos los cosechás y los acomodás en el maple. Tocar la pantalla nunca fabrica Eggos. Es el mecanismo de Ant Forest (la app de Alipay con cientos de millones de usuarios): la energía sale de acciones reales y el usuario entra a juntarla.
 2. **Sin culpa.** La gallina no se muere, no pasa hambre y no reta. Si no entrás, te espera con los huevos en el nido. Las mascotas que castigan la ausencia terminan echando al usuario; las que solo premian (Finch) retienen mejor.
-3. **Treinta segundos.** La visita diaria se resuelve con una mano y en medio minuto: entrar, cosechar, dar de comer, listo. Comprar un maple: tres toques.
+3. **Treinta segundos.** Cada visita se resuelve con una mano y en medio minuto: entrar, cosechar, listo. Comprar un maple: tres toques.
 
-**Qué NO es:** no es una billetera, no hay cripto a la vista, no hay inversión con ganancia en plata, y los Eggos no se compran ni se transfieren.
+4. **Color, no adicción.** No hay nada que obligue a entrar todos los días: ni rachas, ni misiones, ni cosas que se pierden. La gallina y el maple hacen simpático lo que el cliente igual venía a hacer (comprar, pedir un retiro, mirar su impacto).
+
+**Qué NO es:** no es un videojuego, no es una billetera, no hay cripto a la vista, no hay inversión con ganancia en plata, y los Eggos no se transfieren ni se cambian por plata.
 
 ---
 
@@ -47,13 +56,13 @@ SUPUESTO: es **una sola app con dos modos**; el modo lo define el rol que ya exi
 
 Quien ya era cliente de la app actual y entra con el mismo email **encuentra su historial**: sus compras viejas ya se convirtieron en Eggos y larvas.
 
-### Todos los días (30 segundos)
+### Cada vez que entra (30 segundos)
 
-Entrar → la gallina puso (según lo que pasó en la realidad) → tocar para cosechar → los huevos van al maple → darle larvas → una novedad real de la granja ("Hoy las gallinas pusieron 212 huevos", "El Lote 7 dio 12 kg de larvas").
+No hace falta entrar todos los días. Cuando entra: la gallina puso (según lo que pasó en la realidad) → tocar para cosechar → los huevos van al maple → una novedad real de la granja ("Hoy las gallinas pusieron 212 huevos", "El Lote 7 dio 12 kg de larvas").
 
-### Cada semana
+### Cada semana o quincena
 
-Comprar un maple o pedir un retiro. Una misión semanal opcional.
+Comprar un maple o pedir un retiro.
 
 ### Cada mes
 
@@ -78,7 +87,7 @@ Cinco pestañas abajo, con íconos pixelados. Nada más.
 - **Gallina.** Estados: contenta, comiendo, poniendo, durmiendo (de noche, hora de Montevideo), de paseo (si hace mucho que no entrás). Nunca triste ni enferma.
 - **Larvario.** Bandejas con las larvas del usuario. Las larvas son el **alimento** y representan lo real: aparecen por kilos de residuos entregados, por huevos comprados (la larva que hay detrás de cada huevo) y por apadrinar lotes.
 - **Nido.** Donde aparecen los huevos dorados (Eggos) para cosechar. Tiene un tope visual, pero **nada se pierde**: lo que no entra queda guardado en el galpón.
-- **Maple.** Treinta casilleros. Cada huevo cosechado ocupa uno. **Maple completo = se puede canjear por huevos de verdad.** Es la barra de progreso más clara posible: el cliente ve cuánto le falta para su premio.
+- **Maple.** Treinta casilleros que se llenan a medida que crece el saldo de Eggos. **Maple completo = el saldo alcanza para el descuento máximo en el próximo pedido.** Es la barra de progreso más clara posible: el cliente ve cuánto le falta para su premio.
 - **Camioncito** (restaurantes): llega cuando se confirma un retiro y se va cargado. Después "vuelve" con las larvas que salieron de esos residuos.
 - **Cartel de la granja.** Novedades reales del circuito y totales de la comunidad.
 
@@ -86,12 +95,12 @@ Cinco pestañas abajo, con íconos pixelados. Nada más.
 
 | Acción | En el juego | Qué hay atrás (real) |
 | --- | --- | --- |
-| Dar de comer | Arrastrar o tocar una larva; la gallina come y festeja | Consume larvas del usuario, que salieron de compras o residuos reales |
+| Dar de comer | Tocar una larva; la gallina come y festeja | Solo un gesto simpático: no da ni quita nada. Las larvas que se ven representan las compras y los residuos reales |
 | Poner | La gallina pone un huevo dorado | Se libera un Eggo ya ganado y pendiente de cosechar |
 | Cosechar | Tocar el huevo; vuela al maple | El Eggo pasa de "pendiente" a "en tu saldo" |
-| Armar el maple | Se llenan los 30 casilleros | Saldo suficiente para canjear |
+| Armar el maple | Se llenan los 30 casilleros | El saldo de Eggos crece hacia el descuento máximo |
 
-SUPUESTO: dar de comer no es obligatorio para cobrar. Si alguien no quiere jugar, hay un botón "Cosechar todo" y un modo sin animaciones. El juego es un regalo, no un peaje.
+Nada de esto es obligatorio para cobrar. Si alguien no quiere jugar, hay un botón "Cosechar todo" y un modo sin animaciones. El juego es un regalo, no un peaje.
 
 ---
 
@@ -99,40 +108,46 @@ SUPUESTO: dar de comer no es obligatorio para cobrar. Si alguien no quiere jugar
 
 En pantalla siempre se dice **Eggos** (regla del proyecto: no se usa "coin", "cripto" ni "token"). "Ego Coins" queda como nombre de trabajo.
 
-### 5.1 Reglas de la economía
+### 5.1 Reglas de la economía (decisión de Ramón, 13/11: valor real y que no se pierda plata)
 
-- Los Eggos son **puntos de un programa de fidelidad**. No se compran con plata, no se pasan a otra persona, no se cambian por plata.
-- Se ganan solo cuando la acción real quedó firme: pedido **entregado**, retiro **clasificado en planta**, adopción **activa**, apadrinamiento **confirmado**.
-- Vencen a los 12 meses sin movimiento en la cuenta (SUPUESTO), para que no se acumule una deuda infinita de huevos.
-- Los bonos de juego (bienvenida, misiones, referidos) tienen tope: no más del 10 % de lo emitido en el mes (SUPUESTO).
+- **1 Eggo = $ 1 de descuento en huevos de Eggologic.** Fácil de explicar y fácil de contar. (SUPUESTO: la equivalencia exacta.)
+- Se ganan solo cuando la acción real quedó firme: pedido **entregado**, retiro **clasificado en planta**. **Jugar no da Eggos**: como cada Eggo es plata, no hay bonos por entrar, cosechar ni dar de comer.
+- No se transfieren ni se cambian por plata. Solo se usan en huevos (y más adelante en otros productos de Eggologic).
 
 ### 5.2 Calculadora de Eggos (propuesta)
 
-Todos los números son `SUPUESTO` y viven en un solo archivo (`eggos/reglas.py`), para que cambiarlos sea editar una línea.
+Todos los números son `SUPUESTO` y viven en un solo archivo (`eggos/reglas.py`): cambiarlos es editar una línea, y el cambio vale de ahí en adelante.
 
 | Acción | Eggos | Cuándo se acreditan |
 | --- | --- | --- |
-| Comprar huevos | **1 por huevo** | Pedido entregado |
-| Entregar residuos | **2 por kg orgánico** (restos vegetales + residuos de plato) | Retiro clasificado |
+| Comprar huevos (incluye la adopción con plan mensual) | **5 cada $ 100** (5 %) | Pedido entregado |
+| Entregar residuos | **1 por kg orgánico** (restos vegetales + residuos de plato) | Retiro clasificado |
 | Calidad de la separación | ×1,2 si los impropios son menos del 5 %; ×0,8 si pasan el 15 % | Con el retiro |
-| Adoptar una gallina (plan mensual, ver 6) | 50 al empezar + 20 por mes activo | Cada mes |
-| Apadrinar larvas (ver 7) | 1 cada $ 10 aportados | Aporte confirmado |
-| Bienvenida | 20 | Al crear la gallina |
-| Referido | 50 para cada uno | Primer pedido entregado del invitado |
-| Misión semanal | 5 a 20 | Al cumplirla |
+| Bandeja de larvas (ver 7) | Lo que pagó + 10 % | Pago confirmado |
+| Referido (opcional) | 50 para cada uno | Primer pedido entregado del invitado |
 
-**Canje:** `20 Eggos = 1 huevo`. Un maple de 30 huevos = 600 Eggos. En el juego: cada casillero del maple de canje vale 20 Eggos.
+Ejemplos: una Quincena ($ 160) da 8 Eggos. Un restaurante que entrega 500 kg orgánicos bien separados gana 600 Eggos, que son $ 600 en huevos.
 
-### 5.3 Qué significan esos números
+### 5.3 Los candados para no perder plata
 
-Con el precio actual (Quincena: 15 huevos a $ 160, unos $ 10,7 por huevo):
+1. **Los Eggos de premio cubren hasta el 50 % de un pedido** (SUPUESTO). Cada canje viene acompañado de una venta en plata; nadie se lleva huevos gratis sin comprar.
+2. **Presupuesto mensual:** lo emitido como premio no pasa del 8 % de las ventas del mes (SUPUESTO). Si se acerca, el tablero avisa y se ajustan las tasas.
+3. **Vencimiento:** los Eggos de premio vencen a los 12 meses de ganados (SUPUESTO). La deuda no crece para siempre.
+4. **Un Eggo le cuesta a Eggologic menos de $ 1:** se paga en huevos, así que el costo real es el costo de producir esos huevos, no su precio de venta.
+5. **Tablero "Economía de Eggos"** para Ramón: emitidos, canjeados, vencidos, saldo pendiente (la deuda en pesos) y porcentaje sobre ventas, mes a mes.
+6. **Cada origen se acredita una sola vez** (lo garantiza la base), y un error se corrige con un movimiento contrario que queda a la vista.
 
-- 1 Eggo vale unos **$ 0,53** en huevos.
-- Comprar da un **5 % de vuelta**: cada 20 maples comprados, uno gratis.
-- Un restaurante que entrega 500 kg orgánicos en el mes gana 1.000 Eggos = **50 huevos** (unos $ 530).
-- Una gallina adoptada da 20 Eggos por mes = 1 huevo extra por mes.
+**La cuenta, con un mes de ejemplo** (números inventados para mostrar el método):
 
-**La pregunta de fondo es de negocio, no técnica:** qué porcentaje de la producción de huevos está dispuesto Eggologic a entregar por canje. La app va a tener un tablero interno ("Economía de Eggos") con: emitidos, canjeados, pendientes (la deuda en huevos) y ese porcentaje, para ajustar las tasas con datos.
+| | |
+| --- | --- |
+| Ventas del mes | $ 100.000 |
+| Eggos por compras (5 %) | 5.000 |
+| Eggos por residuos (1.500 kg) | 1.500 |
+| Total emitido | 6.500 Eggos = 6,5 % de las ventas (dentro del 8 %) |
+| Costo real si se canjea todo, con un huevo que cuesta producir el 55 % de su precio | $ 3.575 = 3,6 % de las ventas |
+
+Para cerrar las tasas con números de verdad hacen falta **tres datos de Ramón**: cuánto cuesta producir un huevo, cuánto se vende por mes, y cuánto vale para Eggologic un kilo de residuo (lo que ahorra en alimento menos lo que cuesta ir a buscarlo; y si el restaurante paga o no por el retiro). Con eso se confirma o se corrige el 5 % y el Eggo por kilo.
 
 ### 5.4 Relación con Guardian y FGET
 
@@ -143,7 +158,7 @@ Con el precio actual (Quincena: 15 huevos a $ 160, unos $ 10,7 por huevo):
 
 ### 5.5 Mercado de canje
 
-- **Fase 1:** Eggos → huevos (media docena, quincena, maple). El canje crea un pedido común, que se entrega por el circuito de siempre.
+- **Fase 1:** los Eggos se usan como **descuento al hacer un pedido** de huevos (hasta el 50 % con Eggos de premio). No hay una tienda aparte: es un casillero "Usar mis Eggos" en el pedido de siempre.
 - **Más adelante:** frass (el abono que sale de los lotes, ya se registra en `Lote.kg_frass`) para plantas; **donar huevos** a un comedor u olla con los Eggos; productos con la gráfica del juego.
 
 ---
@@ -153,7 +168,7 @@ Con el precio actual (Quincena: 15 huevos a $ 160, unos $ 10,7 por huevo):
 Dos niveles, para que nadie quede afuera y haya un producto real atrás:
 
 1. **Gallina de bienvenida (gratis, una por cuenta).** Es la mascota y la compañera del juego. Todos la tienen desde el primer minuto.
-2. **Adopción real (plan mensual).** SUPUESTO: el cliente paga una cuota mensual y recibe los huevos de "su" gallina (por ejemplo un maple por mes; una ponedora da entre 20 y 25 huevos al mes). Es una **suscripción de huevos** con cara de adopción: ingreso previsible para Eggologic y la producción vendida por adelantado. En el mundo, la gallina adoptada pone al ritmo real de la granja (huevos del período ÷ cantidad de gallinas).
+2. **Adopción real (plan mensual).** Da Eggos como cualquier compra (5 %). SUPUESTO: el cliente paga una cuota mensual y recibe los huevos de "su" gallina (por ejemplo un maple por mes; una ponedora da entre 20 y 25 huevos al mes). Es una **suscripción de huevos** con cara de adopción: ingreso previsible para Eggologic y la producción vendida por adelantado. En el mundo, la gallina adoptada pone al ritmo real de la granja (huevos del período ÷ cantidad de gallinas).
 
 Para la adopción real hace falta un dato que la app hoy no tiene: **cuántas gallinas hay**. Se suma como parámetro o como campo del registro de granja (que de todos modos pasa a ser por período, decisión del 24/10).
 
@@ -169,19 +184,24 @@ Se dice con honestidad: la gallina adoptada representa una parte del plantel, no
 - **Restaurante — trazabilidad real:** la app ya une cada retiro con su lote. Se puede contar la historia completa: *"Tus residuos del 14/10 entraron al Lote 7. El lote dio 12 kg de larvas y 30 kg de abono, y alimentó a las gallinas que pusieron 340 huevos."* Es lo más fuerte que tiene Eggologic para mostrar y ya está en los datos.
 - **Consumidor:** la larva que hay detrás de sus huevos (gramos de larva por huevo × huevos comprados), ya calculado en `impacto/calculos.py`.
 
-### Aportar capital — hay que hacerlo con cuidado
+### Aportar a la producción: la "bandeja de larvas" (versión sencilla, decisión de Ramón 13/11)
 
-Recibir plata del público prometiendo una ganancia es actividad regulada en Uruguay. La Ley 19.820 puso el financiamiento colectivo bajo el Banco Central (solo a través de plataformas autorizadas), y en 2025, después de las estafas de los fondos ganaderos, el BCU presentó un anteproyecto para regular también a las empresas productivas que captan fondos con promesa de rentabilidad. **No es un terreno para improvisar desde una app.**
+Recibir plata del público prometiendo una ganancia es actividad regulada en Uruguay (Ley 19.820 y Banco Central; en 2025, tras las estafas de los fondos ganaderos, el BCU propuso regular también a las empresas productivas que captan fondos con promesa de rentabilidad). Por eso el aporte **no es una inversión: es una compra de huevos por adelantado**, que es lo más simple de explicar, de programar y de llevar en la contabilidad.
 
-La propuesta es llegar al mismo objetivo (que la comunidad financie larvas) por un camino que no es una inversión financiera:
+**Cómo funciona:**
 
-| Nivel | Qué es | Qué recibe el cliente | Riesgo legal |
-| --- | --- | --- | --- |
-| **A. Apadrinar con Eggos** | El cliente destina Eggos a un lote | Su nombre en la bandeja, la historia del lote, insignia | Ninguno: no hay plata |
-| **B. Apadrinar una bandeja** (compra anticipada) | Paga hoy un monto fijo que financia una bandeja de un lote | **Huevos** a futuro (un vale con algo de más: paga 10 maples, recibe 11), Eggos y el seguimiento del lote: kilos de residuo transformados, larvas, abono | Bajo: es una venta anticipada de producto, no una promesa de ganancia. Confirmar con contador (IVA del pago adelantado, condiciones del vale) |
-| **C. Inversión con retorno en plata** | Aporte de capital con ganancia | Dinero | **Alto. Fuera de este plan** hasta tener asesoramiento legal; probablemente requiere plataforma autorizada por el BCU |
+1. El cliente toca "Apadrinar una bandeja" y elige un monto fijo (SUPUESTO: $ 500, $ 1.000 o $ 2.000).
+2. Paga por transferencia, como hoy. Una persona de Eggologic confirma el pago.
+3. Recibe **ese monto + 10 % en Eggos** (paga $ 1.000, tiene 1.100 Eggos para huevos). Los Eggos pagados no tienen el tope del 50 % ni vencen (SUPUESTO): es plata del cliente.
+4. En su mundo aparece la bandeja con su nombre, y puede ver el lote real al que se asignó: kilos de residuo, larvas y abono.
 
-En el juego, apadrinar una bandeja la hace aparecer en el larvario con un cartelito, crece con el avance real del lote (inicio → cosecha) y al cosecharse "llueven" larvas al mundo del padrino.
+**Por qué cierra:** Eggologic recibe la plata hoy y la devuelve en huevos durante los meses siguientes; el costo es un 10 % de descuento. No hay promesa de ganancia en plata, ni intereses, ni devolución en dinero.
+
+**Candados:** tope por persona, y un tope total de bandejas vendidas que no supere lo que la granja puede entregar en huevos (SUPUESTO: un mes de producción). Antes de lanzarlo, una consulta corta con el contador (cómo se factura un pago adelantado).
+
+En la base, los Eggos pagados y los de premio se anotan con motivos distintos, aunque el cliente vea un solo saldo. Así el futuro pase al registro verificable (policy v2) puede contar solo los de premio por impacto.
+
+**Fuera del plan:** cualquier aporte con retorno en plata, hasta tener asesoramiento legal.
 
 ---
 
@@ -217,16 +237,18 @@ Equivalencias simpáticas (bolsas de residuos, tachos) solo con factores que Car
 
 ---
 
-## 10. Motivación: por qué alguien vuelve
+## 10. El toque de juego (liviano a propósito)
 
-- **Niveles** (ya existen): cada nivel desbloquea algo visible en el mundo — un gallinero mejor, un cartel, una gallina de otro color.
-- **Colección:** razas de gallinas pixeladas, accesorios, decoración. Se ganan, no se compran.
-- **Misiones semanales** atadas a conductas reales: "Semana con menos de 5 % de impropios" (restaurante), "Pedí antes del jueves" (ayuda a planificar el reparto), "Devolvé tu maple vacío".
-- **Novedades reales** todos los días en el cartel: es contenido gratis que ya produce la operación.
-- **Constancia sin castigo:** se cuenta "semanas activas", no días seguidos, y no se pierde nada por faltar.
-- **Compartir:** tarjeta mensual con la gallina y los números.
-- **Comunidad antes que competencia:** una meta colectiva del mes ("entre todos, 2.000 kg transformados") con premio para todos. Los rankings entre restaurantes, más adelante y solo si ellos quieren.
-- **Avisos:** pocos y útiles: "Tu pedido sale mañana", "Tus residuos ya son larvas", "Tu maple está completo". Nunca "tu gallina te extraña".
+Lo que hay:
+
+- **La gallina con nombre** y sus pocos gestos (camina, pone, duerme, festeja).
+- **Cosechar al maple**: el momento simpático de recibir los Eggos.
+- **Niveles** (ya existen): cada nivel cambia algo visible en el mundo — un gallinero mejor, una gallina de otro color.
+- **Novedades reales** de la granja en el cartel.
+- **Tarjeta mensual** para compartir, con la gallina y los números.
+- **Avisos**, pocos y útiles: "Tu pedido sale mañana", "Tus residuos ya son larvas". Nunca "tu gallina te extraña".
+
+Lo que **no** hay (decisión de Ramón, 13/11): rachas, misiones, rankings, colecciones, minijuegos, ni nada que premie pasar tiempo en la app o castigue no entrar.
 
 ---
 
@@ -263,11 +285,57 @@ Equivalencias simpáticas (bolsas de residuos, tachos) solo con factores que Car
 
 - **`api/`** — endpoints JSON bajo `/api/v1/`, vistas como funciones (como el resto del proyecto). Es el contrato entre las dos apps; se documenta en un archivo.
 - **`eggos/`** — `MovimientoEggos` (solo se agrega, nunca se edita: usuario, cantidad, motivo, referencia al origen, fecha) y `reglas.py`. El saldo es la suma. Un error se corrige con un movimiento contrario, igual que los reportes de corrección de Guardian.
-- **`mundo/`** — gallinas, larvas disponibles, huevos pendientes de cosecha, misiones, apadrinamientos, adopciones, pedidos de retiro.
+- **`mundo/`** — la gallina, las bandejas apadrinadas, las adopciones y los pedidos de retiro.
 
 **Cómo se acreditan los Eggos sin tocar el código actual:** una función repetible, `acreditar_pendientes(usuario)`, busca pedidos entregados y retiros clasificados que todavía no tengan su movimiento y los crea (cada origen puede acreditarse una sola vez, garantizado por la base). Corre cuando el usuario abre la app y por comando. Sin señales escondidas y sin cambios en `tienda` ni `captura`.
 
 **El servidor manda.** La app del cliente nunca dice "sumame Eggos"; dice "coseché" y el servidor decide cuánto había. Así no se puede hacer trampa desde el teléfono.
+
+### Cómo queda el código
+
+**Repo nuevo `eggo-world`** (Marcel no necesita abrirlo):
+
+```
+eggo-world/
+  src/
+    pantallas/    inicio, mundo, tienda, residuos, impacto, yo
+    mundo/        gallina, nido, maple (sprites y animaciones)
+    api.ts        el ÚNICO archivo que habla con el servidor
+  public/arte/    los dibujos en pixel art
+  README.md
+```
+
+**Repo actual `Eggologic_APP`** — se agregan tres carpetas y se tocan tres archivos:
+
+```
+Eggologic_APP/
+  cuentas/ captura/ tienda/ impacto/ guardian/    ← como están
+  api/            NUEVA  vistas JSON bajo /api/v1/ (solo traducen; no tienen reglas)
+  eggos/          NUEVA  MovimientoEggos + reglas.py (todas las tasas)
+  mundo/          NUEVA  gallina, bandejas, pedidos de retiro
+  docs/eggo-world/        el contrato de la API y un doc por etapa
+```
+
+Lo único que se toca del código existente:
+
+| Archivo | Cambio |
+| --- | --- |
+| `eggologic/settings.py` | Sumar las tres apps y la configuración de Google y CORS |
+| `eggologic/urls.py` | Una línea: `path("api/v1/", include("api.urls"))` |
+| `requirements.txt` | Dos dependencias: `google-auth` y `django-cors-headers` |
+| `tienda` (en W3, PR aparte) | El descuento con Eggos en el pedido |
+| `captura` (en W4, PR aparte) | La lista de retiros pedidos para el chofer |
+
+**Reglas para no marear a Marcel:**
+
+1. **Lo viejo nunca importa de lo nuevo.** `api`, `eggos` y `mundo` leen de `tienda`, `captura` e `impacto`; al revés, nunca. Un test automático lo verifica.
+2. **Las fórmulas siguen en un solo lugar:** impacto en `impacto/calculos.py`, Eggos en `eggos/reglas.py`. La API no calcula nada.
+3. **Un interruptor:** la variable `EGGO_WORLD_ACTIVO`. Apagada, la API no responde y la app actual funciona igual que hoy.
+4. **PRs chicos y por etapa**, con tests, cada uno con su doc. Los dos cambios en pantallas existentes van en PRs separados y avisados.
+5. **Mismo estilo:** vistas como funciones, Django convencional, comentarios solo para el "por qué".
+6. **Migraciones solo de las apps nuevas** (tablas nuevas), salvo el descuento en el pedido.
+
+Lo que Marcel tiene que revisar en total: la carpeta `eggos/` (un modelo y un archivo de reglas), la carpeta `mundo/` (tres modelos chicos), y `api/` (vistas cortas). El repo nuevo es opcional para él.
 
 ### Contrato de la API (borrador)
 
@@ -276,13 +344,12 @@ Equivalencias simpáticas (bolsas de residuos, tachos) solo con factores que Car
 | `POST /api/v1/auth/google`, `/auth/login`, `/auth/salir` | Entrar y salir |
 | `GET /api/v1/yo` | Perfil, rol, saldo, nivel |
 | `GET /api/v1/mundo` | Estado completo del mundo (acredita lo pendiente) |
-| `POST /api/v1/mundo/gallinas`, `/mundo/alimentar`, `/mundo/cosechar` | Acciones del juego |
+| `POST /api/v1/mundo/gallina`, `/mundo/cosechar` | Ponerle nombre a la gallina; cosechar |
 | `GET /api/v1/eggos/movimientos` | Historial |
 | `GET /api/v1/tienda/productos`, `GET/POST /api/v1/tienda/pedidos` | Comprar (mismo `Pedido` de hoy) |
-| `GET /api/v1/canjes/catalogo`, `POST /api/v1/canjes` | Canjear |
 | `GET/POST /api/v1/retiros/solicitudes` | Pedir retiro y ver el estado |
 | `GET /api/v1/impacto`, `/impacto/trazabilidad`, `/impacto/comunidad` | Tablero |
-| `GET/POST /api/v1/larvas/lotes`, `/larvas/apadrinar` | Larvas |
+| `GET /api/v1/larvas/lotes`, `GET/POST /api/v1/larvas/bandejas` | Ver lotes; apadrinar una bandeja |
 | `GET/POST /api/v1/adopciones` | Adopción real |
 
 ### Entrar con Google
@@ -301,7 +368,7 @@ Equivalencias simpáticas (bolsas de residuos, tachos) solo con factores que Car
 ### Tecnología de la app nueva (SUPUESTO, a confirmar con Marcel)
 
 - **App web instalable (PWA):** se abre desde un link o un QR en el maple, se agrega a la pantalla de inicio y funciona como una app. Sin tiendas al principio.
-- **Vite + TypeScript + React** para las pantallas, y **Phaser 3** (motor de juegos 2D, maduro y bien documentado) solo para la escena del mundo, aislado en su carpeta.
+- **Vite + TypeScript + React** para las pantallas. **Sin motor de juegos:** como el juego es liviano, la gallina y el maple se animan con hojas de sprites y CSS. Menos dependencias y menos código.
 - **Hosting:** sitio estático gratis en Render (mismo panel que ya usan), en `mundo.eggologic.org`; la API queda en la web actual. Al compartir dominio, la conexión es más simple y segura.
 - **Tiendas de apps:** cuando el producto esté validado, se empaqueta la misma app con Capacitor.
 - **Avisos:** notificaciones web (en iPhone funcionan solo con la app instalada en la pantalla de inicio) y email con la casilla que ya existe.
@@ -325,7 +392,7 @@ Equivalencias simpáticas (bolsas de residuos, tachos) solo con factores que Car
 - **Programa de Eggos:** bases y condiciones claras (cómo se ganan, cuánto valen, cuándo vencen, que no son dinero).
 - **Aporte a larvas:** solo los niveles A y B del punto 7. Consulta con contador y abogado antes del nivel B.
 - **Menores:** un juego de gallinas atrae chicos. SUPUESTO: cuenta solo para mayores de 18; los chicos juegan desde la cuenta de un adulto.
-- **Trampas:** Eggos solo por hechos verificados; topes en bonos; un referido vale cuando hay un pedido entregado; una gallina gratis por cuenta; límite de pedidos por minuto en la API; cada canje queda como pedido que una persona entrega.
+- **Trampas:** Eggos solo por hechos verificados; jugar no da Eggos; un referido vale cuando hay un pedido entregado; una gallina gratis por cuenta; límite de pedidos por minuto en la API; cada canje queda como pedido que una persona entrega.
 - **Marca:** "Eggo" es una marca registrada de waffles de Kellogg's en otros países. Antes de invertir en la marca "Eggo World", consultar el registro en Uruguay (DNPI).
 - **Secretos:** las claves de Google van en variables de entorno, nunca en los repos. El repo nuevo también se asume público.
 - Sigue valiendo todo lo del proyecto: solo testnet, sin billeteras para usuarios, nada personal a Guardian.
@@ -338,14 +405,20 @@ Mismo método de siempre: cada etapa termina con un resumen de checkpoint y se f
 
 | Etapa | Qué se hace | Cómo se sabe que está |
 | --- | --- | --- |
-| **W0. Decisiones y prototipo** | Respuestas a las preguntas del punto 17. Guía de arte. Prototipo navegable **sin servidor** (datos de mentira) de inicio, mundo y cosecha | Ramón lo prueba en su celular y dice "es esto" |
+| **W0. Prototipo** | Guía de arte. Prototipo navegable **sin servidor** (datos de mentira) de inicio, mundo, cosecha y pedido. No toca la app actual ni necesita a Marcel | Ramón lo prueba en su celular y dice "es esto" |
 | **W1. Cimientos** | Repo nuevo. App `api/`. Entrar con Google y con email. Perfil. Impacto de solo lectura con datos reales | Un cliente actual entra con Google y ve su historial |
-| **W2. Mundo y Eggos** | Apps `eggos/` y `mundo/`. Gallina, larvas, cosecha, maple. Historial de Eggos. Tablero interno de economía | Un pedido entregado en la app actual aparece como huevos para cosechar |
-| **W3. Tienda y canje** | Comprar maples desde Eggo World. Canjear Eggos. Mis pedidos | Un pedido hecho en Eggo World aparece en Pedidos de la app actual, y un canje también |
+| **W2. Mundo y Eggos** | Apps `eggos/` y `mundo/`. Gallina, cosecha, maple. Historial de Eggos. Tablero de economía | Un pedido entregado en la app actual aparece como huevos para cosechar |
+| **W3. Tienda** | Comprar desde Eggo World y usar Eggos como descuento. Mis pedidos | Un pedido hecho en Eggo World aparece en Pedidos de la app actual |
 | **W4. Restaurantes** | Pedir retiro (y la lista para el chofer). Tablero del restaurante. Trazabilidad por lote | El Popu pide un retiro, y después ve en qué lote terminó |
-| **W5. Adopción y larvas** | Adopción real (plan mensual). Apadrinar con Eggos (A) y bandejas (B) | Primera adopción y primer apadrinamiento reales |
-| **W6. Pulido y beta** | Misiones, niveles con premios visibles, avisos, tarjeta para compartir, sonido, accesibilidad. Beta cerrada con unos 10 clientes y El Popu | Dos semanas de uso real sin errores graves |
-| **Después** | Pago en línea, tiendas de apps, balde retornable para hogares, donaciones, metas colectivas, Eggos en la policy v2 | — |
+| **W5. Bandejas y adopción** | Bandeja de larvas. Adopción con plan mensual | Primera bandeja y primera adopción reales |
+| **W6. Pulido y beta** | Niveles visibles, avisos, tarjeta para compartir, accesibilidad. Beta cerrada con unos 10 clientes y El Popu | Dos semanas de uso real sin errores graves |
+| **Después** | Pago en línea, tiendas de apps, balde retornable para hogares, donaciones, Eggos en la policy v2 | — |
+
+### Orden sugerido (Ramón pidió una sugerencia, 13/11)
+
+1. **Ahora: W0, el prototipo.** Es barato, no toca nada de lo que funciona y sirve para saber si la idea gusta antes de gastar en ella.
+2. **En paralelo y con prioridad en la app actual: los cambios de operación del 24/10** (retiro por bultos, clasificación con kilos y foto, producción por período, Guardian diario). Eggo World reparte Eggos, que son plata, según esos datos: si los kilos y las entregas no están bien cargados, se paga mal.
+3. **Después: W1 en adelante**, una etapa por vez.
 
 W0 a W3 dan una app completa para consumidores. W4 suma a los restaurantes.
 
@@ -390,25 +463,26 @@ W0 a W3 dan una app completa para consumidores. W4 suma a los restaurantes.
 
 ## 17. Preguntas para Ramón
 
-Las que cambian el diseño:
+Respondidas el 13/11: aporte a larvas (sencillo: bandeja como compra anticipada), valor de los Eggos (valor real, con candados) y orden de trabajo (el sugerido en el punto 14).
 
-1. **Presupuesto de canje:** ¿qué porcentaje de la producción de huevos puede irse en canjes? Con eso se ajustan las tasas del punto 5.2.
-2. **Adopción:** ¿gratis y simbólica, o también el plan mensual con huevos (suscripción)? Si hay plan: ¿precio, cuántos huevos, cuántas gallinas hay hoy?
-3. **Aporte a larvas:** ¿arrancamos con A (Eggos) y B (compra anticipada con huevos de vuelta), dejando afuera el retorno en plata hasta tener asesoramiento?
-4. **Residuos de hogares:** ¿fuera de la primera versión? ¿Te interesa probar el balde retornable más adelante?
-5. **Arte:** ¿contratamos un pixel artist, o arrancamos con arte generado para el prototipo?
+Siguen abiertas:
+
+1. **Tres números para cerrar las tasas:** cuánto cuesta producir un huevo, cuánto se vende por mes, y cuánto vale un kilo de residuo para Eggologic (¿el restaurante paga por el retiro?).
+2. **¿1 Eggo = $ 1 te cierra?** ¿Y el tope de 50 % del pedido con Eggos de premio?
+3. **Adopción:** ¿solo la gallina gratis de bienvenida, o también el plan mensual con huevos? Si hay plan: precio, cantidad de huevos y cuántas gallinas hay hoy.
+4. **Residuos de hogares:** ¿fuera de la primera versión?
+5. **Arte:** ¿pixel artist contratado, o arte generado para el prototipo?
 6. **Nombre:** ¿"Eggo World" queda? (Ver la nota de marca en el punto 13.)
-7. **Pago en línea** (Mercado Pago u otro): ¿después de la beta, o lo necesitás antes?
-8. **Orden:** ¿Eggo World arranca ya con W0, o primero los cambios de operación del 24/10?
+7. **Pago en línea:** ¿después de la beta, o antes?
 
 ## 18. Puntos para Marcel
 
 - ¿Está de acuerdo con repo aparte + tres apps aisladas (`api`, `eggos`, `mundo`) y la regla "lo viejo no importa de lo nuevo"?
 - API con vistas como funciones y `JsonResponse`, o prefiere Django REST Framework.
 - Login: verificación propia con `google-auth` + llave de sesión, o `django-allauth`.
-- React + Phaser para la app nueva, o algo más liviano.
+- React sin motor de juegos para la app nueva, o prefiere otra cosa.
 - Acreditación de Eggos con una función repetible en vez de señales.
-- El canje como `Pedido` con una forma de pago nueva ("canje"): es el único cambio de modelo en `tienda`.
+- El descuento con Eggos en el `Pedido`: es el único cambio de modelo en `tienda`.
 
 ## 19. Referencias
 
