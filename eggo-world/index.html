@@ -1,1 +1,67 @@
-<!doctype html><title>Eggo World</title>__GOOGLE_CLIENT_ID__
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Eggo World</title>
+  <base href="/static/mundo/">
+  <meta name="theme-color" content="#1d583b">
+  <meta name="google-client-id" content="__GOOGLE_CLIENT_ID__">
+  <link rel="icon" href="arte/icono-192.png">
+  <link rel="apple-touch-icon" href="arte/icono-192.png">
+  <link rel="manifest" href="app.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,700&family=Jersey+15&display=swap">
+  <link rel="stylesheet" href="paleta.css">
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Carga: frases que van cambiando mientras llegan los datos. -->
+    <section id="carga" class="pantalla">
+      <img class="pixel flota" src="arte/eggo-linea.png" width="88" height="108" alt="">
+      <h1>Eggo World</h1>
+      <p id="frase">Ubicando gallinas…</p>
+    </section>
+
+    <!-- Entrada: un botón grande. -->
+    <section id="entrada" class="pantalla" hidden>
+      <img class="pixel" src="arte/eggo-linea.png" width="88" height="108" alt="">
+      <h1>Eggo World</h1>
+      <p>Tu chacra en Eggologic: adoptá una gallina, juntá huevos y pedilos cuando quieras.</p>
+      <div id="boton-google"></div>
+      <p id="sin-google" class="chico" hidden>Entrar con Google todavía no está disponible.</p>
+      <a class="boton secundario" href="/ingresar/?next=/mundo/">Entrar con email</a>
+      <a class="enlace" href="/registrarse/">Crear una cuenta con email</a>
+    </section>
+
+    <!-- La chacra: la única pantalla. Los objetos son los botones. -->
+    <main id="chacra" hidden>
+      <div id="cielo"></div>
+      <div id="suelo"></div>
+      <div id="cosas"></div>
+      <header id="arriba">
+        <button class="contador" data-abrir="cuenta" aria-label="Mis Eggos">
+          <img class="pixel" src="arte/eggo-chico.png" width="26" height="32" alt=""><span id="saldo">0</span>
+        </button>
+        <button class="contador" data-abrir="huevos" aria-label="Mis huevos">
+          <img class="pixel" src="arte/huevo.png" width="21" height="24" alt=""><span id="huevos">0</span>
+        </button>
+        <img id="insignia" class="pixel" src="arte/insignia.png" width="33" height="36" alt="Socio" hidden>
+      </header>
+    </main>
+
+    <!-- El panel sube desde abajo; arriba se sigue viendo la chacra. -->
+    <div id="fondo-panel" hidden></div>
+    <aside id="panel" hidden aria-live="polite">
+      <header><h2 id="panel-titulo"></h2><button id="cerrar" aria-label="Cerrar">×</button></header>
+      <div id="panel-cuerpo"></div>
+    </aside>
+
+    <div id="aviso" hidden role="status"></div>
+  </div>
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

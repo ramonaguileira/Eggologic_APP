@@ -145,6 +145,20 @@ class ApiTests(TestCase):
         self.assertEqual(self.enviar("pedir", datos).status_code, 200)
         self.assertEqual(self.ana.cliente.__class__.objects.get(usuario=self.ana).direccion, "Ruta 10")
 
+    def test_datos_raros_no_rompen_nada(self):
+        self.client.force_login(self.ana)
+        for nombre, datos in [
+            ("dar_larvas", {"gallina": "x", "cantidad": "muchas"}),
+            ("pedir_huevos", {"huevos": "quince"}),
+            ("pedir", {"items": "no es una lista", "forma_pago": "eggos"}),
+            ("pedir", {"items": [{"producto": self.quincena.pk, "cantidad": -3}], "forma_pago": "eggos"}),
+            ("adoptar", {"plan": ["dos_anios"], "nombre": "Clota"}),
+            ("recargar", {"paquete": "500", "medio": "transferencia"}),
+        ]:
+            self.assertEqual(self.enviar(nombre, datos).status_code, 400, (nombre, datos))
+        self.assertFalse(Pedido.objects.exists())
+        self.assertFalse(Gallina.objects.exists())
+
     def test_recargar_solo_en_paquetes(self):
         self.client.force_login(self.ana)
         self.assertEqual(self.enviar("recargar", {"paquete": 123, "medio": "transferencia"}).status_code, 400)

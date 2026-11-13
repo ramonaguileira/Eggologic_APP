@@ -55,6 +55,9 @@ def cliente(vista):
             return vista(request, *args, **kwargs)
         except mundo.NoSePuede as error:
             return JsonResponse({"error": str(error)}, status=400)
+        except (TypeError, ValueError, AttributeError):
+            # Datos con una forma inesperada (un texto donde iba un número, por ejemplo).
+            return JsonResponse({"error": "No entendimos el pedido."}, status=400)
 
     return activo(envuelta)
 
