@@ -146,20 +146,21 @@ Ramón todavía no habló con el inversor (13/11), así que se puede arrancar of
 
 Lo que contó Ramón: ella presta la plata; se le devuelve con el 15 % de todo lo que produzca el predio, y cuando se terminó de pagar queda un 10 % como arriendo. Es un esquema claro y sano. Falta escribir:
 
-1. **Cuánto prestó:** 4.340 (Ramón, 13/11). `SUPUESTO`: son dólares, unos **$ 173.600**.
+1. **Cuánto prestó:** USD 4.340, unos **$ 173.600** (Ramón, 13/11). Tiene ganas de seguir invirtiendo (huerta, cerdos).
 2. **A qué precio se cuenta lo que recibe** para ir descontando la deuda. Si recibe productos, lo lógico es contarlos al precio de venta: es lo que valen para ella, y la deuda baja más rápido. Si recibe efectivo, se cuenta el efectivo.
 3. **Si la deuda se ajusta** por inflación o queda en pesos fijos.
 4. **Que el 10 % posterior es arriendo** y por cuánto tiempo.
 
-**Cuánto tarda en pagarse.** Depende de cuánto produzca el predio, y conviene mirarlo antes de armar el nodo:
+**Cuánto tarda en pagarse.** Ramón espera unos 60 huevos por día en La Nona en la primera etapa, y devolver en 4 a 8 años. A ella no la apura el plazo: le sirve tener el campo productivo y la tierra activa.
 
-| Si el predio produce por año (a precio de venta) | El 15 % es | La deuda de $ 173.600 se paga en |
-| --- | --- | --- |
-| $ 120.000 (un gallinero de 50 gallinas) | $ 18.000 | casi 10 años |
-| $ 386.000 (unas 160 gallinas, o gallinas más huerta) | $ 58.000 | 3 años |
-| $ 580.000 | $ 87.000 | 2 años |
+| | |
+| --- | --- |
+| Producción | 60 huevos por día: unos 21.900 por año |
+| 15 % para La Nona | 3.285 huevos por año (9 por día) |
+| Contados a precio de venta | $ 35.000 por año: la deuda se paga en **5 años** |
+| Contados a $ 4 (efectivo) | $ 13.000 por año: 13 años |
 
-Con un solo gallinero de 50 gallinas la deuda casi no baja. Para devolverle en un plazo razonable, La Nona tiene que producir bastante más (huerta incluida), o hay que sumar pagos en efectivo. Si en vez de productos se le paga efectivo a $ 4 por huevo, tarda casi el triple.
+Entra en el plazo que quiere Ramón **si lo que ella recibe se cuenta a precio de venta**. Por eso importa dejar escrito a qué precio se cuenta. Lo que sume la huerta acorta el plazo.
 
 Con 15 % comprometido sobre todo el predio, ahí hay lugar para un 10 % más como máximo antes de llegar al tope del 25 %.
 
@@ -303,11 +304,10 @@ Respondidas el 13/11: moneda (todo en pesos), pago en efectivo ($ 4 por huevo), 
 
 Siguen abiertas:
 
-1. **Los 4.340 de La Nona,** ¿son dólares?
-2. **¿Cuánto va a producir La Nona** y en qué plazo querés devolverle?
-3. ¿Hay algo escrito entre Lucas, Cami y vos sobre cómo se decide?
-4. ¿Quién trabaja en cada nodo y cómo cobra hoy?
-5. ¿Los cerdos van a comer larvas, residuos o alimento comprado?
+1. ¿A qué precio se cuenta lo que recibe La Nona para ir bajando la deuda?
+2. ¿Hay algo escrito entre Lucas, Cami y vos sobre cómo se decide?
+3. ¿Quién trabaja en cada nodo y cómo cobra hoy?
+4. ¿Los cerdos van a comer larvas, residuos o alimento comprado?
 
 ## 13. Referencias
 

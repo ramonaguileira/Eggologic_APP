@@ -132,7 +132,15 @@ Conclusión: las gallinas adoptadas conviene asignarlas a los gallineros con men
   - Gallinero nuevo (50 gallinas): hasta 25 si los socios se llevan 20 % ($ 90.000), o hasta 23 si se llevan 25 % ($ 82.800).
 - **Máximo 4 gallinas por cuenta** (`SUPUESTO`): es consumo de una familia, no una inversión.
 - Los huevos acumulados se pueden pedir hasta 6 meses después de terminados los dos años (`SUPUESTO`).
-- Se puede ofrecer también una **gallina de 1 año** (200 huevos, 1.900 Eggos): entrada más barata y menos riesgo de inflación.
+- **Tres formas de tener una gallina** (Ramón, 13/11: también de un año y mensual). Todas ponen lo mismo, 200 huevos por año, y entran en el mismo cupo:
+
+  | Gallina | Se paga | Por huevo | Para quién |
+  | --- | --- | --- | --- |
+  | Dos años | 3.600 Eggos, una vez | $ 9,00 | Quien quiere el mejor precio |
+  | Un año | 1.900 Eggos, una vez | $ 9,50 | Quien quiere probar |
+  | Mensual | 170 Eggos por mes, débito automático; se corta cuando quiera (`SUPUESTO`) | $ 10,20 | Quien no quiere pagar todo junto |
+
+  La mensual da unos 17 huevos por mes y deja unos $ 65 por mes por gallina, sin adelanto de plata pero sin deuda en huevos.
 - Con Mercado Pago el cliente puede pagar en cuotas con tarjeta y Eggologic cobra todo junto (con la comisión que corresponda).
 
 ### 3.5 Cuándo canjea
@@ -160,7 +168,7 @@ Quien no tiene gallina también puede pedir levantes: ve sus larvas y su impacto
 
 ### 3.7 Suscripción
 
-Con Mercado Pago Suscripciones (disponible en Uruguay): una quincena o un maple cada 15 o 30 días, con débito automático en la tarjeta. Da el 5 % en Eggos como cualquier compra. Es la segunda fuente de ingreso previsible, más simple que la gallina.
+La suscripción **es la gallina mensual** (ver 3.4): un solo producto, con Mercado Pago Suscripciones (disponible en Uruguay), en vez de una suscripción de huevos por un lado y gallinas por otro. Quien quiere más huevos, suma gallinas.
 
 ### 3.8 Lo que Ramón tiene que mirar todos los meses
 
@@ -260,7 +268,7 @@ No es difícil, pero es plata: es la etapa que más pruebas necesita.
 
 ```
 ┌──────────────────────────┐         ┌─────────────────────────────────────────┐
-│  eggo-world (repo NUEVO)  │  HTTPS  │  Eggologic_APP (repo actual, Django)     │
+│  eggo-world/ (carpeta)    │  HTTPS  │  Eggologic_APP (repo actual, Django)     │
 │  App web instalable       │ ──────► │  api/     ← única puerta de entrada      │
 │  Pixel art, pantallas     │  JSON   │  eggos/   ← saldo, reglas, pagos         │
 │  No guarda datos propios  │ ◄────── │  mundo/   ← gallinas, larvas, levantes   │
@@ -270,7 +278,7 @@ No es difícil, pero es plata: es la etapa que más pruebas necesita.
                                      └─────────────────────────────────────────┘
 ```
 
-**Repo nuevo `eggo-world`** (Marcel no necesita abrirlo): pantallas, dibujos y un solo archivo que habla con el servidor. Vite + TypeScript + React, sin motor de juegos: la gallina se anima con hojas de sprites y CSS.
+**Carpeta `eggo-world/`** (Marcel no necesita abrirla): pantallas, dibujos y un solo archivo que habla con el servidor. Vite + TypeScript + React, sin motor de juegos: la gallina se anima con hojas de sprites y CSS.
 
 **Repo actual:** tres carpetas nuevas.
 
@@ -376,8 +384,7 @@ Respondidas el 13/11: precio de la gallina (pesos), entregas, gallinas en postur
 
 Siguen abiertas:
 
-1. **¿Sumamos la gallina de un año** (200 huevos, 1.900 Eggos)?
-2. **¿Repo nuevo o carpeta aparte?** (Ver "Antes de construir".)
+No quedan preguntas que frenen el plan. Para confirmar al pasar: el precio de la gallina mensual ($ 170 por mes).
 
 ### Antes de construir
 
@@ -385,19 +392,13 @@ Ramón quiere construir directamente, sin prueba manual previa (13/11). Para arr
 
 | Qué | Quién | Para qué etapa |
 | --- | --- | --- |
-| Decidir dónde vive el código de la app nueva | Ramón y Marcel | W0 |
 | Proyecto en Google Cloud con el botón "Entrar con Google" (hay guía paso a paso cuando toque) | Ramón | W1 |
 | Emails únicos en la app actual (`ramon` e `info@` comparten uno) | Ramón | W1 |
 | Confirmar la cuenta de vendedor de Mercado Pago a nombre de la SAS y sacar las credenciales de prueba | Ramón | W3 |
 | Consulta con abogado y contador sobre la gallina prepaga y el saldo en Eggos | Ramón | Antes de cobrar la primera gallina |
 | Dominio `mundo.eggologic.org` | Ramón | W1 |
 
-**Dónde vive el código.** Dos opciones:
-
-- **Repo nuevo `eggo-world`:** la separación más clara. Ramón tiene que crearlo y dar acceso.
-- **Carpeta `eggo-world/` dentro del repo actual:** igual de separada en la práctica (su propio proyecto, sin mezclarse con Django), se publica aparte en Render, y se puede arrancar ya. Si después se quiere, se pasa a un repo propio.
-
-Sugerencia: la carpeta, para no perder tiempo; Marcel decide si prefiere el repo.
+**Dónde vive el código (Ramón lo dejó a criterio de Claude, 13/11):** en una **carpeta `eggo-world/` dentro del repo actual**. Queda igual de separada (es un proyecto propio, no se mezcla con Django), se publica aparte en Render y se puede arrancar sin esperar un repo nuevo. Si Marcel prefiere un repo propio, se mueve la carpeta tal cual.
 
 ## 13. Puntos para Marcel
 
