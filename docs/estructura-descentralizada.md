@@ -8,17 +8,20 @@ Documento hermano: `docs/eggo-world-plan-maestro.md`.
 
 ## 1. La foto de hoy
 
-Lo que entendí de lo que contó Ramón el 13/11 (corregir lo que esté mal):
+Según lo que contó Ramón el 13/11 (corregir lo que esté mal):
 
-| Nodo | Dónde | Qué hace | Quiénes |
+**La empresa:** Lucas tiene el 50 %; Ramón y Cami, el otro 50 %.
+
+| Nodo | Dónde | Qué hace | Socio del nodo y qué recibe |
 | --- | --- | --- | --- |
-| **Incubadora** | Casa de Ramón | Incubación | Ramón |
-| **Planta BSF** | Terreno lindero a la casa | Larvas (con afrechillo y residuos) y compost | Ramón |
-| **Camino Verde** | A 15 minutos | Gallinas y huevos. Viene un gallinero nuevo con otro socio inversor | Sitio Camino Verde + socio inversor nuevo |
-| **La Nona / Iguzquiza / Miramar Acres** | A 7 minutos | Nodo nuevo; va a tener huerta | Socios a definir |
+| **Incubadora** | Casa de Ramón | Incubación | — |
+| **Planta BSF** | Terreno lindero | Larvas (sobre todo con afrechillo) y compost | — |
+| **Camino Verde** | A 15 minutos | Unas 60 gallinas en postura | Presta la tierra, no pone plata: **10 % de la producción**, como arriendo |
+| **Gallinero nuevo en Camino Verde** | Ídem | 50 gallinas | Inversor nuevo: pone 3.000 y recibe **15 % de la producción**, con derecho de recompra para Eggologic |
+| **La Nona / Iguzquiza / Miramar Acres** | A 7 minutos | Nodo nuevo, con huerta. Todavía no produce | Invierte en infraestructura: **15 % de la producción**, en especie o en efectivo |
 | **Cerdos** | A definir | En unos meses | A definir |
 
-En el centro: **Eggologic y Ramón**. Alrededor: socios distintos en cada lugar, con aportes distintos (tierra, plata, trabajo).
+Se vende solo en la zona (El Tesoro y La Barra).
 
 **El problema:** el proyecto crece más rápido que sus reglas. Sin un formato claro, cada socio nuevo es un acuerdo distinto, nadie sabe bien qué le toca, y todo depende de la memoria de Ramón.
 
@@ -84,30 +87,58 @@ Una persona puede tener más de un papel, pero conviene pagar cada papel por sep
 
 ---
 
-## 4. La plata, con un ejemplo
+## 4. La plata, con los acuerdos reales
 
-Números para mostrar el método. Lo único real es el costo ($ 5,50) y el precio ($ 10,67); el resto es `SUPUESTO` y hay que negociarlo.
+Los acuerdos que ya existen son **un porcentaje de la producción**. Es una buena base: se mide en la app y no hay que discutir ganancias. Lo que falta es ver cuánto cuestan y ponerles borde.
 
-**Un huevo vendido a $ 10,67:**
+Datos: un huevo cuesta $ 5,50 y se vende a $ 10,67. `SUPUESTO`: 225 huevos por gallina por año; los 3.000 del gallinero son dólares, a $ 40.
 
-| Va para | Monto | Qué cubre |
+### Cuánto margen queda cuando una parte de los huevos va a socios
+
+Eggologic paga todo el costo y vende solo los huevos que le quedan:
+
+| Parte que va a socios | Dónde pasa | Margen por huevo producido |
 | --- | --- | --- |
-| Nodo gallinero | $ 7,00 (precio de nodo) | Costo de producir ($ 5,50) + $ 1,50 para los socios del nodo |
-| Central | $ 3,67 | Cobro con tarjeta, entrega, app, premios en Eggos, administración y ganancia |
+| 0 % | — | $ 5,17 |
+| 10 % | Camino Verde hoy | $ 4,10 |
+| 15 % | La Nona | $ 3,57 |
+| **25 %** | **Gallinero nuevo en Camino Verde (10 % + 15 %)** | **$ 2,50** |
 
-**Dentro del nodo, los $ 1,50 se reparten** según su ficha. Por ejemplo: $ 1,00 al inversor hasta recuperar lo acordado, $ 0,50 al anfitrión.
+**Los porcentajes se suman y salen de la producción bruta, no de la ganancia.** Con 25 % comprometido, se va la mitad del margen. No es un problema hoy, pero es el límite: propongo como regla **no pasar del 25 % comprometido en ningún nodo**.
 
-**Ejemplo de un gallinero de 100 gallinas** (`SUPUESTO`: 225 huevos por gallina por año, $ 1,00 por huevo al inversor, factor 1,3):
+### El gallinero nuevo, en números
 
-| Si el inversor puso | Tiene que recuperar | Cobra por año | Tarda |
-| --- | --- | --- | --- |
-| $ 50.000 | $ 65.000 | $ 22.500 | 2,9 años |
-| $ 100.000 | $ 130.000 | $ 22.500 | 5,8 años |
-| $ 300.000 | $ 390.000 | $ 22.500 | 17 años: no cierra |
+| | |
+| --- | --- |
+| Inversión | USD 3.000 (unos $ 120.000), para 50 gallinas |
+| Producción esperada | 11.250 huevos por año (unos 31 por día) |
+| 15 % para el inversor | 1.690 huevos por año: **entre 4 y 5 por día, no 7** |
+| Lo que vale para el inversor (a precio de venta) | $ 18.000 por año: **15 % anual sobre lo que puso** |
+| Lo que le cuesta a Eggologic producirlos | $ 9.300 por año: 7,7 % anual |
+| 10 % para Camino Verde | 1.125 huevos por año |
+| Margen que le queda a Eggologic | unos $ 28.000 por año, vendiendo todo lo demás |
 
-Así se ve rápido si un trato es razonable: el margen del huevo solo aguanta inversiones chicas por gallina. Si el gallinero cuesta más, la diferencia tiene que salir de otro lado (gallinas adoptadas, plazo más largo, o que el inversor también sea anfitrión). **Antes de cerrar con el socio del gallinero nuevo, llenar esta tabla con los números reales.**
+Para llegar a 7 huevos por día con el 15 %, las 50 gallinas tendrían que poner 47 huevos diarios, casi todas todos los días. Conviene decirle al inversor el número realista antes de firmar.
 
-**Cuando el huevo es de una gallina adoptada** ($ 9,00 en vez de $ 10,67): el nodo cobra sus $ 7,00 igual. El descuento lo absorbe la central, que a cambio recibió la plata por adelantado.
+**Opinión:** el trato es bueno para las dos partes. El inversor recibe un 15 % anual en huevos y recupera su capital; a Eggologic esa plata le cuesta entre 7,7 % (lo que gasta) y 15 % (lo que deja de vender) por año, parecido o mejor que un crédito, y sin entregar parte de la empresa.
+
+### Qué hay que dejar escrito antes de firmar
+
+1. **Recompra.** Recomendación: Eggologic puede recomprar cuando quiera a partir del mes 12, **al valor invertido y sin descontar los huevos recibidos** (los huevos son su ganancia; el capital se devuelve entero). Es lo más simple y lo más fácil de explicar. Mientras no se recompre, sigue el 15 %.
+2. **En qué moneda se recompra.** Si puso dólares y se le devuelven dólares, el riesgo del tipo de cambio es de Eggologic (los huevos se venden en pesos).
+3. **Qué pasa si quiere efectivo en vez de huevos:** a qué precio se le pagan. Si es al precio de venta al público, cuesta el 15 % entero y Eggologic hace todo el trabajo de vender. Sugerencia: un precio acordado más bajo (por ejemplo $ 8).
+4. **Si puede vender sus huevos por su cuenta** y con qué nombre. Son 32 huevos por semana: más de lo que come una familia.
+5. **De quién son el gallinero y las gallinas**, y quién paga la reposición cuando terminan su ciclo.
+6. **Sobre qué se calcula el 15 %:** huevos puestos, registrados en la app por período.
+7. **Qué pasa si el gallinero cierra** o si Camino Verde deja de prestar la tierra.
+
+Lo mismo vale para La Nona, con una pregunta más: su 15 % es sobre qué producción (¿la huerta, un gallinero, todo lo del predio?).
+
+### La comunidad como otra forma de financiar lo mismo
+
+Con las 60 gallinas de hoy se pueden ofrecer hasta **34 gallinas en adopción: $ 122.400 por adelantado**, casi lo mismo que cuesta el gallinero nuevo. Cuesta parecido (16 % de descuento en dos años), se termina sola a los dos años y trae clientes fieles. No reemplaza al inversor hoy, porque falta la app y la consulta legal, pero más adelante puede servir para recomprarle.
+
+Cuidado con cruzar las dos cosas: en el gallinero nuevo, con 25 % comprometido, una gallina adoptada a $ 3.600 deja poco y en un mal escenario da pérdida (ver el plan de Eggo World, 3.4). Las adopciones van primero a los gallineros con menos porcentaje comprometido.
 
 ### Precios internos entre nodos
 
@@ -135,9 +166,7 @@ Una vez por mes, la app saca para cada nodo: unidades entregadas × precio de no
 | --- | --- | --- | --- |
 | **Propia** (ganancia reinvertida) | Lo chico y lo urgente | Ninguno | Lenta |
 | **Socios inversores** (pocos, conocidos, con contrato) | Armar un nodo entero | El tanto por unidad | Un contrato por nodo; nunca promesas de palabra |
-| **Comunidad** (gallinas adoptadas en Eggo World) | Poblar un gallinero, capital de trabajo | 16 % de descuento, cerca de 18 % anual | Es deuda en huevos; cupo; solo producto |
-
-**Cómo se combinan en un gallinero nuevo:** el socio inversor pone la estructura; las gallinas se financian con adopciones. Con el cupo del 60 %, un gallinero de 100 gallinas admite 60 adopciones: **$ 216.000 por adelantado** (60 × $ 3.600), menos comisión. Cada gallina adoptada "vive" en un gallinero concreto y el cliente lo ve en su mundo.
+| **Comunidad** (gallinas adoptadas en Eggo World) | Poblar un gallinero, capital de trabajo, recomprar a un inversor | 16 % de descuento, cerca de 18 % anual | Es deuda en huevos; cupo; solo producto |
 
 **La línea que no se cruza:** a la comunidad se le vende producto; a los inversores se les firma un contrato privado. Nunca se ofrece al público una ganancia en plata desde la app: eso es captación de ahorro público y está bajo el Banco Central.
 
@@ -163,7 +192,12 @@ Con la ficha hecha, sumar un nodo nuevo es llenar una página, no inventar un ac
 
 ## 7. El formato legal (para llevar al abogado)
 
-No conozco hoy bajo qué figura opera Eggologic, así que esto son opciones:
+La empresa es 50 % de Lucas y 50 % de Ramón y Cami. Dos cosas para cuidar con un reparto por mitades:
+
+- **Un acuerdo de socios escrito** que diga cómo se decide cuando no hay acuerdo, quién firma con los socios de los nodos y qué pasa si uno quiere salir.
+- **Las gallinas prepagas y los acuerdos con inversores son deudas de la empresa:** las dos mitades tienen que estar de acuerdo.
+
+Sobre cómo encajar los nodos, las opciones son:
 
 | Opción | Cómo es | A favor | En contra |
 | --- | --- | --- | --- |
@@ -237,13 +271,14 @@ Los puntos 1 a 3 son la base de Eggo World (las gallinas adoptadas viven en un g
 
 ## 12. Preguntas para Ramón
 
-1. ¿Bajo qué figura legal opera hoy Eggologic? ¿Hay socios en la empresa?
-2. ¿Qué se le prometió a cada socio actual (Camino Verde, el inversor del gallinero nuevo, La Nona)?
-3. ¿Cuánto cuesta armar un gallinero y de cuántas gallinas? ¿Cuántas gallinas hay hoy?
-4. ¿Los socios venden algo por su cuenta, o todo sale por Eggologic?
-5. ¿Quién trabaja en cada nodo y cómo cobra hoy?
-6. ¿Qué querés que sea tuyo sí o sí (la marca, la planta BSF, la incubadora, la app)?
-7. ¿Los cerdos van a comer larvas, residuos o alimento comprado?
+1. **Los 3.000 del gallinero nuevo,** ¿son dólares?
+2. **La recompra:** ¿te cierra "al valor invertido, sin descontar huevos, desde el mes 12"? ¿En qué moneda?
+3. **Si un socio quiere efectivo en vez de huevos,** ¿a qué precio se los pagás?
+4. **El 15 % de La Nona,** ¿es sobre la huerta o sobre todo lo que se produzca ahí?
+5. **¿Los socios pueden vender sus huevos por su cuenta?**
+6. **¿Qué tipo de sociedad es Eggologic** (SAS, SRL, otra)? ¿Hay algo escrito entre Lucas, Cami y vos?
+7. ¿Quién trabaja en cada nodo y cómo cobra hoy?
+8. ¿Los cerdos van a comer larvas, residuos o alimento comprado?
 
 ## 13. Referencias
 

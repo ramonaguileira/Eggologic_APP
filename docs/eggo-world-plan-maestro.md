@@ -1,6 +1,8 @@
 # Eggo World — plan maestro (versión 2)
 
-**Estado:** propuesta para que Ramón revise (13/11/2026). **No hay nada construido.** Todo número que no dio Ramón está marcado `SUPUESTO`.
+**Estado:** propuesta en revisión (13/11/2026). **No hay nada construido.** Todo número que no dio Ramón está marcado `SUPUESTO`.
+
+**Confirmado por Ramón (13/11):** gallina de dos años a 3.600; los Eggos quedan fuera de Hedera; hoy hay unas 60 gallinas en postura; el envío no se cobra y cuesta poco porque se vende solo en la zona (El Tesoro y La Barra).
 
 Documento hermano: `docs/estructura-descentralizada.md` (cómo conviven los nodos, los socios y la central).
 
@@ -46,6 +48,9 @@ Cómo apoya la gente: comprando huevos (y pronto verduras y compost), suscribié
 | Precio de venta hoy | $ 10,67 por huevo (Quincena: 15 huevos a $ 160) | Productos cargados en la app |
 | Margen por huevo | $ 5,17 (48 %) | Cuenta |
 | Producción de una gallina | 200 a 250 huevos por año | Ramón, 13/11 |
+| Gallinas en postura hoy | Unas 60 (Camino Verde) | Ramón, 13/11 |
+| Entregas | Solo en la zona; no se cobran y cuestan poco | Ramón, 13/11 |
+| Parte de la producción que va a socios | 10 % en Camino Verde; 25 % en el gallinero nuevo (ver 3.4) | Ramón, 13/11 |
 | Valor de los residuos para Eggologic | Casi nulo hoy: es inversión en educación | Ramón, 13/11 |
 | Comisión de Mercado Pago | 7 % todo incluido | `SUPUESTO`: no encontré la tarifa de Uruguay; se confirma en la cuenta de Ramón |
 
@@ -86,7 +91,7 @@ Se promete el piso (200) y no el techo (250) a propósito: la diferencia que pon
 | Precio | Por huevo | Descuento contra comprar suelto |
 | --- | --- | --- |
 | 3.200 Eggos | $ 8,00 | 25 % |
-| **3.600 Eggos (recomendado)** | **$ 9,00** | **16 %** |
+| **3.600 Eggos (elegido por Ramón, 13/11)** | **$ 9,00** | **16 %** |
 | 4.000 Eggos | $ 10,00 | 6 % |
 
 **Qué deja una gallina de $ 3.600:**
@@ -99,7 +104,17 @@ Se promete el piso (200) y no el techo (250) a propósito: la diferencia que pon
 | Costo de producir los huevos | − $ 2.200 | − $ 2.746 |
 | **Queda (antes de entregas)** | **$ 1.148** | **$ 602** |
 
-**El punto que puede romper la cuenta: las entregas.** 400 huevos son unas 27 entregas de 15. Si cada entrega cuesta $ 50, se van $ 1.350 y la gallina da pérdida. Por eso el plan propone (`SUPUESTO`): retiro gratis en puntos de entrega, o envío a domicilio pago (en Eggos), o gratis cuando va junto con otra compra o suscripción.
+**Las entregas.** 400 huevos son unas 27 entregas de 15. Hoy no son un problema: se reparte en la zona y cuesta poco (Ramón, 13/11). Para que siga así: entregar de a 30 cuando se pueda, juntar la entrega con otras compras y cobrar el envío fuera de la zona el día que se salga.
+
+**El efecto de los porcentajes de los socios.** En cada nodo, una parte de los huevos va a los socios antes de vender (10 % a Camino Verde por la tierra; 15 % más al inversor del gallinero nuevo). Como Eggologic paga todo el costo, cada huevo entregado a un adoptante sale más caro:
+
+| Gallinero | Parte de socios | Costo por huevo entregado | Queda por gallina, caso base | Caso malo |
+| --- | --- | --- | --- | --- |
+| Sin socios | 0 % | $ 5,50 | $ 1.148 | $ 602 |
+| Camino Verde actual | 10 % | $ 6,11 | $ 904 | $ 297 |
+| Gallinero nuevo en Camino Verde | 25 % | $ 7,33 | $ 415 | **− $ 313** |
+
+Conclusión: las gallinas adoptadas conviene asignarlas a los gallineros con menos porcentaje comprometido, y no sumar más porcentajes sobre el gallinero nuevo. Si el cliente paga por transferencia en vez de tarjeta, cada gallina deja $ 252 más.
 
 **Cuánto cuesta esta financiación.** Contra vender suelto, el descuento es de $ 667 por gallina, a cambio de cobrar en promedio un año antes: equivale a pagar cerca de un **18 % anual en pesos**. Conviene compararlo con lo que cobraría un banco. A favor: no hay garantías, y cada gallina es un cliente fiel por dos años.
 
@@ -111,7 +126,9 @@ Se promete el piso (200) y no el techo (250) a propósito: la diferencia que pon
 
 **Candados:**
 
-- **Cupo:** gallinas adoptadas ≤ 60 % de las gallinas reales en postura (`SUPUESTO`). El resto de los huevos es para la venta directa, los restaurantes y el colchón.
+- **Cupo** (`SUPUESTO`): los huevos prometidos a adoptantes (220 por gallina) no pasan del 70 % de lo que queda después de la parte de los socios, calculado con el piso de 200 huevos por gallina real. El resto es para la venta directa, los restaurantes y el colchón.
+  - **Hoy (60 gallinas, 10 % a Camino Verde): hasta 34 gallinas adoptadas, que son $ 122.400 por adelantado.**
+  - Gallinero nuevo (50 gallinas, 25 % a socios): hasta 23, que son $ 82.800.
 - **Máximo 4 gallinas por cuenta** (`SUPUESTO`): es consumo de una familia, no una inversión.
 - Los huevos acumulados se pueden pedir hasta 6 meses después de terminados los dos años (`SUPUESTO`).
 - Se puede ofrecer también una **gallina de 1 año** (200 huevos, 1.900 Eggos): entrada más barata y menos riesgo de inflación.
@@ -267,7 +284,20 @@ No soy abogado ni contador; esto es para llevarles las preguntas correctas.
 
 - **Gallina prepaga.** Es una venta de huevos por adelantado, que se devuelve en producto y nunca en plata. Hay que cuidar que no se parezca a los "fondos ganaderos" (gente que pone plata en animales y espera una ganancia), que terminaron en estafas y llevaron al Banco Central a proponer más regulación en 2025. Lo que la distingue: se entrega producto para consumo propio, hay tope de gallinas por persona, no se revende ni se transfiere, y no se promete ganancia. **Consultar antes de lanzar**, junto con las condiciones para el consumidor: qué pasa si Eggologic no puede entregar (devolución de lo no entregado).
 - **Eggos comprados.** Son un saldo prepago de uso exclusivo en Eggologic, como una tarjeta de regalo. Confirmar con el contador cómo se factura (al cobrar o al entregar) y que no entra en la regulación de dinero electrónico.
-- **Eggos y el registro verificable.** Ahora que el Eggo vale plata y se compra, **recomiendo que viva solo en la base de la app**, no en Hedera: un token comprable con valor en pesos entra en el terreno de la ley de activos virtuales (Ley 20.345). Esto choca con la decisión del 12/10 (mostrar el FGET del restaurante como "Eggos" y hacer un mint compensatorio). Propuesta: Guardian sigue registrando el **impacto** del restaurante (kilos, tCO2e) y en pantalla eso se llama "impacto verificado", no Eggos. Para decidir con Marcel y CarboSur.
+- **Eggos fuera de Hedera (confirmado por Ramón, 13/11).** El Eggo es plata de la tienda y vive solo en la base de la app. Hedera, a través de Guardian, sigue registrando el **impacto**, que es lo que importa para el MRV y para ANDE. Son dos cosas separadas que nunca se convierten una en otra:
+
+  | | Eggos | Impacto verificado |
+  | --- | --- | --- |
+  | Qué es | Saldo para usar en Eggologic | Constancia de residuo rescatado |
+  | Dónde vive | Base de la app | Hedera, vía Guardian |
+  | Se compra | Sí | No: solo se gana con kilos medidos |
+  | Para quién | Clientes | Restaurantes (y más adelante hogares) |
+
+- **Nombre para el impacto verificado, en lugar de FGET.** Propuesta: **Rescates**. *1 Rescate = 1 kg de residuo orgánico rescatado y verificado.* Se entiende sin explicar ("El Popu lleva 1.240 Rescates"), está en español y no suena a plata. "Waste Coins" tiene dos problemas: la regla del proyecto de no decir "coin", y que "coin" sugiere algo que se compra y se vende, justo lo que este registro no es. Alternativas: "Kilos Verificados" (más técnico), "Ciclos" (más poético, menos claro).
+  - En Hedera el token se sigue llamando FGET (en tCO2e) mientras dure la policy actual: no se puede renombrar sin una versión nueva. En pantalla ya se puede mostrar como "Rescates" calculados por kilo.
+  - En la policy v2, el token pasa a ser por kilo y se llama Rescate (símbolo `RESC`), con el mint compensatorio que ya estaba previsto.
+  - Más adelante, el CIN (certificado de impacto circular) se emite a partir de los Rescates.
+  - Esto reemplaza la decisión del 12/10 de mostrar FGET como "Eggos". Avisar a Marcel y a CarboSur.
 - **Datos personales** (Ley 18.331): política de privacidad, términos, baja de cuenta.
 - **Menores:** cuenta solo para mayores de 18 (`SUPUESTO`).
 - **Marca:** "Eggo" es una marca de waffles de Kellogg's en otros países; consultar el registro en Uruguay antes de invertir en el nombre.
@@ -296,7 +326,7 @@ No soy abogado ni contador; esto es para llevarles las preguntas correctas.
 
 | Riesgo | Cómo se cuida |
 | --- | --- |
-| Se venden más gallinas que huevos hay | Cupo del 60 %, tablero de huevos adeudados |
+| Se venden más gallinas que huevos hay | Cupo por gallinero, tablero de huevos adeudados |
 | La plata adelantada se gasta y después falta para el alimento | Regla de los tres montos (3.4) |
 | Las entregas se comen el margen | Puntos de retiro, envío pago o junto con otra compra |
 | Suben los costos en dos años | Gallina de 1 año como opción; revisar el precio de las nuevas cada 6 meses |
@@ -309,14 +339,18 @@ No soy abogado ni contador; esto es para llevarles las preguntas correctas.
 
 ## 12. Preguntas para Ramón
 
-1. **Precio de la gallina:** ¿te cierra 3.600 Eggos ($ 3.600) por dos años y 400 huevos garantizados? ¿Sumamos la de un año?
-2. **Entregas:** ¿hoy cobrás el envío? ¿Cuánto te cuesta cada entrega? ¿Puede haber puntos de retiro?
-3. **Gallinas reales:** ¿cuántas hay en postura hoy y cuántas va a haber? De eso sale el cupo.
-4. **Del costo de $ 5 a $ 6 por huevo,** ¿cuánto es alimento, cuánto la gallina y cuánto trabajo?
-5. **Eggos por compras:** ¿5 % o 10 %?
-6. **Levante de residuos:** ¿60 Eggos? ¿1 huevo extra por kilo, o 2 como en tu ejemplo?
-7. **Eggos fuera de Hedera** y el impacto del restaurante con otro nombre: ¿de acuerdo? (Cambia la decisión del 12/10.)
-8. **Mercado Pago:** ¿tenés cuenta de vendedor? ¿A nombre de qué empresa?
+Respondidas el 13/11: precio de la gallina, entregas, gallinas en postura, Eggos fuera de Hedera.
+
+Siguen abiertas:
+
+1. **Los 3.600 son pesos uruguayos,** ¿no? (En el audio salió como euros.)
+2. **Nombre del impacto verificado:** ¿"Rescates"?
+3. **Del costo de $ 5 a $ 6 por huevo,** ¿cuánto es alimento, cuánto la gallina y cuánto trabajo?
+4. **Eggos por compras:** ¿5 % o 10 %?
+5. **Levante de residuos:** ¿60 Eggos? ¿1 huevo extra por kilo, o 2 como en tu ejemplo?
+6. **¿Sumamos la gallina de un año** (200 huevos, 1.900 Eggos)?
+7. **Mercado Pago:** ¿tenés cuenta de vendedor a nombre de la empresa?
+8. **¿Lucas está de acuerdo** con vender producción por adelantado? Es una deuda de la empresa.
 
 ## 13. Puntos para Marcel
 
