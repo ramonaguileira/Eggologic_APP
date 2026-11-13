@@ -1,6 +1,6 @@
 # Prompt para diseñar la identidad visual de Eggo World
 
-Copiar todo lo que está debajo de la línea y pegarlo en Claude Design. Adjuntar el logo de Eggologic (`static/img/logo.svg`).
+Copiar todo lo que está debajo de la línea y pegarlo en Claude Design. Adjuntar el logo de Eggologic (el PDF horizontal con la frase "Huevos regenerativos").
 
 ---
 
@@ -24,7 +24,7 @@ Es para gente común, de todas las edades, que la usa un minuto por vez. **No es
 
 ## Punto de partida
 
-Te adjunto el logo de Eggologic: un huevo crema sobre fondo verde. Los colores actuales de la marca son verde `#2f6b3f`, crema `#fbf6ea` y amarillo yema `#f2b632`. Partí de ahí y armá una paleta de pixel art que funcione con eso.
+Te adjunto el logo de Eggologic: un huevo dibujado con una sola línea blanca que termina en espiral, con la palabra "Eggologic" en una letra redondeada y amistosa y la frase "Huevos regenerativos", todo en blanco sobre verde oscuro `#1d583b`. La marca es verde y blanco. Partí de ahí: mantené ese verde como color principal, sumá un amarillo yema como acento y armá una paleta de pixel art que conviva con el logo. La espiral del huevo es el gesto propio de la marca: usala (por ejemplo, en el huevo que hace de ícono de los Eggos).
 
 ## Cómo es la app (importante para el diseño)
 
