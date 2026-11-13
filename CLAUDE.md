@@ -73,6 +73,8 @@ python manage.py guardian_enviar   # manda a Guardian los reportes revisados (es
 | Datos | Plan de datos tras la auditoría (fases 0 a 5, hasta marzo de 2027) | Fase 0 para revisar y publicada en Render (`docs/plan-datos-fase-0.md`) |
 | 5 | Experiencia de cliente y restaurante: más simple, clara y estética en el celular; que el cliente se arregle solo (recuperar contraseña por email, entrar con el email, registro más corto) | Después de la respuesta de Marcel |
 
+| Eggo World | App nueva para clientes y restaurantes, gamificada y en pixel art, en repo aparte y conectada por una API (pedido de Ramón, 13/11). Reemplazaría a la Etapa 5 | Plan maestro para revisar (`docs/eggo-world-plan-maestro.md`); nada construido |
+
 Todas las etapas pasan a la revisión de Marcel (`docs/para-marcel.md`).
 
 **Etapa 3 (Guardian).** Usa estas variables de entorno, cargadas según el instructivo que tiene Ramón:
