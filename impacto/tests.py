@@ -42,6 +42,10 @@ class ImpactoTests(TestCase):
         factores = calculos.factores_del_circuito()
         self.assertEqual(factores["kg_residuo_por_huevo"], Decimal("0.5"))
 
+    def test_las_larvas_de_la_comunidad_se_estiman_por_batea(self):
+        Lote.objects.create(registrado_por=self.operador, bandejas=6, g_neonatos=Decimal("5"))
+        self.assertEqual(calculos.totales_de_la_comunidad()["kg_larvas"], 12)
+
     def test_sin_datos_no_hay_factores(self):
         RegistroGranja.objects.all().delete()
         self.assertIsNone(calculos.factores_del_circuito())

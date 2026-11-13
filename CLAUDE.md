@@ -174,7 +174,8 @@ Cosas de MGS que aprendimos:
 - **PR #12** (rama `claude/keen-heisenberg-xon3e4`): arreglos, bultos y registrar entrega. Lo aprueba Marcel.
 - **Dolor de Ramón (13/11):** cargar le lleva demasiado. Hay lotes, granja y entregas sin cargar, y residuos que procesó sin pesar. Lo que sigue tiene que hacer la carga más corta, no más completa.
 - **Respuestas de Ramón (13/11):** lo que se procesó sin pesar no se carga, ni como estimación. La fecha del retiro es siempre la de la carga: se carga en el día. La clasificación sigue en su pantalla aparte.
-- **Larvas y granja (13/11):** de las larvas se anota, por semana, los huevos de larva recibidos (en gramos) y las bateas armadas; cada batea lleva de 7 a 10 kg de residuo mezclado con afrechillo. De la granja, los huevos de un período y de qué granja vinieron. Camino Verde e Igusquiza son las granjas donde están las gallinas; las larvas se crían en la planta de Ramón. Reemplaza los puntos 4 y 5 del 24/10.
+- **Larvas y granja (13/11):** de las larvas se anota, por semana, los huevos de larva recibidos (en gramos) y las bateas armadas; cada batea lleva de 7 a 10 kg de residuo mezclado con afrechillo. De la granja, los huevos de un período y de qué granja vinieron. Camino Verde e Eguzquiza son las granjas donde están las gallinas; las larvas se crían en la planta de Ramón. Reemplaza los puntos 4 y 5 del 24/10.
+- **Granjas:** Camino Verde y Eguzquiza (nombre de la ruta que pasa enfrente; también se le dice Miramar Acres, por el barrio, o La Nona). En "Mi impacto", los kg de larvas se estiman a 2 kg por batea.
 - **Trazabilidad por lote:** se deja de anotar por ahora (retiros de cada lote, cosecha, kg de larvas a las gallinas). Los campos quedan en la base, sin uso.
 - **Orden de lo que sigue:** foto en la clasificación; Eggos en pantalla para el restaurante.
 

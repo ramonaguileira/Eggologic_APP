@@ -32,6 +32,9 @@ FACTOR_CONSERVADOR = Decimal("0.70")
 KG_CO2E_POR_KG_DESVIADO = Decimal("0.5")
 CENTESIMO = Decimal("0.01")
 
+# SUPUESTO (Ramón, 13/11): cada batea da unos 2 kg de larvas. La cosecha no se pesa por ahora.
+KG_LARVAS_POR_BATEA = 2
+
 
 def emisiones_evitadas(kg_organicos):
     """tCO2e de un reporte: línea de base, proyecto, fugas y reducción neta, con 2 decimales.
@@ -56,7 +59,7 @@ def factores_del_circuito():
 def totales_de_la_comunidad():
     return {
         "kg_rescatados": Retiro.objects.aggregate(total=Sum(KG_ORGANICOS))["total"] or 0,
-        "bateas": Lote.objects.aggregate(total=Sum("bandejas"))["total"] or 0,
+        "kg_larvas": (Lote.objects.aggregate(total=Sum("bandejas"))["total"] or 0) * KG_LARVAS_POR_BATEA,
         "huevos": RegistroGranja.objects.aggregate(total=Sum("huevos"))["total"] or 0,
         "restaurantes": Retiro.objects.values("restaurante").distinct().count(),
     }

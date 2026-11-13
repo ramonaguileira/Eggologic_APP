@@ -9,7 +9,7 @@
 1. **Larvas, una carga por semana** (menú **Larvas**, antes **Lotes**). Pide la fecha, los huevos de larva recibidos en gramos, las bateas armadas y observaciones.
    - Ya no pide elegir los retiros que entran, ni la cosecha (kg de larvas y de frass).
 2. **Granja, una carga por período** (menú **Granja**). Pide la granja, desde, hasta, los huevos producidos y observaciones.
-   - **Granjas:** Camino Verde e Igusquiza, donde están las gallinas. Se administran en **Administración → Granjas**.
+   - **Granjas:** Camino Verde e Eguzquiza, donde están las gallinas. Se administran en **Administración → Granjas**.
    - Dos cargas de la misma granja no pueden pisarse en las fechas: los huevos se contarían dos veces.
    - Ya no pide los kg de larvas que comieron las gallinas ni el lote de las larvas.
 3. **Panel, informe y "Mi impacto"** muestran lo que ahora se anota: gramos de huevos de larva, bateas armadas y huevos por granja. Se fueron los kg de larvas, el frass, el rendimiento y la trazabilidad por lote.
@@ -35,15 +35,16 @@ python manage.py runserver
 `python manage.py test`: **114 tests, todos pasan**, en SQLite y en PostgreSQL 16. `makemigrations --check` no encuentra cambios pendientes.
 
 - La migración se probó en PostgreSQL sobre el esquema anterior con un registro de granja viejo: quedó asignado a Camino Verde, como período de un día.
-- Probado en Chromium con tamaño de celular: una carga de larvas, una de huevos de Igusquiza, panel, informe, los CSV y "Mi impacto" de cliente y de restaurante. Sin errores.
+- Probado en Chromium con tamaño de celular: una carga de larvas, una de huevos de Eguzquiza, panel, informe, los CSV y "Mi impacto" de cliente y de restaurante. Sin errores.
 
 ## SUPUESTOS
 
 1. **Una carga de larvas por semana** es la costumbre, no una regla: la app no impide cargar dos.
 2. **Un período de granja cuenta entero donde cae su último día** (en el panel de 30 días, en el informe y en el CSV).
 3. **Los registros de granja anteriores** eran todos de Camino Verde.
-4. **Igusquiza queda activa desde ahora**, aunque todavía no empezó.
+4. **Eguzquiza queda activa desde ahora**, aunque todavía no empezó.
 5. **Los kg de cada batea no se cargan:** se anota solo la cantidad.
+6. **2 kg de larvas por batea** para el número que ven los clientes (dato de Ramón, sin pesar).
 
 ## Puntos para Marcel
 
@@ -54,5 +55,7 @@ python manage.py runserver
 
 ## Preguntas
 
-1. **Igusquiza:** ¿está bien escrito el nombre?
-2. **"Mi impacto"** ahora dice "bateas de larvas armadas" donde decía "kg de larvas criadas". ¿Te sirve ese dato para clientes, o lo saco?
+Respondidas por Ramón el 13/11:
+
+1. **Nombre de la granja:** Eguzquiza (es la ruta que pasa enfrente). También se le puede decir Miramar Acres, por el barrio, o La Nona. El nombre se cambia en **Administración → Granjas**.
+2. **"Mi impacto"** sigue mostrando kg de larvas criadas, estimados a 2 kg por batea (`KG_LARVAS_POR_BATEA` en `impacto/calculos.py`).

@@ -105,7 +105,7 @@ class RegistroGranjaTests(DatosDePrueba):
     def setUp(self):
         super().setUp()
         self.camino_verde = Granja.objects.get(nombre="Camino Verde")
-        self.igusquiza = Granja.objects.get(nombre="Igusquiza")
+        self.igusquiza = Granja.objects.get(nombre="Eguzquiza")
 
     def form(self, granja, desde, hasta, huevos="300"):
         datos = {"granja": granja.pk, "desde": desde, "fecha": hasta, "huevos": huevos}

@@ -7,7 +7,7 @@ def crear_granjas(apps, schema_editor):
     Granja = apps.get_model("captura", "Granja")
     RegistroGranja = apps.get_model("captura", "RegistroGranja")
     camino_verde, _ = Granja.objects.get_or_create(nombre="Camino Verde")
-    Granja.objects.get_or_create(nombre="Igusquiza")
+    Granja.objects.get_or_create(nombre="Eguzquiza")
     for registro in RegistroGranja.objects.filter(granja=None):
         registro.granja = camino_verde
         registro.desde = registro.fecha
