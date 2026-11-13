@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from .forms import FirstDeliveryForm, LoginForm, RegistroClienteForm
+from .models import Cliente
 
 
 def ingresar(request):
