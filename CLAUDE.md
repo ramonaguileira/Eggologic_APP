@@ -172,6 +172,8 @@ Cosas de MGS que aprendimos:
 - **Retiro por bultos:** un cajón por vez, cada uno con su peso y su foto, todos en un solo retiro del día. Los 13 retiros anteriores quedan como están.
 - **PR #12** (rama `claude/keen-heisenberg-xon3e4`): arreglos, bultos y registrar entrega. Lo aprueba Marcel.
 - **Dolor de Ramón (13/11):** cargar le lleva demasiado. Hay lotes, granja y entregas sin cargar, y residuos que procesó sin pesar. Lo que sigue tiene que hacer la carga más corta, no más completa.
+- **Respuestas de Ramón (13/11):** lo que se procesó sin pesar no se carga, ni como estimación. La fecha del retiro es siempre la de la carga: se carga en el día. La clasificación sigue en su pantalla aparte.
+- **Lo que Ramón anota hoy (13/11):** de las larvas, por semana, los huevos de larva que recibió y cuántas bateas armó (de 7 a 10 kg cada una). De la granja, la producción de huevos y de qué granja vino: Camino Verde o Igusquiza (que todavía no empezó). Falta confirmar unidades antes de rehacer los formularios de lotes y granja.
 - **Orden de lo que sigue:** clasificación con foto; granja por período con varios lotes; Eggos en pantalla para el restaurante.
 
 **Restaurantes nuevos (resolución temporal, 06/10).** Se cargan en la app desde el primer día; el usuario en Guardian se crea cuando entran en serio al piloto, con el alta solo con el código. Mientras tanto sus meses esperan en **Reportes**. No habrá restaurantes nuevos antes del 19/10.
