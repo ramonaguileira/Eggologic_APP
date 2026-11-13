@@ -3,6 +3,7 @@ import re
 from datetime import date, timedelta
 
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.db.models import Count, F, Q, Sum
 from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -14,8 +15,8 @@ from cuentas.permisos import requiere
 from guardian.models import ReporteMensual
 from impacto import calculos
 
-from .forms import LoteForm, RegistroGranjaForm, RetiroChoferForm, RetiroClasificacionForm
-from .models import Lote, RegistroGranja, Retiro
+from .forms import BultoForm, LoteForm, RegistroGranjaForm, RetiroChoferForm, RetiroClasificacionForm
+from .models import Bulto, Lote, RegistroGranja, Retiro
 
 DIAS_DEL_PANEL = 30
 CANTIDAD_EN_LISTAS = 50
@@ -83,7 +84,12 @@ def _leer_fecha(texto):
 
 @requiere(Usuario.puede_ver_retiros_y_lotes)
 def retiros(request):
-    lista = Retiro.objects.select_related("restaurante", "lote")[:CANTIDAD_EN_LISTAS]
+    # Al contar los bultos, Django deja de aplicar el orden del modelo: hay que pedirlo.
+    lista = (
+        Retiro.objects.select_related("restaurante", "lote")
+        .annotate(cantidad_bultos=Count("bultos"))
+        .order_by("-fecha")[:CANTIDAD_EN_LISTAS]
+    )
     return render(request, "captura/retiros.html", {"retiros": lista})
 
 
@@ -112,17 +118,63 @@ def _formulario(request, clase_form, instancia, titulo, volver_a, plantilla="cap
     return render(request, plantilla, {"form": form, "titulo": titulo, "volver_a": volver_a})
 
 
+def _despues_del_retiro(usuario):
+    # El chofer no ve la lista de retiros: vuelve al formulario vacío.
+    return "captura:retiros" if usuario.puede_ver_retiros_y_lotes() else "captura:retiro_nuevo"
+
+
 @requiere(Usuario.puede_retirar)
 def retiro_nuevo(request):
-    retiro = Retiro(registrado_por=request.user)
-    # El chofer no ve la lista de retiros: después de guardar vuelve al formulario vacío.
-    volver_a = "captura:retiros" if request.user.puede_ver_retiros_y_lotes() else "captura:retiro_nuevo"
-    return _formulario(request, RetiroChoferForm, retiro, "Nuevo retiro", volver_a, "captura/retiro_nuevo.html")
+    """Empieza un retiro con su primer bulto. Si el usuario dejó uno sin terminar, sigue con ese."""
+    sin_terminar = Retiro.objects.filter(en_carga=True, registrado_por=request.user).first()
+    if sin_terminar:
+        return redirect("captura:retiro_bultos", sin_terminar.pk)
+    form = RetiroChoferForm(request.POST or None, request.FILES or None)
+    if request.method == "POST" and form.is_valid():
+        retiro = form.guardar(request.user)
+        return redirect("captura:retiro_bultos", retiro.pk)
+    contexto = {"form": form, "titulo": "Nuevo retiro", "volver_a": _despues_del_retiro(request.user)}
+    return render(request, "captura/retiro_nuevo.html", contexto)
+
+
+@requiere(Usuario.puede_retirar)
+def retiro_bultos(request, pk):
+    """El retiro que se está cargando: sus bultos, el total, agregar otro bulto y terminar."""
+    retiro = get_object_or_404(Retiro.objects.select_related("restaurante"), pk=pk, en_carga=True)
+    if retiro.registrado_por != request.user and not request.user.puede_ver_retiros_y_lotes():
+        raise PermissionDenied
+    accion = request.POST.get("accion")
+    if accion == "terminar":
+        retiro.en_carga = False
+        retiro.save(update_fields=["en_carga", "actualizado_en"])
+        messages.success(request, f"Retiro guardado: {number_format(retiro.kg_levantados, 1)} kg.")
+        return redirect(_despues_del_retiro(request.user))
+    if accion == "quitar":
+        # Para corregir un peso mal cargado antes de terminar. El último bulto no se quita.
+        bulto = get_object_or_404(retiro.bultos, pk=request.POST.get("bulto"))
+        if retiro.bultos.count() > 1:
+            bulto.foto.delete(save=False)
+            bulto.delete()
+            retiro.sumar_bultos()
+        return redirect("captura:retiro_bultos", retiro.pk)
+    form = BultoForm(request.POST or None, request.FILES or None, instance=Bulto(retiro=retiro))
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        retiro.sumar_bultos()
+        return redirect("captura:retiro_bultos", retiro.pk)
+    return render(request, "captura/retiro_bultos.html", {"retiro": retiro, "form": form})
+
+
+@requiere(Usuario.puede_ver_retiros_y_lotes)
+def retiro_detalle(request, pk):
+    """Los bultos de un retiro, con sus fotos."""
+    retiro = get_object_or_404(Retiro.objects.select_related("restaurante"), pk=pk)
+    return render(request, "captura/retiro_detalle.html", {"retiro": retiro})
 
 
 @requiere(Usuario.puede_clasificar)
 def retiro_clasificar(request, pk):
-    retiro = get_object_or_404(Retiro.objects.select_related("restaurante"), pk=pk)
+    retiro = get_object_or_404(Retiro.objects.select_related("restaurante"), pk=pk, en_carga=False)
     kg = number_format(retiro.kg_levantados, 1)
     titulo = f"Clasificar retiro N.º {pk} · {retiro.restaurante.nombre} · {kg} kg levantados"
     return _formulario(request, RetiroClasificacionForm, retiro, titulo, "captura:retiros")
@@ -135,6 +187,16 @@ def retiro_foto(request, pk):
     if not retiro.foto:
         raise Http404
     return FileResponse(retiro.foto.open("rb"))
+
+
+@requiere(lambda usuario: usuario.puede_retirar() or usuario.puede_ver_retiros_y_lotes())
+def bulto_foto(request, pk):
+    """La foto de un bulto. El chofer ve solo las del retiro que está cargando."""
+    bulto = get_object_or_404(Bulto.objects.select_related("retiro"), pk=pk)
+    es_suyo = bulto.retiro.en_carga and bulto.retiro.registrado_por == request.user
+    if not es_suyo and not request.user.puede_ver_retiros_y_lotes():
+        raise PermissionDenied
+    return FileResponse(bulto.foto.open("rb"))
 
 
 @requiere(Usuario.puede_clasificar)
@@ -214,7 +276,7 @@ def _respuesta_csv(nombre_archivo, encabezados, filas):
 @requiere(Usuario.puede_ver_datos)
 def exportar_retiros(request):
     desde, hasta, codigo = _filtros(request)
-    retiros = Retiro.objects.select_related("restaurante").order_by("fecha")
+    retiros = Retiro.objects.select_related("restaurante").annotate(cantidad_bultos=Count("bultos")).order_by("fecha")
     if desde:
         retiros = retiros.filter(fecha__date__gte=desde)
     if hasta:
@@ -236,8 +298,10 @@ def exportar_retiros(request):
             r.lote_id or "",
             _numero(r.latitud),
             _numero(r.longitud),
-            "sí" if r.foto else "no",
+            "sí" if r.foto or r.cantidad_bultos else "no",
             _texto(r.observaciones),
+            r.cantidad_bultos or "",
+            "sí" if r.impropios_estimados else "no",
         ]
         for r in retiros
     )
@@ -257,6 +321,9 @@ def exportar_retiros(request):
         "longitud",
         "tiene_foto",
         "observaciones",
+        # Las columnas nuevas van al final, para no correr las anteriores.
+        "bultos",
+        "impropios_estimados",
     ]
     return _respuesta_csv(_nombre_archivo("retiros", desde, hasta, codigo), encabezados, filas)
 

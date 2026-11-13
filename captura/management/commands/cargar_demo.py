@@ -158,7 +158,8 @@ class Command(BaseCommand):
                 )
         # creado_en se completa solo al crear; para los datos de ejemplo se lleva al pasado.
         fecha = timezone.make_aware(datetime.combine(self.hoy - timedelta(days=dias_atras), time(10, 0)))
-        Pedido.objects.filter(pk=pedido.pk).update(creado_en=fecha)
+        entregado_en = fecha.date() if estado == Pedido.Estado.ENTREGADO else None
+        Pedido.objects.filter(pk=pedido.pk).update(creado_en=fecha, entregado_en=entregado_en)
 
     def crear_usuario(self, nombre_usuario, rol, password, superusuario=False, nombre=""):
         usuario, creado = Usuario.objects.get_or_create(

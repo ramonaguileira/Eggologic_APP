@@ -1,7 +1,9 @@
+from datetime import date, timedelta
 from decimal import Decimal
 
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from cuentas.models import Cliente, Restaurante, Usuario
 
@@ -102,3 +104,54 @@ class PedidosDeAdministracionTests(TestCase):
             self.assertEqual(self.client.get(reverse("tienda:pedidos_admin")).status_code, 403)
         self.pedido.refresh_from_db()
         self.assertEqual(self.pedido.estado, Pedido.Estado.RECIBIDO)
+
+    def test_al_marcar_entregado_queda_la_fecha(self):
+        self.client.force_login(crear_usuario(Usuario.Rol.ADMIN))
+        self.client.post(self.entregar)
+        self.pedido.refresh_from_db()
+        self.assertEqual(self.pedido.entregado_en, timezone.localdate())
+
+
+class RegistrarEntregaTests(TestCase):
+    def setUp(self):
+        self.operador = crear_usuario(Usuario.Rol.OPERADOR)
+        self.maple = Producto.objects.create(nombre="Maple", huevos=30, precio=Decimal("650"))
+        self.url = reverse("tienda:entrega_nueva")
+        self.ayer = timezone.localdate() - timedelta(days=1)
+        self.client.force_login(self.operador)
+
+    def registrar(self, **datos):
+        base = {"fecha": self.ayer.isoformat(), "forma_pago": "contra_entrega", f"cantidad_{self.maple.pk}": "2"}
+        return self.client.post(self.url, {**base, **datos})
+
+    def test_entrega_a_un_restaurante_queda_como_pedido_entregado(self):
+        usuario = crear_usuario(Usuario.Rol.RESTAURANTE)
+        Restaurante.objects.create(nombre="El Popu", codigo="R-001", usuario=usuario, direccion="Calle 2", telefono="42 123")
+        self.assertContains(self.client.get(self.url), "El Popu (restaurante)")
+        self.assertRedirects(self.registrar(comprador=usuario.pk), reverse("tienda:pedidos_admin"))
+        pedido = Pedido.objects.get()
+        self.assertEqual(pedido.usuario, usuario)
+        self.assertEqual(pedido.estado, Pedido.Estado.ENTREGADO)
+        self.assertEqual(pedido.entregado_en, self.ayer)
+        self.assertEqual(pedido.cargado_por, self.operador)
+        self.assertEqual(pedido.huevos, 60)
+        self.assertEqual(pedido.direccion, "Calle 2")
+
+    def test_entrega_a_un_cliente_nuevo_le_crea_la_cuenta(self):
+        self.registrar(nombre_nuevo="Ana", email_nuevo="ana@example.com")
+        pedido = Pedido.objects.get()
+        self.assertEqual(pedido.usuario.first_name, "Ana")
+        self.assertEqual(pedido.usuario.rol, Usuario.Rol.CLIENTE)
+        self.assertTrue(Cliente.objects.filter(usuario=pedido.usuario).exists())
+        # Con contraseña (que nadie conoce) para que pueda entrar con "Olvidé mi contraseña".
+        self.assertTrue(pedido.usuario.has_usable_password())
+
+    def test_hay_que_elegir_a_alguien_y_la_fecha_no_puede_ser_futura(self):
+        self.assertContains(self.registrar(), "Elegí un cliente o restaurante")
+        manana = (timezone.localdate() + timedelta(days=1)).isoformat()
+        self.assertContains(self.registrar(nombre_nuevo="Ana", fecha=manana), "fecha futura")
+        self.assertFalse(Pedido.objects.exists())
+
+    def test_carbosur_no_registra_entregas(self):
+        self.client.force_login(crear_usuario(Usuario.Rol.CARBOSUR))
+        self.assertEqual(self.client.get(self.url).status_code, 403)

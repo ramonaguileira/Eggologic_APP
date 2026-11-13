@@ -72,6 +72,7 @@ python manage.py guardian_enviar   # manda a Guardian los reportes revisados (es
 | 4 | Entregables ANDE (demo 19/10/2026) | Para revisar |
 | Datos | Plan de datos tras la auditoría (fases 0 a 5, hasta marzo de 2027) | Fase 0 para revisar y publicada en Render (`docs/plan-datos-fase-0.md`) |
 | Arreglos | Errores y puntos flojos del estudio del 12/11 (`docs/arreglos-13-11.md`) | Para revisar, en la rama `claude/keen-heisenberg-xon3e4` |
+| Bultos y entregas | Retiro por bultos, diferencia a impropios y registrar entrega (`docs/bultos-y-entregas.md`) | Para revisar, en el PR #12 |
 | 5 | Experiencia de cliente y restaurante: más simple, clara y estética en el celular; que el cliente se arregle solo (recuperar contraseña por email, entrar con el email, registro más corto) | Después de la respuesta de Marcel |
 
 Todas las etapas pasan a la revisión de Marcel (`docs/para-marcel.md`).
@@ -167,6 +168,10 @@ Cosas de MGS que aprendimos:
 - **Factor provisorio y credenciales por variable de entorno:** quedan así por ahora.
 - **Render (reporte del 12/11):** web y base en planes pagos, sin vencimiento. Un solo respaldo, del 05/11. Sin Cron Job. El Blueprint sigue la rama `claude/peaceful-bardeen-4k285s` con sincronización automática, no `main`.
 - **En línea (12/11):** 13 retiros de El Popu, sin lotes, sin registros de granja y sin pedidos. Cada bulto está cargado como un retiro aparte.
-- **Orden de lo que sigue:** registrar entrega; retiro por bultos; clasificación con foto; granja por período con varios lotes; Eggos en pantalla para el restaurante.
+- **Diferencia en la clasificación:** si impropios + vegetales + plato suma menos que lo levantado, la diferencia se carga a impropios como estimación. Vale también para los retiros ya cargados.
+- **Retiro por bultos:** un cajón por vez, cada uno con su peso y su foto, todos en un solo retiro del día. Los 13 retiros anteriores quedan como están.
+- **PR #12** (rama `claude/keen-heisenberg-xon3e4`): arreglos, bultos y registrar entrega. Lo aprueba Marcel.
+- **Dolor de Ramón (13/11):** cargar le lleva demasiado. Hay lotes, granja y entregas sin cargar, y residuos que procesó sin pesar. Lo que sigue tiene que hacer la carga más corta, no más completa.
+- **Orden de lo que sigue:** clasificación con foto; granja por período con varios lotes; Eggos en pantalla para el restaurante.
 
 **Restaurantes nuevos (resolución temporal, 06/10).** Se cargan en la app desde el primer día; el usuario en Guardian se crea cuando entran en serio al piloto, con el alta solo con el código. Mientras tanto sus meses esperan en **Reportes**. No habrá restaurantes nuevos antes del 19/10.

@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from cuentas.permisos import requiere
 from impacto.calculos import factores_del_circuito
 
-from .forms import PedidoForm
+from .forms import EntregaForm, PedidoForm
 from .models import Pedido, Producto
 from cuentas.models import Cliente, Usuario
 
@@ -63,6 +63,18 @@ def pedido_entregado(request, pedido_id):
         messages.success(request, "El pedido se marcó como entregado.")
         return redirect("tienda:pedidos_admin")
     return render(request, "tienda/pedido_entregado.html", {"pedido": pedido})
+
+
+@requiere(Usuario.puede_gestionar_pedidos)
+def entrega_nueva(request):
+    """Carga una entrega ya hecha (por ejemplo, huevos entregados en mano)."""
+    productos = Producto.objects.filter(activo=True)
+    form = EntregaForm(request.POST or None, productos=productos)
+    if request.method == "POST" and form.is_valid():
+        pedido = form.crear_entrega(request.user)
+        messages.success(request, f"Entrega registrada: pedido N.º {pedido.pk}, {pedido.huevos} huevos.")
+        return redirect("tienda:pedidos_admin")
+    return render(request, "tienda/entrega_nueva.html", {"form": form})
 
 
 @requiere(Usuario.puede_gestionar_pedidos)

@@ -2,7 +2,10 @@
 {% load static %}
 
 {% block antes_de_guardar %}
+  <p class="tenue">Pesá el primer cajón y sacale una foto. Después vas a poder sumar los demás.</p>
   <p id="estado-ubicacion" class="tenue">Para registrar la ubicación, permití el acceso cuando el celular lo pida.</p>
   <script src="{% static 'js/ubicacion.js' %}" defer></script>
   <script src="{% static 'js/foto.js' %}" defer></script>
 {% endblock %}
+
+{% block texto_boton %}Guardar y seguir{% endblock %}

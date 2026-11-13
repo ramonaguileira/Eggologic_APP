@@ -14,7 +14,7 @@
       <thead>
         <tr>
           <th>N.º</th><th>Fecha</th><th>Restaurante</th><th>kg levantados</th>
-          <th>Impropios</th><th>Vegetales</th><th>Plato</th><th>Foto</th><th>Ubicación</th><th>Lote</th><th></th>
+          <th>Impropios</th><th>Vegetales</th><th>Plato</th><th>Fotos</th><th>Ubicación</th><th>Lote</th><th></th>
         </tr>
       </thead>
       <tbody>
@@ -25,13 +25,16 @@
             <td>{{ retiro.restaurante.nombre }}</td>
             <td class="num">{{ retiro.kg_levantados|floatformat:1 }}</td>
             {% if retiro.clasificado %}
-              <td class="num">{{ retiro.kg_impropios|floatformat:1 }}</td>
+              <td class="num">{{ retiro.kg_impropios|floatformat:1 }}{% if retiro.impropios_estimados %} <abbr title="Incluye una estimación: la clasificación sumaba menos que lo levantado.">est.</abbr>{% endif %}</td>
               <td class="num">{{ retiro.kg_restos_vegetales|floatformat:1 }}</td>
               <td class="num">{{ retiro.kg_residuos_plato|floatformat:1 }}</td>
             {% else %}
-              <td colspan="3"><span class="etiqueta">Sin clasificar</span></td>
+              <td colspan="3"><span class="etiqueta">{% if retiro.en_carga %}En carga{% else %}Sin clasificar{% endif %}</span></td>
             {% endif %}
-            <td>{% if retiro.foto %}<a href="{% url 'captura:retiro_foto' retiro.pk %}" target="_blank">Ver</a>{% else %}—{% endif %}</td>
+            <td>
+              {% if retiro.cantidad_bultos %}<a href="{% url 'captura:retiro_detalle' retiro.pk %}">{{ retiro.cantidad_bultos }} bulto{{ retiro.cantidad_bultos|pluralize }}</a>
+              {% elif retiro.foto %}<a href="{% url 'captura:retiro_foto' retiro.pk %}" target="_blank">Ver</a>{% else %}—{% endif %}
+            </td>
             <td>
               {% if retiro.latitud is not None %}
                 <a href="https://www.openstreetmap.org/?mlat={{ retiro.latitud|stringformat:'f' }}&mlon={{ retiro.longitud|stringformat:'f' }}#map=18/{{ retiro.latitud|stringformat:'f' }}/{{ retiro.longitud|stringformat:'f' }}" target="_blank" rel="noopener">Mapa</a>
@@ -39,7 +42,9 @@
             </td>
             <td>{{ retiro.lote_id|default:"—" }}</td>
             <td>
-              {% if user.puede_clasificar %}
+              {% if retiro.en_carga %}
+                {% if user.puede_retirar %}<a href="{% url 'captura:retiro_bultos' retiro.pk %}">Seguir</a>{% endif %}
+              {% elif user.puede_clasificar %}
                 <a href="{% url 'captura:retiro_clasificar' retiro.pk %}">{% if retiro.clasificado %}Editar{% else %}Clasificar{% endif %}</a>
               {% endif %}
             </td>

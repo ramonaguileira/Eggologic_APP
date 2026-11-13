@@ -19,7 +19,7 @@
       {% endfor %}
       {% block antes_de_guardar %}{% endblock %}
       <div class="acciones">
-        <button type="submit" class="boton">Guardar</button>
+        <button type="submit" class="boton">{% block texto_boton %}Guardar{% endblock %}</button>
         <a href="{% url volver_a %}">Cancelar</a>
       </div>
     </form>

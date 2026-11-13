@@ -40,7 +40,9 @@ class RegistroBase(models.Model):
 class Retiro(RegistroBase):
     """Residuo que el chofer levanta en un restaurante, y cómo se clasifica.
 
-    El chofer carga el restaurante, los kg y una foto; la fecha y la ubicación se toman solas.
+    El chofer carga el restaurante y los bultos de a uno, cada uno con su peso y su foto (Ramón,
+    13/11: los cajones no se pueden apilar en la balanza). La app suma los bultos; la fecha y la
+    ubicación se toman solas. La balanza se tara con un cajón vacío, así que los pesos son netos.
     La clasificación se completa después, en la planta. En términos del FLW Standard: los
     restos vegetales se acercan a "partes no comestibles asociadas", los residuos de plato a
     "alimento", y los impropios quedan fuera del inventario (SUPUESTO, lo define CarboSur).
@@ -49,6 +51,9 @@ class Retiro(RegistroBase):
     restaurante = models.ForeignKey(Restaurante, on_delete=models.PROTECT, related_name="retiros")
     fecha = models.DateTimeField(default=timezone.now)
     kg_levantados = campo_kg("levantado (kg)")
+    # Mientras el chofer sigue agregando bultos. La planta clasifica recién cuando lo termina.
+    en_carga = models.BooleanField(default=False, editable=False)
+    # Los retiros anteriores a los bultos tienen una sola foto, acá. Los nuevos, una por bulto.
     foto = models.FileField(
         upload_to="retiros/%Y/%m/",
         blank=True,
@@ -65,6 +70,9 @@ class Retiro(RegistroBase):
     kg_impropios = campo_kg("impropios (kg)", null=True, blank=True)
     kg_restos_vegetales = campo_kg("restos vegetales (kg)", null=True, blank=True)
     kg_residuos_plato = campo_kg("residuos de plato (kg)", null=True, blank=True)
+    # Cuando la clasificación suma menos que lo levantado, la diferencia se carga a impropios como
+    # estimación (decisión de Ramón, 13/11). Lo que se pesó queda anotado en las observaciones.
+    impropios_estimados = models.BooleanField("impropios con estimación", default=False, editable=False)
 
     # Línea de base para CarboSur: lo que el restaurante descartó por otra vía (basura común)
     # desde el retiro anterior. Opcional. SUPUESTO: se informa en cada retiro.
@@ -102,6 +110,23 @@ class Retiro(RegistroBase):
             return None
         return self.kg_restos_vegetales + self.kg_residuos_plato
 
+    def sumar_bultos(self):
+        self.kg_levantados = sum((bulto.kg for bulto in self.bultos.all()), CERO)
+        self.save(update_fields=["kg_levantados", "actualizado_en"])
+
+    def cargar_diferencia_a_impropios(self):
+        """Si la clasificación suma menos que lo levantado, suma la diferencia a impropios."""
+        diferencia = self.kg_levantados - sum(self._clasificacion())
+        if diferencia <= 0:
+            return
+        nota = (
+            f"Impropios pesados: {number_format(self.kg_impropios, 2)} kg. Se sumaron "
+            f"{number_format(diferencia, 2)} kg de diferencia con lo levantado, como estimación."
+        )
+        self.kg_impropios += diferencia
+        self.impropios_estimados = True
+        self.observaciones = f"{self.observaciones}\n{nota}".strip()
+
     def clean(self):
         valores = self._clasificacion()
         cargados = [v for v in valores if v is not None]
@@ -114,6 +139,27 @@ class Retiro(RegistroBase):
             raise ValidationError("La clasificación suma más kg que lo levantado.")
         if self.lote_id and not self.clasificado:
             raise ValidationError("Este retiro está en un lote: la clasificación no se puede borrar.")
+
+
+class Bulto(models.Model):
+    """Un cajón de un retiro, pesado solo en la balanza."""
+
+    retiro = models.ForeignKey(Retiro, on_delete=models.CASCADE, related_name="bultos")
+    kg = models.DecimalField("peso (kg)", max_digits=8, decimal_places=2, validators=[MinValueValidator(Decimal("0.01"))])
+    foto = models.FileField(
+        upload_to="retiros/%Y/%m/",
+        validators=[
+            FileExtensionValidator(["jpg", "jpeg", "png", "webp", "heic", "heif"]),
+            validar_tamano_foto,
+        ],
+    )
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["id"]
+
+    def __str__(self):
+        return f"Bulto de {number_format(self.kg, 1)} kg"
 
 
 class Lote(RegistroBase):

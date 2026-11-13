@@ -26,4 +26,4 @@ class PedidoAdmin(admin.ModelAdmin):
     list_filter = ["estado", "forma_pago"]
     search_fields = ["usuario__username", "usuario__first_name", "direccion", "telefono"]
     inlines = [ItemPedidoInline]
-    readonly_fields = ["usuario", "creado_en"]
+    readonly_fields = ["usuario", "creado_en", "cargado_por"]

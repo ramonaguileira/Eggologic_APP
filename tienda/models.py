@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import timezone
 
 
 class Producto(models.Model):
@@ -37,9 +38,20 @@ class Pedido(models.Model):
     direccion = models.CharField("dirección de entrega", max_length=200)
     telefono = models.CharField("teléfono", max_length=40)
     notas = models.TextField(blank=True)
+    # El día en que se entregó. El impacto del cliente se cuenta por esta fecha, no por la del pedido.
+    entregado_en = models.DateField("fecha de entrega", null=True, blank=True)
+    # Solo en las entregas que carga Eggologic desde "Registrar entrega".
+    cargado_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name="+", editable=False
+    )
 
     class Meta:
         ordering = ["-creado_en"]
+
+    def save(self, *args, **kwargs):
+        if self.estado == self.Estado.ENTREGADO and not self.entregado_en:
+            self.entregado_en = timezone.localdate()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Pedido N.º {self.pk}"

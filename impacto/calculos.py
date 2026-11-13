@@ -120,7 +120,7 @@ def impacto_de_compras(usuario, factores):
     """Huevos que compró el usuario (pedidos entregados) y lo que representan."""
     items = ItemPedido.objects.filter(pedido__usuario=usuario, pedido__estado=Pedido.Estado.ENTREGADO)
     huevos = items.aggregate(total=Sum(F("cantidad") * F("huevos_por_unidad")))["total"] or 0
-    huevos_por_mes = _por_mes(items, "pedido__creado_en", F("cantidad") * F("huevos_por_unidad"))
+    huevos_por_mes = _por_mes(items, "pedido__entregado_en", F("cantidad") * F("huevos_por_unidad"))
     return {
         "huevos": huevos,
         "kg_rescatados": huevos * factores["kg_residuo_por_huevo"] if factores else None,
