@@ -311,11 +311,69 @@ No es difícil, pero es plata: es la etapa que más pruebas necesita.
 
 ## 8. Arte
 
-**Lo dibuja Claude** (Ramón, 13/11). Guía corta: paleta sacada del logo, piezas de 16×16 o 32×32 escaladas en múltiplos enteros, tipografía pixelada con tildes y ñ para títulos y una común para textos y números.
+Ramón armó la identidad en Claude Design (13/11) y entregó un primer paquete, guardado en `docs/eggo-world-arte/`. Para verlo de un vistazo: `vista-sprites.png` y `vista-escena.png`.
 
-Lista para la primera versión: pollito, gallina (caminar, comer, poner, dormir, festejar), huevo, nido, maple de 15 y de 30, larvas, balde, camioncito, gallinero, fondo de día y de noche, íconos de las pestañas, insignias de nivel.
+### Lo que ya está
 
-Sonido: dos o tres efectos cortos, apagados por defecto.
+**Paleta de 16 colores** (`paleta.css`, variables `--egg-*`), en cuatro familias:
+
+| Familia | Colores |
+| --- | --- |
+| Verdes | tinta `#0c2a1f`, bosque `#143f2c`, **verde Eggologic `#1d583b`**, pradera `#2f7d4c`, brote `#58a95c`, hoja `#9ad37a` |
+| Cáscara | blanco `#ffffff`, cáscara `#f6f0dc`, paja `#d6cba6`, nido `#a89c78` |
+| Yema | yema luz `#ffdf6b`, **yema `#f5b921`**, ámbar `#d98414` |
+| Tierra | cresta `#c8472f`, tierra `#7a5230`, humus `#452c1b` |
+
+Reglas del paquete: el verde Eggologic es el principal; la yema es el acento (Eggos, premios y botones de acción); el contorno es tinta, nunca negro puro; fondos en verde Eggologic o bosque, texto en blanco o cáscara.
+
+**Quince sprites** (PNG a tamaño real y a 4×, y SVG), más una escena de muestra:
+
+| Sprite | Tamaño | Uso en la app |
+| --- | --- | --- |
+| `gallina-blanca`, `gallina-colorada` | 16×16 | Las gallinas adoptadas |
+| `pollito` | 10×10 | Detalle de la chacra |
+| `eggo`, `eggo-chico` | 22×27, 13×16 | Ícono de los Eggos: un huevo con la espiral del logo |
+| `eggo-dorado`, `eggo-dorado-chico` | 22×27, 13×16 | Premios y bonos |
+| `eggo-linea` | 22×27 | Huevo de línea blanca, para fondos verdes (pantalla de carga) |
+| `larva` | 16×6 | Las larvas |
+| `nido` | 18×8 | Nido con huevos |
+| `gallinero`, `granero`, `casita` | 22×18, 28×24, 22×22 | Objetos de la chacra |
+| `brote` | 16×16 | Planta |
+| `cerco` | 12×13 | Se repite a lo ancho, cada 12 px |
+| `escena-granja` | 127×36 | Muestra de cómo se ve todo junto |
+
+### Qué cambia en el plan
+
+- **La grilla es de 16×16, no de 32×32.** Es más simple y queda bien; se muestra a 4× en el celular. Se adopta.
+- **Los botones usan lo que ya está dibujado** (`SUPUESTO`), para pedir menos dibujos nuevos:
+
+  | Objeto | Cartelito | Sprite |
+  | --- | --- | --- |
+  | Gallinero | Gallinas | Ya está |
+  | Nido | Huevos | Ya está |
+  | Granero (en lugar del puesto de feria) | Tienda | Ya está |
+  | Casita (en lugar del buzón) | Mi cuenta | Ya está |
+  | Brote (en lugar del pizarrón) | Impacto | Ya está |
+  | Balde de residuos | Residuos | **Falta** |
+
+- La espiral del logo quedó dentro del huevo de los Eggos: es el gesto de la marca en la app.
+
+### Lo que falta
+
+El paquete trae dibujos quietos. Para construir todo lo del punto 4 falta:
+
+| Qué | Para qué | Urgencia |
+| --- | --- | --- |
+| Cuadros de animación de la gallina: caminar, picotear, echada, dormida, contenta | Que la gallina se mueva | Necesario |
+| Balde de residuos (vacío y lleno) y maple (15 y 30) | El botón de Residuos y el canje | Necesario |
+| Chacra vertical para celular (la escena actual es apaisada), de día y de noche | La pantalla principal | Necesario |
+| Tipografías (una pixelada para títulos y una común para textos) | Todo | Necesario |
+| El panel que sube, botones y contadores | Todo | Necesario |
+| Pajarito, caracol, bichito | La chacra vacía y el juego de la gallina | Puede esperar |
+| Comedero, bebedero, camioncito, cartelito | Detalles | Puede esperar |
+| Ícono de la app y logo de Eggo World | Publicación | Puede esperar |
+
+Dos caminos para completarlo: pedirle el resto a Claude Design, o que Claude los dibuje al construir siguiendo esta paleta y este estilo (los sprites son grillas chicas y se pueden hacer a mano en el mismo formato). Lo más rápido es lo segundo para todo lo "necesario", y dejar a Claude Design lo que es marca (logo e ícono de la app).
 
 ---
 
