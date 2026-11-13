@@ -2,7 +2,7 @@
 
 **Estado:** propuesta en revisión (13/11/2026). **No hay nada construido.** Todo número que no dio Ramón está marcado `SUPUESTO`.
 
-**Confirmado por Ramón (13/11):** 1 Eggo = $ 1; 5 % de vuelta en compras; levante a 60 Eggos y 1 huevo extra por kilo; el impacto verificado se llama **Rescates**; Lucas está de acuerdo con vender producción por adelantado; la experiencia visual del punto 4; gallina de dos años a 3.600 pesos; los Eggos quedan fuera de Hedera; hoy hay unas 60 gallinas en postura; el envío no se cobra y cuesta poco porque se vende solo en la zona (El Tesoro y La Barra).
+**Confirmado por Ramón (13/11):** 1 Eggo = $ 1; dos precios (3 % de vuelta pagando con plata, 5,5 % menos con Eggos, 7,5 % menos siendo socio); recarga en paquetes; levante a 60 Eggos y 1 huevo extra por kilo; el impacto verificado se llama **Rescates**; Lucas está de acuerdo con vender producción por adelantado; la experiencia visual del punto 4; gallina de dos años a 3.600 pesos; los Eggos quedan fuera de Hedera; hoy hay unas 60 gallinas en postura; el envío no se cobra y cuesta poco porque se vende solo en la zona (El Tesoro y La Barra).
 
 Documento hermano: `docs/estructura-descentralizada.md` (cómo conviven los nodos, los socios y la central).
 
@@ -54,14 +54,50 @@ Cómo apoya la gente: comprando huevos (y pronto verduras y compost), suscribié
 | Valor de los residuos para Eggologic | Casi nulo hoy: es inversión en educación | Ramón, 13/11 |
 | Comisión de Mercado Pago | 7 % todo incluido | `SUPUESTO`: no encontré la tarifa de Uruguay; se confirma en la cuenta de Ramón |
 
-### 3.2 El Eggo
+### 3.2 El Eggo (decisiones de Ramón, 13/11)
 
-**Propuesta: 1 Eggo = $ 1.** Es un saldo a favor que solo se usa en Eggologic.
+**1 Eggo = $ 1.** Es un saldo a favor que solo se usa en Eggologic. Se puede usar la app solo para comprar huevos, sin gallina ni juego, y está bien.
 
-- **Se compran** con Mercado Pago, 1 a 1 (en la práctica nadie "compra Eggos": al adoptar o comprar, paga lo que le falta).
-- **Se ganan** comprando: **5 Eggos cada $ 100** (5 % de vuelta).
-- **Se usan** para adoptar gallinas, pagar levantes de residuos y como descuento en la tienda.
-- No se transfieren ni se cambian por plata. Los comprados no vencen; los ganados vencen a los 12 meses (`SUPUESTO`).
+**Dos formas de pagar, dos precios:**
+
+| Cómo paga | Qué pasa | Ejemplo: Quincena de $ 160 |
+| --- | --- | --- |
+| Con plata, directo (Mercado Pago, transferencia o contra entrega) | Precio lleno, y le vuelve el **3 %** en Eggos | Paga $ 160, recibe 5 Eggos |
+| Con Eggos | **5,5 % menos** | Paga 151 Eggos |
+| Con Eggos, siendo socio | **7,5 % menos** | Paga 148 Eggos |
+
+- Quien paga con Eggos no recibe Eggos de vuelta: su premio es el precio.
+- Los precios en Eggos se redondean al peso (`SUPUESTO`).
+- La gallina cuesta lo mismo de las dos formas (3.600): ya tiene su descuento adentro.
+
+**Cómo se consiguen Eggos:**
+
+- **Recarga en paquetes de 500, 1.000 o 2.000** (1 a 1, con Mercado Pago o transferencia). No se carga "justo lo que falta": el precio más bajo es el premio por adelantar varias compras.
+- El 3 % que vuelve al pagar con plata.
+- La única excepción a los paquetes es la gallina: ahí se paga la diferencia exacta.
+
+**Socio (la insignia).** Quien pasa **un mes entero con 1.000 Eggos o más** en la cuenta gana la insignia para el mes siguiente. Ventajas:
+
+1. 7,5 % de descuento pagando con Eggos, en lugar de 5,5 %.
+2. Prioridad cuando faltan huevos.
+3. Acceso primero a lo nuevo (verduras, cerdo, gallinas de un gallinero nuevo).
+4. Precio congelado: si sube un precio, el socio sigue comprando al precio anterior por tres meses (`SUPUESTO`: el plazo).
+
+La insignia se ve en la chacra. Se mantiene mientras el saldo no baje de 1.000; si baja, se pierde al mes siguiente y se recupera igual que se ganó.
+
+**Lo que no hay:** intereses ni Eggos que crecen solos por estar guardados. Los Eggos no se transfieren ni se cambian por plata. Los comprados no vencen; los ganados vencen a los 12 meses (`SUPUESTO`).
+
+**La cuenta:**
+
+| | Margen por huevo |
+| --- | --- |
+| Pagando con plata (precio lleno, 3 % de vuelta) | unos $ 5,00 |
+| Pagando con Eggos (5,5 % menos) | $ 4,58 |
+| Socio (7,5 % menos) | $ 4,37 |
+
+El 2 % extra del socio le cuesta a Eggologic unos $ 6 por mes en una familia que compra dos quincenas, a cambio de tener $ 1.000 adelantados: cerca de un 8 % anual. Es más barato que la gallina (18 %).
+
+**Candados** (`SUPUESTO`): tope de 10.000 Eggos por cuenta, y tope total de Eggos en circulación de un mes de ventas, porque todo saldo guardado es deuda en huevos.
 
 ### 3.3 Por qué no cierra "1 Eggo cada $ 100 y gallina a 100 Eggos"
 
@@ -76,9 +112,9 @@ Ramón tiró esos números como ejemplo y pidió que los revise. Así como está
 | Valor de esos huevos al público | $ 4.267 |
 | Devolución al cliente | **43 % de lo que compró** |
 
-Se va casi la mitad del margen, y además ese cliente deja de comprar 400 huevos. Con la propuesta de este plan (5 % de vuelta), los Eggos ganados son un descuento chico y sano, y **la gallina se compra**: ese es justamente el pago adelantado que se busca.
+Se va casi la mitad del margen, y además ese cliente deja de comprar 400 huevos. Con lo que quedó decidido (3 % de vuelta pagando con plata, 5,5 % menos pagando con Eggos), el premio es chico y sano, y **la gallina se compra**: ese es justamente el pago adelantado que se busca.
 
-Si Ramón quiere premiar más, el margen aguanta hasta un 10 % de vuelta (costo real cercano al 6 % de las ventas, porque se paga en huevos a precio de costo).
+
 
 ### 3.4 La gallina: precio y qué deja
 
@@ -373,7 +409,7 @@ El paquete trae dibujos quietos. Para construir todo lo del punto 4 falta:
 | Comedero, bebedero, camioncito, cartelito | Detalles | Puede esperar |
 | Ícono de la app y logo de Eggo World | Publicación | Puede esperar |
 
-Dos caminos para completarlo: pedirle el resto a Claude Design, o que Claude los dibuje al construir siguiendo esta paleta y este estilo (los sprites son grillas chicas y se pueden hacer a mano en el mismo formato). Lo más rápido es lo segundo para todo lo "necesario", y dejar a Claude Design lo que es marca (logo e ícono de la app).
+Dos caminos para completarlo: pedirle el resto a Claude Design, o que Claude los dibuje al construir siguiendo esta paleta y este estilo (los sprites son grillas chicas y se pueden hacer a mano en el mismo formato). **Decidido (Ramón, 13/11): lo que falta lo dibuja Claude**, respetando la paleta y el estilo del paquete, que a Ramón le gustó; puede mejorarlo, no tiene que ser idéntico. Al construir, lo primero es mostrarle la gallina animada y el balde para que apruebe el estilo.
 
 ---
 
@@ -438,7 +474,7 @@ No soy abogado ni contador; esto es para llevarles las preguntas correctas.
 
 ## 12. Preguntas para Ramón
 
-Respondidas el 13/11: precio de la gallina (pesos), entregas, gallinas en postura, Eggos fuera de Hedera, nombre "Rescates", 5 % de vuelta, levante a 60 Eggos y 1 huevo por kilo, acuerdo de Lucas.
+Respondidas el 13/11: precio de la gallina (pesos), entregas, gallinas en postura, Eggos fuera de Hedera, nombre "Rescates", precios y descuentos, levante a 60 Eggos y 1 huevo por kilo, acuerdo de Lucas.
 
 Siguen abiertas:
 
