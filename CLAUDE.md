@@ -39,6 +39,7 @@ App piloto de Eggologic (Nodo 1, Maldonado): registra el circuito residuo de res
   - fotos de los retiros guardadas en la base (`captura/almacen.py`).
 - `tienda/`: productos y pedidos (pago contra entrega o transferencia).
 - `impacto/`: "Mi impacto" de clientes y restaurantes. Todas las fórmulas están en `impacto/calculos.py`, incluido el factor provisorio de CO2e.
+- `eggos/`, `mundo/`, `api/` y `eggo-world/`: **Eggo World**, la chacra en pixel art para clientes (se abre en `/mundo/`). Todos sus números están en `eggos/reglas.py`. Las apps de arriba no importan nada de estas. Se prende con `EGGO_WORLD_ACTIVO=True`. Qué se hizo y qué falta: `docs/eggo-world-etapa-1.md`.
 - `guardian/`: cliente de la API de MGS, reporte mensual por restaurante (lo revisa una persona en **Reportes**) y los comandos `guardian_estado` y `guardian_enviar`.
 - `docs/`:
   - propuesta aprobada (`etapa-0-propuesta.md`);
@@ -57,6 +58,8 @@ python manage.py migrate
 python manage.py cargar_demo --password "<contraseña de prueba>"
 python manage.py test
 python manage.py runserver
+EGGO_WORLD_ACTIVO=True python manage.py runserver   # con Eggo World prendido, en /mundo/
+python eggo-world/arte/dibujar.py   # vuelve a dibujar los sprites (necesita Pillow)
 python manage.py guardian_estado   # revisa la conexión con Guardian sin escribir nada
 python manage.py guardian_enviar   # manda a Guardian los reportes revisados (escribe en el Guardian real)
 ```
@@ -73,7 +76,7 @@ python manage.py guardian_enviar   # manda a Guardian los reportes revisados (es
 | Datos | Plan de datos tras la auditoría (fases 0 a 5, hasta marzo de 2027) | Fase 0 para revisar y publicada en Render (`docs/plan-datos-fase-0.md`) |
 | 5 | Experiencia de cliente y restaurante: más simple, clara y estética en el celular; que el cliente se arregle solo (recuperar contraseña por email, entrar con el email, registro más corto) | Después de la respuesta de Marcel |
 
-| Eggo World | App nueva para clientes y restaurantes, gamificada y en pixel art, en repo aparte y conectada por una API (pedido de Ramón, 13/11). Reemplazaría a la Etapa 5 | Plan maestro para revisar (`docs/eggo-world-plan-maestro.md`); nada construido |
+| Eggo World | Chacra en pixel art para clientes: adoptar gallinas, juntar y pedir huevos, tienda con dos precios, Eggos, levantes de residuos (pedido de Ramón, 13/11). Reemplaza a la Etapa 5 | Primera construcción para revisar (`docs/eggo-world-etapa-1.md`), apagada hasta poner `EGGO_WORLD_ACTIVO`. Google y Mercado Pago sin probar de verdad |
 
 Todas las etapas pasan a la revisión de Marcel (`docs/para-marcel.md`).
 
@@ -176,6 +179,7 @@ Cosas de MGS que aprendimos:
 - **Arte de Eggo World (Ramón, 13/11):** primer paquete de Claude Design en `docs/eggo-world-arte/`: paleta de 16 colores (verde Eggologic `#1d583b`, yema `#f5b921`, contorno tinta `#0c2a1f`) y 15 sprites quietos en grilla de 16×16. Faltan animaciones, balde, maple, chacra vertical, tipografías y piezas de interfaz (lista en el plan, punto 8). El logo real es un huevo de línea blanca con espiral sobre verde oscuro, con la frase "Huevos regenerativos".
 - **Precios y socios de Eggo World (Ramón, 13/11):** se puede usar solo para comprar huevos. Pagando con plata: precio lleno y 3 % de vuelta en Eggos (ya no 5 %). Pagando con Eggos: 5,5 % menos; 7,5 % menos con la insignia de socio. Recarga en paquetes de 500, 1.000 o 2.000. Socio = un mes entero con 1.000 Eggos o más: descuento mayor, prioridad de stock, acceso primero y precio congelado. Sin intereses. El arte que falta lo dibuja Claude en el estilo del paquete.
 - **Últimas definiciones antes de construir (Ramón, 13/11):** disponibilidad como número fijo editable desde administración (arranca en 200 huevos); el chofer pesa el balde de hogares al retirarlo; larvas a los 14 días; cuenta regresiva de entrega (24 h por defecto) que administración puede reemplazar por día y hora exactos; Eggo World arranca solo para consumidores; las planillas de Ramón se conectan más adelante. El plan está cerrado; falta la orden de Ramón para empezar a construir.
+- **Construcción (13/11):** Ramón pidió construir todo de una, sin revisiones intermedias. Quedó hecho y apagado; la lista de lo que falta está en `docs/eggo-world-etapa-1.md`. La chacra es HTML, CSS y JavaScript sin compilar, servida por Django en `/mundo/` (no React ni un sitio aparte).
 - Nodos: incubadora (casa de Ramón), planta BSF (terreno lindero), Camino Verde (gallinas; viene otro gallinero con un socio inversor), La Nona / Iguzquiza / Miramar Acres (nuevo, con huerta); cerdos en unos meses. La app necesita un modelo `Nodo`, a sumar junto con la producción por período.
 
 **Restaurantes nuevos (resolución temporal, 06/10).** Se cargan en la app desde el primer día; el usuario en Guardian se crea cuando entran en serio al piloto, con el alta solo con el código. Mientras tanto sus meses esperan en **Reportes**. No habrá restaurantes nuevos antes del 19/10.

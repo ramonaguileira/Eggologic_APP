@@ -1,6 +1,6 @@
 # Eggo World — plan maestro (versión 2)
 
-**Estado:** propuesta en revisión (13/11/2026). **No hay nada construido.** Todo número que no dio Ramón está marcado `SUPUESTO`.
+**Estado:** construido en una primera versión el 13/11/2026. Lo que se hizo, lo que cambió respecto de este plan y lo que falta está en `docs/eggo-world-etapa-1.md`. Todo número que no dio Ramón está marcado `SUPUESTO`.
 
 **Confirmado por Ramón (13/11):** 1 Eggo = $ 1; dos precios (3 % de vuelta pagando con plata, 5,5 % menos con Eggos, 7,5 % menos siendo socio); recarga en paquetes; levante a 60 Eggos y 1 huevo extra por kilo; el impacto verificado se llama **Rescates**; Lucas está de acuerdo con vender producción por adelantado; la experiencia visual del punto 4; gallina de dos años a 3.600 pesos; los Eggos quedan fuera de Hedera; hoy hay unas 60 gallinas en postura; el envío no se cobra y cuesta poco porque se vende solo en la zona (El Tesoro y La Barra).
 
