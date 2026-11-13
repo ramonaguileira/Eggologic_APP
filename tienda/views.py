@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
 
 from cuentas.permisos import requiere
 from impacto.calculos import factores_del_circuito
@@ -14,7 +12,7 @@ from cuentas.models import Cliente, Usuario
 
 def _datos_de_entrega(usuario):
     """Dirección y teléfono guardados, para no tener que escribirlos en cada pedido."""
-    perfil = getattr(usuario, "cliente", None) or getattr(usuario, "restaurante", None)
+    perfil = getattr(usuario, "restaurante", None) or getattr(usuario, "cliente", None)
     if perfil is None:
         return {}
     return {"direccion": perfil.direccion, "telefono": perfil.telefono}
@@ -23,16 +21,12 @@ def _datos_de_entrega(usuario):
 @requiere(Usuario.puede_comprar)
 def tienda(request):
     """Página de la tienda."""
-    try:
-        cliente = request.user.cliente
-    except Cliente.DoesNotExist:
-        # Si no tiene Cliente, crear uno y redirigir a impacto
-        Cliente.objects.create(usuario=request.user)
-        return redirect("impacto:mi_impacto")
-
-    # Si no tiene datos de entrega, redirigir a primera entrega
-    if not cliente.telefono or not cliente.direccion:
-        return redirect("primera_entrega")
+    # El cliente carga su dirección y teléfono antes del primer pedido. Al restaurante no se le
+    # pide: sus datos los cargó Eggologic, y el formulario del pedido los deja corregir.
+    if request.user.rol == Usuario.Rol.CLIENTE:
+        cliente, _ = Cliente.objects.get_or_create(usuario=request.user)
+        if not cliente.telefono or not cliente.direccion:
+            return redirect("primera_entrega")
 
     productos = Producto.objects.filter(activo=True)
     form = PedidoForm(request.POST or None, productos=productos, initial=_datos_de_entrega(request.user))
@@ -59,46 +53,26 @@ def mis_pedidos(request):
     }
     return render(request, "tienda/mis_pedidos.html", contexto)
 
-@login_required
+@requiere(Usuario.puede_gestionar_pedidos)
 def pedido_entregado(request, pedido_id):
     """Marca un pedido como entregado."""
     pedido = get_object_or_404(Pedido, pk=pedido_id)
-
-    # Solo administradores o personal autorizado pueden marcar pedidos como entregados
-    if not (request.user.es_admin() or request.user.puede_ver_datos()):
-        raise Http404("No tienes permiso para realizar esta acción.")
-
     if request.method == "POST":
         pedido.estado = Pedido.Estado.ENTREGADO
         pedido.save()
         messages.success(request, "El pedido se marcó como entregado.")
         return redirect("tienda:pedidos_admin")
-
-    return render(request, "tienda/pedido_entregado.html", {
-        "pedido": pedido,
-    })
+    return render(request, "tienda/pedido_entregado.html", {"pedido": pedido})
 
 
-@login_required
+@requiere(Usuario.puede_gestionar_pedidos)
 def pedidos_admin(request):
-    """Muestra todos los pedidos para administradores."""
-    if not (request.user.es_admin() or request.user.is_staff):
-        return redirect("tienda:mis_pedidos")
-
+    """Todos los pedidos, para quien los prepara y los entrega."""
     pedidos = Pedido.objects.select_related("usuario").prefetch_related("items").order_by("-creado_en")
-    return render(request, "tienda/pedidos_admin.html", {
-        "pedidos": pedidos,
-    })
+    return render(request, "tienda/pedidos_admin.html", {"pedidos": pedidos})
 
 
-@login_required
+@requiere(Usuario.puede_gestionar_pedidos)
 def pedido_admin_detalle(request, pedido_id):
-    """Muestra los detalles de un pedido específico para administradores."""
     pedido = get_object_or_404(Pedido.objects.select_related("usuario").prefetch_related("items"), pk=pedido_id)
-
-    if not (request.user.es_admin() or request.user.is_staff):
-        return redirect("tienda:mis_pedidos")
-
-    return render(request, "tienda/pedido_admin_detalle.html", {
-        "pedido": pedido,
-    })
+    return render(request, "tienda/pedido_admin_detalle.html", {"pedido": pedido})

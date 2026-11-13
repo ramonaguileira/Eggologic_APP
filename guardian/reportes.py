@@ -11,6 +11,7 @@ from datetime import date
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.db.models import Count, DateField, Q, Sum
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
@@ -183,17 +184,24 @@ def enviar_pendientes():
     """
     resultados = []
     pendientes = ReporteMensual.objects.exclude(estado=ReporteMensual.Estado.REGISTRADO)
-    for reporte in pendientes.select_related("restaurante"):
-        try:
-            enviar(reporte)
-        except ErrorGuardian as error:
-            # Queda donde estaba: la próxima vuelta retoma desde el paso que falló.
-            reporte.intentos += 1
-            reporte.ultimo_error = str(error)
-            reporte.save(update_fields=["intentos", "ultimo_error"])
-            resultados.append((reporte, str(error)))
-        else:
-            resultados.append((reporte, None))
+    for pk in list(pendientes.values_list("pk", flat=True)):
+        # El reporte queda tomado mientras se envía: si alguien toca el botón dos veces, o el botón
+        # coincide con el comando, el segundo lo saltea. Aprobar dos veces mintearía dos veces.
+        # (La traba funciona en PostgreSQL; SQLite, que se usa solo en desarrollo, la ignora.)
+        with transaction.atomic():
+            reporte = pendientes.select_for_update(skip_locked=True, of=("self",)).filter(pk=pk).first()
+            if reporte is None:
+                continue
+            try:
+                enviar(reporte)
+            except ErrorGuardian as error:
+                # Queda donde estaba: la próxima vuelta retoma desde el paso que falló.
+                reporte.intentos += 1
+                reporte.ultimo_error = str(error)
+                reporte.save(update_fields=["intentos", "ultimo_error"])
+                resultados.append((reporte, str(error)))
+            else:
+                resultados.append((reporte, None))
     return resultados
 
 

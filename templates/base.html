@@ -35,11 +35,8 @@
         {% if user.es_admin %}
           <a href="{% url 'guardian:reportes' %}">Reportes</a>
         {% endif %}
-        {% if user.is_staff %}
-<!--          <a href="{% url 'admin:tienda_pedido_changelist' %}">Pedidos</a>-->
-          <a href="{% url 'tienda:pedidos_admin' %}">Pedidos</a>
-          <a href="{% url 'admin:index' %}">Administración</a>
-        {% endif %}
+        {% if user.puede_gestionar_pedidos %}<a href="{% url 'tienda:pedidos_admin' %}">Pedidos</a>{% endif %}
+        {% if user.is_staff %}<a href="{% url 'admin:index' %}">Administración</a>{% endif %}
         <form method="post" action="{% url 'logout' %}">
           {% csrf_token %}
           <button type="submit" class="enlace">Salir</button>

@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.test import TestCase
 from django.urls import reverse
 
-from cuentas.models import Cliente, Usuario
+from cuentas.models import Cliente, Restaurante, Usuario
 
 from .models import Pedido, Producto
 
@@ -60,3 +60,45 @@ class TiendaTests(TestCase):
         )
         self.client.force_login(operador)
         self.assertEqual(self.client.get(reverse("tienda:tienda")).status_code, 403)
+
+
+def crear_usuario(rol):
+    return Usuario.objects.create_user(username=rol, password="clave-de-prueba-123", rol=rol)
+
+
+class RestauranteEnLaTiendaTests(TestCase):
+    def test_el_restaurante_compra_con_sus_datos_sin_pasar_por_primera_entrega(self):
+        usuario = crear_usuario(Usuario.Rol.RESTAURANTE)
+        Restaurante.objects.create(nombre="El Popu", codigo="R-001", usuario=usuario, direccion="Calle 2", telefono="42 123")
+        self.client.force_login(usuario)
+        respuesta = self.client.get(reverse("tienda:tienda"))
+        self.assertEqual(respuesta.context["form"]["direccion"].value(), "Calle 2")
+        self.assertFalse(Cliente.objects.exists())
+
+    def test_el_cliente_sin_direccion_la_carga_antes_del_primer_pedido(self):
+        self.client.force_login(crear_usuario(Usuario.Rol.CLIENTE))
+        self.assertRedirects(self.client.get(reverse("tienda:tienda")), reverse("primera_entrega"))
+
+
+class PedidosDeAdministracionTests(TestCase):
+    def setUp(self):
+        cliente = crear_usuario(Usuario.Rol.CLIENTE)
+        self.pedido = Pedido.objects.create(usuario=cliente, forma_pago="contra_entrega", direccion="d", telefono="t")
+        self.entregar = reverse("tienda:pedido_entregado", args=[self.pedido.pk])
+
+    def test_administracion_y_operador_marcan_un_pedido_como_entregado(self):
+        for rol in (Usuario.Rol.ADMIN, Usuario.Rol.OPERADOR):
+            Pedido.objects.update(estado=Pedido.Estado.RECIBIDO)
+            self.client.force_login(crear_usuario(rol))
+            self.assertEqual(self.client.get(reverse("tienda:pedidos_admin")).status_code, 200)
+            self.assertRedirects(self.client.post(self.entregar), reverse("tienda:pedidos_admin"))
+            self.pedido.refresh_from_db()
+            self.assertEqual(self.pedido.estado, Pedido.Estado.ENTREGADO)
+
+    def test_carbosur_y_los_clientes_no_tocan_los_pedidos(self):
+        for rol in (Usuario.Rol.CARBOSUR, Usuario.Rol.RESTAURANTE):
+            self.client.force_login(crear_usuario(rol))
+            self.assertEqual(self.client.post(self.entregar).status_code, 403)
+            self.assertEqual(self.client.get(reverse("tienda:pedidos_admin")).status_code, 403)
+        self.pedido.refresh_from_db()
+        self.assertEqual(self.pedido.estado, Pedido.Estado.RECIBIDO)

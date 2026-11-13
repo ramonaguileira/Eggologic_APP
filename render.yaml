@@ -1,12 +1,11 @@
 # Infraestructura en Render (Blueprint). Pasos para crearla en docs/etapa-3.md, "Hosting en Render".
 #
-# Planes gratis (decisión de Ramón, 06/10), pensados para la demo. Límites que hay que tener presentes:
-# - la base gratis vence a los 30 días de creada: antes hay que pasarla a un plan pago;
-# - la web se duerme a los 15 minutos sin uso y tarda un minuto en despertar;
+# Planes pagos desde octubre/noviembre de 2026 (antes eran gratis): web de 0,5 CPU y 512 MB, base
+# de 256 MB con 1 GB de disco. Lo que hay que tener presente:
 # - la web no tiene disco: por eso las fotos de los retiros se guardan en la base (captura/almacen.py);
-# - no hay cron gratis: los reportes se mandan con el botón "Enviar al registro" de la pantalla Reportes.
-# Para pasar a pago: plan starter en la web con un disco (DJANGO_MEDIA_ROOT en el disco) y un
-# servicio cron que corra "python manage.py guardian_enviar" (ver el doc).
+# - no hay cron: los reportes se mandan con el botón "Enviar al registro" de la pantalla Reportes.
+# SUPUESTO: "starter" y "basic-256mb" son los nombres de esos planes en el Blueprint. Los planes se
+# cambiaron a mano en el panel; conviene confirmar los nombres antes de sincronizar este archivo.
 #
 # Las credenciales de Guardian no van acá (el repo es público): se cargan en el panel, en el
 # grupo de variables eggologic-guardian. Región Virginia: la más cercana a Uruguay en Render.
@@ -15,7 +14,7 @@ databases:
   - name: eggologic-db
     databaseName: eggologic
     user: eggologic
-    plan: free
+    plan: basic-256mb
     region: virginia
 
 envVarGroups:
@@ -23,14 +22,14 @@ envVarGroups:
     envVars:
       - key: GUARDIAN_URL
         value: https://guardianservice.app/api/v1
-      # En el panel se suman GUARDIAN_POLICY_ID, GUARDIAN_PROPONENTE_EMAIL,
+      # En el panel se suman DJANGO_EMAIL_SMTP_PASSWORD, GUARDIAN_POLICY_ID, GUARDIAN_PROPONENTE_EMAIL,
       # GUARDIAN_PROPONENTE_PASSWORD y un par GUARDIAN_R00X_EMAIL / _PASSWORD por restaurante.
 
 services:
   - type: web
     name: eggologic
     runtime: python
-    plan: free
+    plan: starter
     region: virginia
     buildCommand: ./build.sh
     startCommand: gunicorn eggologic.wsgi:application
@@ -42,14 +41,12 @@ services:
         value: "False"
       - key: TIENDA_DATOS_TRANSFERENCIA
         sync: false
-      # Primer usuario de administración: build.sh lo crea si no existe (en el plan gratis no hay consola).
+      # Primer usuario de administración: build.sh lo crea si no existe.
       - key: DJANGO_SUPERUSER_USERNAME
         sync: false
       - key: DJANGO_SUPERUSER_EMAIL
         sync: false
       - key: DJANGO_SUPERUSER_PASSWORD
-        sync: false
-      - key: DJANGO_EMAIL_SMTP_PASSWORD
         sync: false
       - key: DB_NAME
         fromDatabase: { name: eggologic-db, property: database }

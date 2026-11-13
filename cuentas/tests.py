@@ -9,8 +9,11 @@ from django.urls import reverse
 from .models import Usuario
 
 
+CLAVE = "clave-de-prueba-123"
+
+
 def crear_usuario(rol, **extra):
-    return Usuario.objects.create_user(username=rol, password="clave-de-prueba-123", rol=rol, **extra)
+    return Usuario.objects.create_user(username=rol, password=CLAVE, rol=rol, **extra)
 
 
 class RolesTests(TestCase):
@@ -77,20 +80,47 @@ class RegistroTests(TestCase):
         respuesta = self.client.post(
             reverse("registrarse"),
             {
-                "username": "lucia",
                 "first_name": "Lucía",
                 "email": "lucia@example.com",
-                "telefono": "099 123 456",
-                "direccion": "Calle 1, Maldonado",
                 "password1": "una-clave-bastante-larga",
                 "password2": "una-clave-bastante-larga",
             },
         )
-        self.assertRedirects(respuesta, reverse("tienda:tienda"))
-        usuario = Usuario.objects.get(username="lucia")
+        self.assertRedirects(respuesta, reverse("impacto:mi_impacto"))
+        # El usuario es el email. La dirección se pide recién en el primer pedido.
+        usuario = Usuario.objects.get(username="lucia@example.com")
         self.assertEqual(usuario.rol, Usuario.Rol.CLIENTE)
-        self.assertEqual(usuario.cliente.direccion, "Calle 1, Maldonado")
+        self.assertEqual(usuario.cliente.direccion, "")
         self.assertEqual(int(self.client.session["_auth_user_id"]), usuario.pk)
+
+    def test_no_se_registra_dos_veces_el_mismo_email(self):
+        crear_usuario(Usuario.Rol.CLIENTE, email="lucia@example.com")
+        datos = {"first_name": "Lucía", "email": "Lucia@example.com", "password1": CLAVE, "password2": CLAVE}
+        respuesta = self.client.post(reverse("registrarse"), datos)
+        self.assertContains(respuesta, "Ya existe una cuenta con este email.")
+
+
+class LoginTests(TestCase):
+    def test_se_entra_con_el_email(self):
+        usuario = crear_usuario(Usuario.Rol.CLIENTE, email="lucia@example.com")
+        self.client.post(reverse("login"), {"username": "LUCIA@example.com", "password": CLAVE})
+        self.assertEqual(int(self.client.session["_auth_user_id"]), usuario.pk)
+
+    def test_dos_usuarios_con_el_mismo_email_no_rompen_el_login(self):
+        crear_usuario(Usuario.Rol.ADMIN, email="info@example.com")
+        segundo = Usuario.objects.create_user(username="segundo", password="otra-clave-larga-456", email="info@example.com")
+        self.client.post(reverse("login"), {"username": "info@example.com", "password": "otra-clave-larga-456"})
+        self.assertEqual(int(self.client.session["_auth_user_id"]), segundo.pk)
+        self.client.logout()
+        respuesta = self.client.post(reverse("login"), {"username": "info@example.com", "password": "incorrecta"})
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+
+class PrimeraEntregaTests(TestCase):
+    def test_quien_no_es_cliente_vuelve_a_su_inicio(self):
+        self.client.force_login(crear_usuario(Usuario.Rol.CHOFER))
+        self.assertRedirects(self.client.get(reverse("primera_entrega")), reverse("inicio"), fetch_redirect_response=False)
 
 
 class PermisosTests(TestCase):

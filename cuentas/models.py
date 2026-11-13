@@ -39,6 +39,12 @@ class Usuario(AbstractUser):
     def puede_ver_granja(self):
         return self.puede_ver_datos() or self.puede_cargar_granja()
 
+    def puede_gestionar_pedidos(self):
+        """Ver todos los pedidos y marcarlos como entregados.
+
+        SUPUESTO: administración y operador. CarboSur no: ve los datos de campo sin editar."""
+        return self.es_admin() or self.rol == self.Rol.OPERADOR
+
     def puede_comprar(self):
         return self.rol in (self.Rol.CLIENTE, self.Rol.RESTAURANTE)
 
