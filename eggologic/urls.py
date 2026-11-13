@@ -16,6 +16,9 @@ urlpatterns = [
     path("impacto/", include("impacto.urls")),
     path("registro/", include("guardian.urls")),
     path("admin/", admin.site.urls),
+    # Eggo World: la chacra y su API, y las pantallas de Eggologic para administrarlo.
+    path("", include("api.urls")),
+    path("eggo-world/", include("mundo.urls")),
 
     path("primera-entrega/", cuentas_views.primera_entrega, name="primera_entrega"),
     # Password recovery URLs

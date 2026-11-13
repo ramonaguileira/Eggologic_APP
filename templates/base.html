@@ -34,6 +34,11 @@
         {% endif %}
         {% if user.es_admin %}
           <a href="{% url 'guardian:reportes' %}">Reportes</a>
+          <a href="{% url 'mundo:panel' %}">Eggo World</a>
+        {% endif %}
+        {% if eggo_world_activo %}
+          {% if user.puede_retirar %}<a href="{% url 'mundo:levantes' %}">Levantes</a>{% endif %}
+          {% if user.rol == "cliente" %}<a href="{% url 'api:chacra' %}">Mi chacra</a>{% endif %}
         {% endif %}
         {% if user.is_staff %}
 <!--          <a href="{% url 'admin:tienda_pedido_changelist' %}">Pedidos</a>-->

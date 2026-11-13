@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block titulo %}Eggo World · Eggologic{% endblock %}
+
+{% block contenido %}
+  <div class="encabezado">
+    <h1>Eggo World</h1>
+    {% if levantes_pedidos %}<a class="boton" href="{% url 'mundo:levantes' %}">{{ levantes_pedidos }} levante{{ levantes_pedidos|pluralize }} por retirar</a>{% endif %}
+  </div>
+  {% if not eggo_world_activo %}
+    <p class="aviso">Eggo World está apagado: los clientes todavía no pueden entrar. Se prende con la variable EGGO_WORLD_ACTIVO.</p>
+  {% endif %}
+
+  <div class="cifras">
+    <div class="cifra"><strong>{{ ajustes.huevos_disponibles }}</strong><span>huevos disponibles para vender</span></div>
+    <div class="cifra"><strong>{{ gallinas|length }} de {{ cupo }}</strong><span>gallinas adoptadas, sobre el cupo</span></div>
+    <div class="cifra"><strong>{{ adeudados }}</strong><span>huevos puestos que todavía no se pidieron</span></div>
+    <div class="cifra"><strong>{{ economia.en_circulacion }}</strong><span>Eggos en manos de clientes (deuda en $)</span></div>
+  </div>
+
+  {% if recargas %}
+    <section class="tarjeta">
+      <h2>Pagos por confirmar</h2>
+      <p class="tenue">Cuando veas la transferencia en la cuenta, acreditala. Si era para una gallina, se activa sola.</p>
+      <div class="tabla">
+        <table>
+          <thead><tr><th>Fecha</th><th>Cliente</th><th>Monto</th><th>Medio</th><th>Para</th><th></th></tr></thead>
+          <tbody>
+            {% for recarga in recargas %}
+              <tr>
+                <td>{{ recarga.creado_en|date:"d/m H:i" }}</td>
+                <td>{{ recarga.usuario.get_full_name|default:recarga.usuario.username }}</td>
+                <td class="num">$ {{ recarga.monto }}</td>
+                <td>{{ recarga.get_medio_display }}</td>
+                <td>{% if recarga.gallina %}Gallina {{ recarga.gallina.nombre }}{% else %}Eggos{% endif %}</td>
+                <td>
+                  <form method="post" action="{% url 'mundo:recarga_resolver' recarga.pk %}">
+                    {% csrf_token %}
+                    <button class="boton pequeno" name="accion" value="acreditar">Acreditar</button>
+                    <button class="enlace" name="accion" value="cancelar">Cancelar</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  {% endif %}
+
+  <section class="tarjeta">
+    <h2>Ajustes</h2>
+    <form method="post">
+      {% csrf_token %}
+      {% for campo in form %}
+        <div class="campo">
+          {{ campo.label_tag }} {{ campo }}
+          {% if campo.help_text %}<p class="tenue">{{ campo.help_text }}</p>{% endif %}
+          {{ campo.errors }}
+        </div>
+      {% endfor %}
+      <button class="boton">Guardar</button>
+    </form>
+  </section>
+
+  <section class="tarjeta">
+    <h2>Economía de Eggos</h2>
+    <div class="cifras">
+      <div class="cifra"><strong>{{ economia.comprados }}</strong><span>comprados (recargas)</span></div>
+      <div class="cifra"><strong>{{ economia.ganados }}</strong><span>ganados por compras</span></div>
+      <div class="cifra"><strong>{{ economia.usados }}</strong><span>usados</span></div>
+      <div class="cifra"><strong>{{ socios|length }}</strong><span>socios este mes</span></div>
+    </div>
+    {% if socios %}<p>Socios: {% for socio in socios %}{{ socio.get_full_name|default:socio.username }}{% if not forloop.last %}, {% endif %}{% endfor %}.</p>{% endif %}
+  </section>
+
+  <section class="tarjeta">
+    <h2>Gallinas adoptadas</h2>
+    {% if gallinas %}
+      <div class="tabla">
+        <table>
+          <thead><tr><th>Gallina</th><th>Cliente</th><th>Plan</th><th>Estado</th><th>Desde</th><th>Pago hasta</th><th>Huevos puestos</th></tr></thead>
+          <tbody>
+            {% for gallina in gallinas %}
+              <tr>
+                <td>{{ gallina.nombre }}</td>
+                <td>{{ gallina.usuario.get_full_name|default:gallina.usuario.username }}</td>
+                <td>{{ gallina.get_plan_display }}</td>
+                <td>{{ gallina.get_estado_display }}</td>
+                <td>{{ gallina.inicio|date:"d/m/Y"|default:"—" }}</td>
+                <td>{{ gallina.pago_hasta|date:"d/m/Y"|default:"—" }}</td>
+                <td class="num">{{ gallina.huevos_puestos }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p>Todavía no hay gallinas adoptadas.</p>
+    {% endif %}
+  </section>
+
+  <p class="tenue">Planillas para Excel:
+    <a href="{% url 'mundo:exportar_movimientos' %}">movimientos de Eggos</a>,
+    <a href="{% url 'mundo:exportar_gallinas' %}">gallinas</a>,
+    <a href="{% url 'mundo:exportar_levantes' %}">levantes</a>.
+  </p>
+{% endblock %}

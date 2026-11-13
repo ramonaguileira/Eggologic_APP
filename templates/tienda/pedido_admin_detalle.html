@@ -39,6 +39,21 @@
     {% endif %}
   {% endif %}
 
+  {% if user.es_admin and pedido.estado != pedido.Estado.ENTREGADO %}
+    <section class="tarjeta">
+      <h2>Entrega</h2>
+      <p>{% if pedido.entrega_estimada %}Estimada: {{ pedido.entrega_estimada|date:"l d/m, H:i" }}{% else %}Sin fecha estimada.{% endif %}</p>
+      <form method="post" action="{% url 'mundo:pedido_entrega' pedido.pk %}">
+        {% csrf_token %}
+        <div class="campo">
+          <label for="entrega_estimada">Día y hora exactos</label>
+          <input id="entrega_estimada" name="entrega_estimada" type="datetime-local" required>
+        </div>
+        <button class="boton">Actualizar entrega</button>
+      </form>
+    </section>
+  {% endif %}
+
   <div class="acciones">
     {% if pedido.estado != pedido.Estado.ENTREGADO and user.es_admin %}
       <a href="{% url 'tienda:pedido_entregado' pedido.pk %}" class="boton">Marcar como entregado</a>
