@@ -160,4 +160,11 @@ Cosas de MGS que aprendimos:
 4. **Producción de huevos por período** (por ejemplo, del 1 al 30 de octubre, o 15 días), no por día. Ramón elige el período.
 5. **Varios lotes de larva por período:** al cargar la producción del período se eligen los lotes que alimentaron a las gallinas.
 
+**Eggo World y estructura descentralizada (Ramón, 13/11). Solo planes, nada construido.** Dos documentos: `docs/eggo-world-plan-maestro.md` y `docs/estructura-descentralizada.md`.
+- Eggo World tiene dos objetivos: pagos adelantados (adoptar una gallina = pagar por adelantado su producción de 2 años) y educar. Juego liviano: un toque de color, nadie colgado jugando. El pixel art lo dibuja Claude.
+- Datos de Ramón: producir un huevo cuesta $ 5 a $ 6; una gallina pone 200 a 250 huevos por año; los residuos hoy no le dan ganancia (las larvas comen sobre todo afrechillo): son inversión en educación.
+- Los Eggos tienen valor real y se pueden comprar; pagos con Mercado Pago (tarjeta y suscripción). Los residuos no dan Eggos: el levante se paga con Eggos y devuelve larvas que suben la producción de la gallina.
+- Propuestas sin confirmar (SUPUESTO): 1 Eggo = $ 1; gallina de 2 años a 3.600 Eggos con 400 huevos garantizados; 5 % de vuelta en compras; Eggos solo en la base de la app, no en Hedera (choca con la decisión del 12/10 de mostrar FGET como Eggos: decidir con Marcel y CarboSur).
+- Nodos: incubadora (casa de Ramón), planta BSF (terreno lindero), Camino Verde (gallinas; viene otro gallinero con un socio inversor), La Nona / Iguzquiza / Miramar Acres (nuevo, con huerta); cerdos en unos meses. La app necesita un modelo `Nodo`, a sumar junto con la producción por período.
+
 **Restaurantes nuevos (resolución temporal, 06/10).** Se cargan en la app desde el primer día; el usuario en Guardian se crea cuando entran en serio al piloto, con el alta solo con el código. Mientras tanto sus meses esperan en **Reportes**. No habrá restaurantes nuevos antes del 19/10.
