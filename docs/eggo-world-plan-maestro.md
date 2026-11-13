@@ -351,7 +351,7 @@ No soy abogado ni contador; esto es para llevarles las preguntas correctas.
 | Etapa | Qué se hace | Cómo se sabe que está |
 | --- | --- | --- |
 | **W0. Prototipo** | Arte y pantallas navegables con datos de mentira. No toca la app actual | Ramón lo prueba en el celular y dice "es esto" |
-| **W1. Cimientos** | Repo nuevo, `api/`, entrar con Google, perfil, impacto de solo lectura | Un cliente actual entra con Google y ve su historial |
+| **W1. Cimientos** | Carpeta `eggo-world/`, `api/`, entrar con Google, perfil, impacto de solo lectura | Un cliente actual entra con Google y ve su historial |
 | **W2. Gallina y Eggos** | `eggos/` y `mundo/`: adoptar (pagando por transferencia), huevos que se acumulan, cosechar, canjear 15 o 30. Tablero de economía | Primera gallina real adoptada y primera quincena canjeada |
 | **W3. Mercado Pago** | Pago con tarjeta y suscripción | Un pago real y un cobro automático de suscripción |
 | **W4. Residuos y larvas** | Pedir levante, estados, raciones de larvas, bono de producción. Lista para el chofer | Un cliente entrega un balde y su gallina sube la producción |
