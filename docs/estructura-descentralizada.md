@@ -10,7 +10,7 @@ Documento hermano: `docs/eggo-world-plan-maestro.md`.
 
 Según lo que contó Ramón el 13/11 (corregir lo que esté mal):
 
-**La empresa:** Lucas tiene el 50 %; Ramón y Cami, el otro 50 %.
+**La empresa:** Eggologic es una **SAS** ya constituida. Lucas tiene el 50 %; Ramón y Cami, el otro 50 %.
 
 | Nodo | Dónde | Qué hace | Socio del nodo y qué recibe |
 | --- | --- | --- | --- |
@@ -121,6 +121,8 @@ Inversión: $ 120.000 para 50 gallinas, que dan unos 11.250 huevos por año (31 
 
 En ningún caso son 7 huevos por día: para eso las 50 gallinas tendrían que poner casi todas todos los días.
 
+Ramón todavía no habló con el inversor (13/11), así que se puede arrancar ofreciendo el 10 % con los números realistas.
+
 **Opinión sobre el porcentaje.** El 10 % es más justo para Eggologic, que pone las gallinas, el alimento, el trabajo y la venta. Pero hay que mirarlo desde el lado del inversor: recibe un 10 % anual **solo si vende él mismo los huevos**, y recupera su capital en pesos fijos, que con el tiempo valen menos. Puede que no le cierre. Dos salidas intermedias: 15 % el primer año y 10 % después; o 10 % con la recompra ajustada por inflación (en unidades indexadas).
 
 ### Lo que ya está definido (Ramón, 13/11)
@@ -144,10 +146,20 @@ En ningún caso son 7 huevos por día: para eso las 50 gallinas tendrían que po
 
 Lo que contó Ramón: ella presta la plata; se le devuelve con el 15 % de todo lo que produzca el predio, y cuando se terminó de pagar queda un 10 % como arriendo. Es un esquema claro y sano. Falta escribir:
 
-1. **Cuánto prestó** (y que la lista de lo que pagó esté firmada).
+1. **Cuánto prestó:** 4.340 (Ramón, 13/11). `SUPUESTO`: son dólares, unos **$ 173.600**.
 2. **A qué precio se cuenta lo que recibe** para ir descontando la deuda. Si recibe productos, lo lógico es contarlos al precio de venta: es lo que valen para ella, y la deuda baja más rápido. Si recibe efectivo, se cuenta el efectivo.
 3. **Si la deuda se ajusta** por inflación o queda en pesos fijos.
 4. **Que el 10 % posterior es arriendo** y por cuánto tiempo.
+
+**Cuánto tarda en pagarse.** Depende de cuánto produzca el predio, y conviene mirarlo antes de armar el nodo:
+
+| Si el predio produce por año (a precio de venta) | El 15 % es | La deuda de $ 173.600 se paga en |
+| --- | --- | --- |
+| $ 120.000 (un gallinero de 50 gallinas) | $ 18.000 | casi 10 años |
+| $ 386.000 (unas 160 gallinas, o gallinas más huerta) | $ 58.000 | 3 años |
+| $ 580.000 | $ 87.000 | 2 años |
+
+Con un solo gallinero de 50 gallinas la deuda casi no baja. Para devolverle en un plazo razonable, La Nona tiene que producir bastante más (huerta incluida), o hay que sumar pagos en efectivo. Si en vez de productos se le paga efectivo a $ 4 por huevo, tarda casi el triple.
 
 Con 15 % comprometido sobre todo el predio, ahí hay lugar para un 10 % más como máximo antes de llegar al tope del 25 %.
 
@@ -226,7 +238,6 @@ Sobre cómo encajar los nodos, las opciones son:
 
 Preguntas para el abogado y el contador:
 
-- ¿Qué figura conviene para la central?
 - ¿Cómo se redacta el retorno del inversor de nodo para que sea un contrato privado claro?
 - ¿Cómo se facturan los pagos adelantados (gallinas, saldo en Eggos)?
 - ¿Qué figura rural aplica al anfitrión que presta tierra?
@@ -292,9 +303,9 @@ Respondidas el 13/11: moneda (todo en pesos), pago en efectivo ($ 4 por huevo), 
 
 Siguen abiertas:
 
-1. **Inversor del gallinero:** ¿10 %, 15 % o escalonado? ¿Ya se le habló de 15 %?
-2. **La Nona:** ¿cuánto prestó?
-3. **¿Qué tipo de sociedad es Eggologic** (SAS, SRL, otra)? ¿Hay algo escrito entre Lucas, Cami y vos?
+1. **Los 4.340 de La Nona,** ¿son dólares?
+2. **¿Cuánto va a producir La Nona** y en qué plazo querés devolverle?
+3. ¿Hay algo escrito entre Lucas, Cami y vos sobre cómo se decide?
 4. ¿Quién trabaja en cada nodo y cómo cobra hoy?
 5. ¿Los cerdos van a comer larvas, residuos o alimento comprado?
 

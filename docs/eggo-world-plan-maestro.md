@@ -44,7 +44,7 @@ Cómo apoya la gente: comprando huevos (y pronto verduras y compost), suscribié
 
 | Dato | Valor | Fuente |
 | --- | --- | --- |
-| Costo de producir un huevo | $ 5 a $ 6 (se usa $ 5,50) | Ramón, 13/11 |
+| Costo de producir un huevo | $ 5 a $ 6 (se usa $ 5,50). **No incluye el tiempo de Ramón** | Ramón, 13/11 |
 | Precio de venta hoy | $ 10,67 por huevo (Quincena: 15 huevos a $ 160) | Productos cargados en la app |
 | Margen por huevo | $ 5,17 (48 %) | Cuenta |
 | Producción de una gallina | 200 a 250 huevos por año | Ramón, 13/11 |
@@ -376,10 +376,28 @@ Respondidas el 13/11: precio de la gallina (pesos), entregas, gallinas en postur
 
 Siguen abiertas:
 
-1. **Del costo de $ 5 a $ 6 por huevo,** ¿cuánto es alimento, cuánto la gallina y cuánto trabajo? ¿Incluye tu tiempo?
-2. **¿Sumamos la gallina de un año** (200 huevos, 1.900 Eggos)?
-3. **Mercado Pago:** ¿tenés cuenta de vendedor a nombre de la empresa?
-4. **¿Probamos la adopción sin app,** con 5 o 10 clientes conocidos, antes de construir? (Ver la devolución.)
+1. **¿Sumamos la gallina de un año** (200 huevos, 1.900 Eggos)?
+2. **¿Repo nuevo o carpeta aparte?** (Ver "Antes de construir".)
+
+### Antes de construir
+
+Ramón quiere construir directamente, sin prueba manual previa (13/11). Para arrancar sin frenos hace falta tener listo:
+
+| Qué | Quién | Para qué etapa |
+| --- | --- | --- |
+| Decidir dónde vive el código de la app nueva | Ramón y Marcel | W0 |
+| Proyecto en Google Cloud con el botón "Entrar con Google" (hay guía paso a paso cuando toque) | Ramón | W1 |
+| Emails únicos en la app actual (`ramon` e `info@` comparten uno) | Ramón | W1 |
+| Confirmar la cuenta de vendedor de Mercado Pago a nombre de la SAS y sacar las credenciales de prueba | Ramón | W3 |
+| Consulta con abogado y contador sobre la gallina prepaga y el saldo en Eggos | Ramón | Antes de cobrar la primera gallina |
+| Dominio `mundo.eggologic.org` | Ramón | W1 |
+
+**Dónde vive el código.** Dos opciones:
+
+- **Repo nuevo `eggo-world`:** la separación más clara. Ramón tiene que crearlo y dar acceso.
+- **Carpeta `eggo-world/` dentro del repo actual:** igual de separada en la práctica (su propio proyecto, sin mezclarse con Django), se publica aparte en Render, y se puede arrancar ya. Si después se quiere, se pasa a un repo propio.
+
+Sugerencia: la carpeta, para no perder tiempo; Marcel decide si prefiere el repo.
 
 ## 13. Puntos para Marcel
 
