@@ -243,10 +243,10 @@ En lugar de pestañas, se toca un objeto del dibujo. Cada uno lleva un cartelito
 | --- | --- |
 | **Gallinero** | Mis gallinas (nombre, huevos puestos, producción, sanidad) y adoptar otra |
 | **Nido y maple** | Mis huevos: cosechar y pedir la quincena o el maple |
-| **Puesto de feria** | Tienda: huevos, verduras, compost, suscripción, mis pedidos |
+| **Granero** | Tienda: huevos, verduras, compost, recargar Eggos, mis pedidos |
 | **Balde de residuos** | Pedir un levante y ver cómo va (pedido → retirado → procesando → larvas listas) |
-| **Pizarrón** | Mi impacto |
-| **Buzón** | Mi cuenta, mis Eggos y sus movimientos, ayuda |
+| **Brote** | Mi impacto |
+| **Casita** | Mi cuenta, mis Eggos y sus movimientos, insignia de socio, ayuda |
 
 Arriba, siempre a la vista: el saldo de Eggos y los huevos acumulados.
 
@@ -261,7 +261,7 @@ Al tocar un objeto, sube un **panel** desde abajo que ocupa unos tres cuartos de
 - **El comportamiento de la gallina es una lista corta de estados** (caminar, picotear, perseguir un bichito, echarse, dormir) que se eligen al azar cada pocos segundos. Son unas cien líneas en un solo archivo.
 - **Menos código que con pestañas:** no hay navegación entre pantallas.
 
-Para restaurantes es la misma chacra; el balde es más grande y el pizarrón muestra sus Rescates.
+Para restaurantes es la misma chacra; el balde es más grande y el brote muestra sus Rescates.
 
 **Una aclaración sobre Google y la tarjeta:** entrar con Google crea la cuenta en un toque, pero no trae la tarjeta. Lo que hace rápido el pago es Mercado Pago: quien ya tiene cuenta ahí paga con la tarjeta que tiene guardada, sin escribirla.
 
@@ -480,19 +480,90 @@ Siguen abiertas:
 
 No quedan preguntas que frenen el plan. Para confirmar al pasar: el precio de la gallina mensual ($ 170 por mes).
 
-### Antes de construir
+### Revisión antes de construir (13/11)
 
-Ramón quiere construir directamente, sin prueba manual previa (13/11). Para arrancar sin frenos hace falta tener listo:
+Repaso de todo el plan contra el código de la app actual.
 
-| Qué | Quién | Para qué etapa |
-| --- | --- | --- |
-| Proyecto en Google Cloud con el botón "Entrar con Google" (hay guía paso a paso cuando toque) | Ramón | W1 |
-| Emails únicos en la app actual (`ramon` e `info@` comparten uno) | Ramón | W1 |
-| Confirmar la cuenta de vendedor de Mercado Pago a nombre de la SAS y sacar las credenciales de prueba | Ramón | W3 |
-| Consulta con abogado y contador sobre la gallina prepaga y el saldo en Eggos | Ramón | Antes de cobrar la primera gallina |
-| Dominio `mundo.eggologic.org` | Ramón | W1 |
+#### Los sistemas que hay que construir
 
-**Dónde vive el código (Ramón lo dejó a criterio de Claude, 13/11):** en una **carpeta `eggo-world/` dentro del repo actual**. Queda igual de separada (es un proyecto propio, no se mezcla con Django), se publica aparte en Render y se puede arrancar sin esperar un repo nuevo. Si Marcel prefiere un repo propio, se mueve la carpeta tal cual.
+**En la app actual (Django), como apps nuevas y aisladas:**
+
+| Sistema | Qué hace |
+| --- | --- |
+| `api/` | La puerta de entrada de Eggo World. Entrar con Google o con email |
+| `eggos/` | Saldo y movimientos, recargas en paquetes, 3 % de vuelta, los dos precios, la insignia de socio y sus ventajas |
+| `mundo/` | Gallinas adoptadas (dos años, un año, mensual), huevos que se acumulan, canje, larvas y bono de producción, levantes de residuos |
+| Pagos | Mercado Pago: pago único, recarga y suscripción mensual |
+
+**En la app actual, tocando lo que ya existe (cada cosa en su PR):**
+
+| Dónde | Cambio |
+| --- | --- |
+| `captura` | El **nodo** y la **producción por período** (decisión del 24/10), con la cantidad de gallinas en postura de cada gallinero. Es la base del cupo de adopciones |
+| `captura` | Levantes de hogares: hoy un retiro solo puede ser de un restaurante |
+| `tienda` | Productos que no son huevos (hoy "huevos por unidad" es obligatorio), los dos precios, pago con Eggos, con huevos de la gallina y con Mercado Pago, y disponibilidad |
+| `impacto` | Rescates en lugar de "Eggos" para el restaurante; larvas por lote |
+| Pantallas de administración | Ver secciones de abajo |
+
+**La app nueva:** carpeta `eggo-world/` con la chacra, los paneles y el arte.
+
+**Configuración:** sitio estático en Render, dominio, credenciales de Google y de Mercado Pago.
+
+#### Cómo queda acoplado a la app de hoy
+
+- **Una sola base y un solo login.** Un cliente de hoy entra a Eggo World con su email y encuentra sus pedidos.
+- **Un pedido es un pedido.** Lo que se compra en Eggo World aparece en la pantalla de Pedidos de siempre, y quien reparte lo marca entregado igual que hoy.
+- **Un levante es un retiro.** Lo que pide un cliente le aparece al chofer en su pantalla de retiros.
+- **La producción real respalda todo.** El cupo de gallinas sale de las gallinas en postura cargadas por nodo; el tablero muestra huevos adeudados contra producción.
+- **Lo que administra Eggologic se hace en la app actual,** no en Eggo World. Pantallas nuevas para administración:
+  - confirmar pagos por transferencia (recargas y gallinas);
+  - adopciones: quién tiene qué gallina y cuántos huevos se le deben;
+  - levantes pedidos;
+  - disponibilidad de la semana por producto;
+  - tablero "Economía de Eggos";
+  - socios del mes.
+- **Planillas.** La app ya exporta retiros, lotes y granja en CSV, que abre Excel. Se suman, con el mismo formato (`SUPUESTO`): ventas y pedidos, recargas y movimientos de Eggos, adopciones y huevos adeudados, y levantes. Sirven para el contador y para ANDE.
+- **Guardian no se toca.** Lo de Eggo World no va al registro.
+- **`main` se publica sola en Render.** Todo entra por PR, con tests y con el interruptor `EGGO_WORLD_ACTIVO` apagado hasta que Ramón lo prenda.
+
+#### Estado de la app actual
+
+- 93 tests; **2 fallan** (el registro y `crear_admin`), ya conocidos de antes.
+- En `tienda/views.py` se usa `Http404` sin importarlo: si alguien sin permiso intenta marcar un pedido como entregado, da error 500 en vez de un aviso.
+- `ramon` e `info@` comparten email: hay que resolverlo antes del login con Google.
+
+Conviene arreglar estas tres cosas en un PR corto antes de empezar.
+
+#### Lo que falta definir
+
+Cambian el diseño:
+
+1. **Disponibilidad.** La app no sabe cuántos huevos hay para vender, y la prioridad de los socios depende de eso. Propuesta: Ramón carga cada semana cuántos huevos hay disponibles; los socios pueden pedir un día antes que el resto.
+2. **Levantes de hogares.** ¿Quién pesa el balde y cuándo? Propuesta: el chofer lo pesa al retirarlo (como hace hoy con los bultos) y eso alcanza; no pasa por la clasificación de planta. Se retira en el mismo viaje que entrega huevos.
+3. **Cuándo llegan las larvas.** Propuesta: 14 días después del levante, fijo. La alternativa es atarlo a la cosecha real del lote, que es más fiel pero más complicado.
+4. **Días y zonas de reparto.** ¿Hay días fijos? La app necesita decirle al cliente cuándo le llega.
+5. **Restaurantes.** Propuesta: Eggo World arranca solo para consumidores; El Popu sigue en la app actual hasta la etapa W4.
+6. **Qué planillas usa hoy Ramón** fuera de la app, para ver si alguna tiene que salir de acá.
+
+Menores (se deciden al construir y se marcan `SUPUESTO`):
+
+- Precio de la gallina mensual ($ 170).
+- Qué pasa cuando termina la gallina: se ofrece renovar.
+- Devoluciones: la mensual se corta cuando quiera; las prepagas no se devuelven, salvo los huevos que Eggologic no pueda entregar.
+- Avisos: por email al principio (el correo ya funciona).
+- Textos de términos y de privacidad: los redacta Claude y los revisa el abogado.
+- Verduras: se definen en la etapa W5 (por unidad, por kilo o por canasta).
+
+#### Lo que Ramón tiene que tener listo
+
+| Qué | Para qué etapa |
+| --- | --- |
+| Proyecto en Google Cloud con el botón "Entrar con Google" (hay guía paso a paso cuando toque) | W1 |
+| Dominio `mundo.eggologic.org` | W1 |
+| Cuenta de vendedor de Mercado Pago a nombre de la SAS y credenciales de prueba | W3 |
+| Cantidad de gallinas en postura por gallinero | W2 |
+
+**Dónde vive el código (Ramón lo dejó a criterio de Claude, 13/11):** en una **carpeta `eggo-world/` dentro del repo actual**. Queda igual de separada (es un proyecto propio, no se mezcla con Django), se publica aparte en Render y se puede arrancar ya. Si Marcel prefiere un repo propio, se mueve la carpeta tal cual.
 
 ## 13. Puntos para Marcel
 
