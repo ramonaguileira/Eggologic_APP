@@ -14,7 +14,7 @@
       <thead>
         <tr>
           <th>N.º</th><th>Fecha</th><th>Restaurante</th><th>kg levantados</th>
-          <th>Impropios</th><th>Vegetales</th><th>Plato</th><th>Fotos</th><th>Ubicación</th><th>Lote</th><th></th>
+          <th>Impropios</th><th>Vegetales</th><th>Plato</th><th>Fotos</th><th>Ubicación</th><th></th>
         </tr>
       </thead>
       <tbody>
@@ -40,7 +40,6 @@
                 <a href="https://www.openstreetmap.org/?mlat={{ retiro.latitud|stringformat:'f' }}&mlon={{ retiro.longitud|stringformat:'f' }}#map=18/{{ retiro.latitud|stringformat:'f' }}/{{ retiro.longitud|stringformat:'f' }}" target="_blank" rel="noopener">Mapa</a>
               {% else %}—{% endif %}
             </td>
-            <td>{{ retiro.lote_id|default:"—" }}</td>
             <td>
               {% if retiro.en_carga %}
                 {% if user.puede_retirar %}<a href="{% url 'captura:retiro_bultos' retiro.pk %}">Seguir</a>{% endif %}
@@ -50,7 +49,7 @@
             </td>
           </tr>
         {% empty %}
-          <tr><td colspan="11" class="tenue">Todavía no hay retiros.</td></tr>
+          <tr><td colspan="10" class="tenue">Todavía no hay retiros.</td></tr>
         {% endfor %}
       </tbody>
     </table>

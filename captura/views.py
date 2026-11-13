@@ -36,19 +36,16 @@ def panel(request):
     # El % de impropios se calcula solo sobre los retiros que ya están clasificados.
     if retiros["levantado_clasificado"]:
         retiros["pct_impropios"] = retiros["impropios"] / retiros["levantado_clasificado"] * 100
-    lotes = Lote.objects.filter(fecha_cosecha__gte=desde.date()).aggregate(
-        larvas=Sum("kg_larvas"), frass=Sum("kg_frass")
+    larvas = Lote.objects.filter(fecha_inicio__gte=desde.date()).aggregate(
+        bateas=Sum("bandejas"), g_huevos=Sum("g_neonatos")
     )
-    granja = RegistroGranja.objects.filter(fecha__gte=desde.date()).aggregate(
-        huevos_producidos=Sum("huevos"), larvas_usadas=Sum("kg_larvas")
-    )
+    granja = RegistroGranja.objects.filter(fecha__gte=desde.date()).aggregate(huevos_producidos=Sum("huevos"))
     contexto = {
         "dias": DIAS_DEL_PANEL,
         "retiros": retiros,
-        "lotes": lotes,
+        "larvas": larvas,
         "granja": granja,
         "sin_clasificar": Retiro.objects.filter(kg_impropios=None).count(),
-        "lotes_en_curso": Lote.objects.filter(fecha_cosecha=None).prefetch_related("retiros"),
         "restaurantes": Restaurante.objects.order_by("codigo"),
     }
     return render(request, "captura/panel.html", contexto)
@@ -86,7 +83,7 @@ def _leer_fecha(texto):
 def retiros(request):
     # Al contar los bultos, Django deja de aplicar el orden del modelo: hay que pedirlo.
     lista = (
-        Retiro.objects.select_related("restaurante", "lote")
+        Retiro.objects.select_related("restaurante")
         .annotate(cantidad_bultos=Count("bultos"))
         .order_by("-fecha")[:CANTIDAD_EN_LISTAS]
     )
@@ -95,13 +92,13 @@ def retiros(request):
 
 @requiere(Usuario.puede_ver_retiros_y_lotes)
 def lotes(request):
-    lista = Lote.objects.prefetch_related("retiros")[:CANTIDAD_EN_LISTAS]
+    lista = Lote.objects.all()[:CANTIDAD_EN_LISTAS]
     return render(request, "captura/lotes.html", {"lotes": lista})
 
 
 @requiere(Usuario.puede_ver_granja)
 def granja(request):
-    lista = RegistroGranja.objects.select_related("lote")[:CANTIDAD_EN_LISTAS]
+    lista = RegistroGranja.objects.select_related("granja")[:CANTIDAD_EN_LISTAS]
     return render(request, "captura/granja.html", {"registros": lista})
 
 
@@ -202,25 +199,25 @@ def bulto_foto(request, pk):
 @requiere(Usuario.puede_clasificar)
 def lote_nuevo(request):
     lote = Lote(registrado_por=request.user)
-    return _formulario(request, LoteForm, lote, "Nuevo lote", "captura:lotes")
+    return _formulario(request, LoteForm, lote, "Larvas de la semana", "captura:lotes")
 
 
 @requiere(Usuario.puede_clasificar)
 def lote_editar(request, pk):
     lote = get_object_or_404(Lote, pk=pk)
-    return _formulario(request, LoteForm, lote, f"Lote N.º {pk}", "captura:lotes")
+    return _formulario(request, LoteForm, lote, f"Larvas N.º {pk}", "captura:lotes")
 
 
 @requiere(Usuario.puede_cargar_granja)
 def granja_nuevo(request):
     registro = RegistroGranja(registrado_por=request.user)
-    return _formulario(request, RegistroGranjaForm, registro, "Registro de granja", "captura:granja")
+    return _formulario(request, RegistroGranjaForm, registro, "Huevos de la granja", "captura:granja")
 
 
 @requiere(Usuario.puede_cargar_granja)
 def granja_editar(request, pk):
     registro = get_object_or_404(RegistroGranja, pk=pk)
-    return _formulario(request, RegistroGranjaForm, registro, "Registro de granja", "captura:granja")
+    return _formulario(request, RegistroGranjaForm, registro, "Huevos de la granja", "captura:granja")
 
 
 # --- Exportación para CarboSur ------------------------------------------------
@@ -372,16 +369,25 @@ def exportar_lotes(request):
 
 @requiere(Usuario.puede_ver_datos)
 def exportar_granja(request):
-    """La granja es una sola para todos los restaurantes: se filtra solo por fecha."""
+    """Las granjas no se separan por restaurante: se filtra solo por la fecha en que termina el período."""
     desde, hasta, _ = _filtros(request)
-    registros = RegistroGranja.objects.order_by("fecha")
+    registros = RegistroGranja.objects.select_related("granja").order_by("fecha")
     if desde:
         registros = registros.filter(fecha__gte=desde)
     if hasta:
         registros = registros.filter(fecha__lte=hasta)
     filas = (
-        [_celda_fecha(g.fecha), g.huevos, _numero(g.kg_larvas), g.lote_id or "", _texto(g.observaciones)]
+        [
+            _celda_fecha(g.fecha),
+            g.huevos,
+            _numero(g.kg_larvas),
+            g.lote_id or "",
+            _texto(g.observaciones),
+            _celda_fecha(g.desde),
+            _texto(g.granja.nombre) if g.granja else "",
+        ]
         for g in registros
     )
-    encabezados = ["fecha", "huevos", "kg_larvas", "lote", "observaciones"]
+    # "fecha" es el último día del período. Las columnas nuevas van al final, para no correr las anteriores.
+    encabezados = ["fecha", "huevos", "kg_larvas", "lote", "observaciones", "desde", "granja"]
     return _respuesta_csv(_nombre_archivo("granja", desde, hasta), encabezados, filas)

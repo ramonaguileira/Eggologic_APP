@@ -1,10 +1,9 @@
 from django import forms
-from django.db.models import Q
 from django.utils import timezone
 
 from cuentas.models import Restaurante
 
-from .models import Bulto, Lote, RegistroGranja, Retiro
+from .models import Bulto, Granja, Lote, RegistroGranja, Retiro
 
 # Los navegadores esperan estos formatos en los campos de fecha nativos.
 CAMPO_FECHA = forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d")
@@ -102,59 +101,23 @@ class RetiroClasificacionForm(forms.ModelForm):
 
 
 class LoteForm(forms.ModelForm):
-    retiros = forms.ModelMultipleChoiceField(
-        queryset=Retiro.objects.none(),
-        widget=forms.CheckboxSelectMultiple,
-        label="Retiros que entran al lote",
-        help_text="Solo aparecen los retiros ya clasificados que no están en otro lote.",
-    )
+    """La carga de larvas de la semana."""
 
     class Meta:
         model = Lote
-        fields = [
-            "fecha_inicio",
-            "bandejas",
-            "g_neonatos",
-            "fecha_cosecha",
-            "kg_larvas",
-            "kg_frass",
-            "observaciones",
-        ]
-        widgets = {
-            "fecha_inicio": CAMPO_FECHA,
-            "fecha_cosecha": CAMPO_FECHA,
-            "observaciones": CAMPO_TEXTO,
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        libres_o_de_este_lote = Q(lote__isnull=True)
-        if self.instance.pk:
-            libres_o_de_este_lote |= Q(lote=self.instance)
-            self.fields["retiros"].initial = self.instance.retiros.all()
-        self.fields["retiros"].queryset = (
-            Retiro.objects.filter(libres_o_de_este_lote)
-            .exclude(kg_impropios=None)
-            .exclude(kg_restos_vegetales=None)
-            .exclude(kg_residuos_plato=None)
-            .select_related("restaurante")
-        )
-
-    def save(self):
-        # Los retiros apuntan al lote, así que primero hay que guardar el lote.
-        lote = super().save()
-        elegidos = self.cleaned_data["retiros"]
-        lote.retiros.exclude(pk__in=elegidos).update(lote=None)
-        elegidos.update(lote=lote)
-        return lote
+        fields = ["fecha_inicio", "g_neonatos", "bandejas", "observaciones"]
+        widgets = {"fecha_inicio": CAMPO_FECHA, "observaciones": CAMPO_TEXTO}
+        help_texts = {"g_neonatos": "Si esta semana no llegaron, poné 0."}
 
 
 class RegistroGranjaForm(forms.ModelForm):
     class Meta:
         model = RegistroGranja
-        fields = ["fecha", "huevos", "kg_larvas", "lote", "observaciones"]
-        widgets = {"fecha": CAMPO_FECHA, "observaciones": CAMPO_TEXTO}
+        fields = ["granja", "desde", "fecha", "huevos", "observaciones"]
+        widgets = {"desde": CAMPO_FECHA, "fecha": CAMPO_FECHA, "observaciones": CAMPO_TEXTO}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["lote"].queryset = Lote.objects.filter(fecha_cosecha__isnull=False)
+        self.fields["granja"].queryset = Granja.objects.filter(activa=True)
+        self.fields["granja"].required = True
+        self.fields["desde"].required = True

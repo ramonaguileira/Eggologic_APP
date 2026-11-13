@@ -21,7 +21,7 @@
         {% if user.puede_ver_datos %}<a href="{% url 'captura:panel' %}">Panel</a>{% endif %}
         {% if user.puede_ver_retiros_y_lotes %}
           <a href="{% url 'captura:retiros' %}">Retiros</a>
-          <a href="{% url 'captura:lotes' %}">Lotes</a>
+          <a href="{% url 'captura:lotes' %}">Larvas</a>
         {% elif user.puede_retirar %}
           <a href="{% url 'captura:retiro_nuevo' %}">Nuevo retiro</a>
         {% endif %}

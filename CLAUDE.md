@@ -33,7 +33,7 @@ App piloto de Eggologic (Nodo 1, Maldonado): registra el circuito residuo de res
 - `cuentas/`: usuarios con rol, restaurantes (con código público) y clientes. Cada persona de campo ve solo su tarea (Ramón, 06/10): chofer (solo retiros), planta (clasificación y lotes), granja (registro diario); operador hace todo el campo; CarboSur ve todo sin editar.
 - `captura/`:
   - retiros: el chofer carga kg, foto y GPS automático; la planta clasifica después;
-  - lotes BSF, granja;
+  - larvas (carga semanal: huevos de larva y bateas) y granja (huevos por período y por granja);
   - panel y exportación CSV para CarboSur;
   - informe del circuito (trazabilidad, línea de base, números para ANDE), con código y nombre de cada restaurante (no va a Guardian);
   - fotos de los retiros guardadas en la base (`captura/almacen.py`).
@@ -73,6 +73,7 @@ python manage.py guardian_enviar   # manda a Guardian los reportes revisados (es
 | Datos | Plan de datos tras la auditoría (fases 0 a 5, hasta marzo de 2027) | Fase 0 para revisar y publicada en Render (`docs/plan-datos-fase-0.md`) |
 | Arreglos | Errores y puntos flojos del estudio del 12/11 (`docs/arreglos-13-11.md`) | Para revisar, en la rama `claude/keen-heisenberg-xon3e4` |
 | Bultos y entregas | Retiro por bultos, diferencia a impropios y registrar entrega (`docs/bultos-y-entregas.md`) | Para revisar, en el PR #12 |
+| Larvas y granja | Carga semanal de larvas y huevos por período y por granja (`docs/larvas-y-granja.md`) | Para revisar, en el PR #12 |
 | 5 | Experiencia de cliente y restaurante: más simple, clara y estética en el celular; que el cliente se arregle solo (recuperar contraseña por email, entrar con el email, registro más corto) | Después de la respuesta de Marcel |
 
 Todas las etapas pasan a la revisión de Marcel (`docs/para-marcel.md`).
@@ -173,7 +174,8 @@ Cosas de MGS que aprendimos:
 - **PR #12** (rama `claude/keen-heisenberg-xon3e4`): arreglos, bultos y registrar entrega. Lo aprueba Marcel.
 - **Dolor de Ramón (13/11):** cargar le lleva demasiado. Hay lotes, granja y entregas sin cargar, y residuos que procesó sin pesar. Lo que sigue tiene que hacer la carga más corta, no más completa.
 - **Respuestas de Ramón (13/11):** lo que se procesó sin pesar no se carga, ni como estimación. La fecha del retiro es siempre la de la carga: se carga en el día. La clasificación sigue en su pantalla aparte.
-- **Lo que Ramón anota hoy (13/11):** de las larvas, por semana, los huevos de larva que recibió y cuántas bateas armó (de 7 a 10 kg cada una). De la granja, la producción de huevos y de qué granja vino: Camino Verde o Igusquiza (que todavía no empezó). Falta confirmar unidades antes de rehacer los formularios de lotes y granja.
-- **Orden de lo que sigue:** clasificación con foto; granja por período con varios lotes; Eggos en pantalla para el restaurante.
+- **Larvas y granja (13/11):** de las larvas se anota, por semana, los huevos de larva recibidos (en gramos) y las bateas armadas; cada batea lleva de 7 a 10 kg de residuo mezclado con afrechillo. De la granja, los huevos de un período y de qué granja vinieron. Camino Verde e Igusquiza son las granjas donde están las gallinas; las larvas se crían en la planta de Ramón. Reemplaza los puntos 4 y 5 del 24/10.
+- **Trazabilidad por lote:** se deja de anotar por ahora (retiros de cada lote, cosecha, kg de larvas a las gallinas). Los campos quedan en la base, sin uso.
+- **Orden de lo que sigue:** foto en la clasificación; Eggos en pantalla para el restaurante.
 
 **Restaurantes nuevos (resolución temporal, 06/10).** Se cargan en la app desde el primer día; el usuario en Guardian se crea cuando entran en serio al piloto, con el alta solo con el código. Mientras tanto sus meses esperan en **Reportes**. No habrá restaurantes nuevos antes del 19/10.

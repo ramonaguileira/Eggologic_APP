@@ -45,21 +45,18 @@ def emisiones_evitadas(kg_organicos):
 
 
 def factores_del_circuito():
-    """Cuánto residuo y cuánta larva hay, en promedio, detrás de cada huevo. None si faltan datos."""
+    """Cuánto residuo hay, en promedio, detrás de cada huevo. None si faltan datos."""
     kg_organicos = Retiro.objects.aggregate(total=Sum(KG_ORGANICOS))["total"]
-    granja = RegistroGranja.objects.aggregate(huevos=Sum("huevos"), larvas=Sum("kg_larvas"))
-    if not kg_organicos or not granja["huevos"]:
+    huevos = RegistroGranja.objects.aggregate(total=Sum("huevos"))["total"]
+    if not kg_organicos or not huevos:
         return None
-    return {
-        "kg_residuo_por_huevo": kg_organicos / granja["huevos"],
-        "g_larva_por_huevo": granja["larvas"] * 1000 / granja["huevos"],
-    }
+    return {"kg_residuo_por_huevo": kg_organicos / huevos}
 
 
 def totales_de_la_comunidad():
     return {
         "kg_rescatados": Retiro.objects.aggregate(total=Sum(KG_ORGANICOS))["total"] or 0,
-        "kg_larvas": Lote.objects.aggregate(total=Sum("kg_larvas"))["total"] or 0,
+        "bateas": Lote.objects.aggregate(total=Sum("bandejas"))["total"] or 0,
         "huevos": RegistroGranja.objects.aggregate(total=Sum("huevos"))["total"] or 0,
         "restaurantes": Retiro.objects.values("restaurante").distinct().count(),
     }
@@ -124,7 +121,6 @@ def impacto_de_compras(usuario, factores):
     return {
         "huevos": huevos,
         "kg_rescatados": huevos * factores["kg_residuo_por_huevo"] if factores else None,
-        "kg_larva": huevos * factores["g_larva_por_huevo"] / 1000 if factores else None,
         "por_mes": serie_mensual(huevos_por_mes),
     }
 
@@ -161,8 +157,8 @@ def impacto_de_entregas(restaurante, factores):
 
 
 def informe(desde, hasta):
-    """Números del circuito entre dos fechas, inclusive: resumen, línea de base por restaurante
-    y trazabilidad por lote.
+    """Números del circuito entre dos fechas, inclusive: resumen, línea de base por restaurante,
+    larvas y huevos por granja.
 
     Va a salir de la app (ANDE, CarboSur). Lleva el nombre de los restaurantes (decisión de Ramón,
     06/10): no va a Guardian, donde solo va el código.
@@ -175,23 +171,19 @@ def informe(desde, hasta):
         impropios=Sum("kg_impropios"),
         organicos=Sum(KG_ORGANICOS),
     )
-    cosecha = Lote.objects.filter(fecha_cosecha__range=(desde, hasta)).aggregate(
-        cantidad=Count("id"), larvas=Sum("kg_larvas"), frass=Sum("kg_frass")
-    )
-    granja = RegistroGranja.objects.filter(fecha__range=(desde, hasta)).aggregate(
-        huevos=Sum("huevos"), larvas=Sum("kg_larvas")
-    )
+    larvas = Lote.objects.filter(fecha_inicio__range=(desde, hasta))
+    de_larvas = larvas.aggregate(bateas=Sum("bandejas"), g_huevos=Sum("g_neonatos"))
+    # SUPUESTO: un período de granja cuenta entero en el informe donde cae su último día.
+    granja = RegistroGranja.objects.filter(fecha__range=(desde, hasta))
     clasificado = totales["levantado_clasificado"]
     resumen = {
         "retiros": totales["cantidad"],
         "kg_levantados": totales["levantado"] or 0,
         "kg_organicos": totales["organicos"] or 0,
         "pct_impropios": totales["impropios"] * 100 / clasificado if clasificado else None,
-        "lotes_cosechados": cosecha["cantidad"],
-        "kg_larvas": cosecha["larvas"] or 0,
-        "kg_frass": cosecha["frass"] or 0,
-        "huevos": granja["huevos"] or 0,
-        "kg_larvas_a_gallinas": granja["larvas"] or 0,
+        "bateas": de_larvas["bateas"] or 0,
+        "g_huevos_larva": de_larvas["g_huevos"] or 0,
+        "huevos": granja.aggregate(total=Sum("huevos"))["total"] or 0,
         "tco2e_provisorio": emisiones_evitadas(totales["organicos"] or Decimal("0"))["neto"],
     }
 
@@ -213,17 +205,10 @@ def informe(desde, hasta):
         total = (fila["levantado_con_linea_base"] or 0) + (fila["no_ingresa"] or 0)
         fila["pct_a_eggologic"] = fila["levantado_con_linea_base"] * 100 / total if fila["con_linea_base"] and total else None
 
-    lotes = []
-    for lote in Lote.objects.filter(fecha_inicio__range=(desde, hasta)).prefetch_related(
-        "retiros__restaurante", "registros_granja"
-    ).order_by("fecha_inicio", "id"):
-        registros = lote.registros_granja.all()
-        lotes.append({
-            "lote": lote,
-            "retiros": len(lote.retiros.all()),
-            "restaurantes": sorted({retiro.restaurante.codigo for retiro in lote.retiros.all()}),
-            # SUPUESTO: los huevos de un día se atribuyen al lote del que salieron las larvas de ese día.
-            "huevos": sum(registro.huevos for registro in registros),
-            "kg_larvas_a_gallinas": sum((registro.kg_larvas for registro in registros), Decimal("0")),
-        })
-    return {"resumen": resumen, "restaurantes": restaurantes, "lotes": lotes}
+    granjas = granja.order_by("granja__nombre").values("granja__nombre").annotate(huevos=Sum("huevos"))
+    return {
+        "resumen": resumen,
+        "restaurantes": restaurantes,
+        "larvas": larvas.order_by("fecha_inicio", "id"),
+        "granjas": list(granjas),
+    }

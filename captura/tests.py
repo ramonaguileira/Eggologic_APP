@@ -12,8 +12,8 @@ from django.utils import timezone
 
 from cuentas.models import Restaurante, Usuario
 
-from .forms import LoteForm, RegistroGranjaForm
-from .models import Archivo, Bulto, Lote, RegistroGranja, Retiro
+from .forms import RegistroGranjaForm
+from .models import Archivo, Bulto, Granja, Lote, RegistroGranja, Retiro
 
 
 class DatosDePrueba(TestCase):
@@ -89,54 +89,56 @@ class LoteTests(DatosDePrueba):
             lote.full_clean()
 
 
-class LoteFormTests(DatosDePrueba):
-    def datos(self, retiros):
-        return {
-            "fecha_inicio": "2026-10-05",
-            "bandejas": "4",
-            "g_neonatos": "8",
-            "retiros": [r.pk for r in retiros],
-        }
-
-    def test_solo_ofrece_retiros_clasificados_y_libres(self):
-        libre = self.crear_retiro("40", (Decimal("1"), Decimal("20"), Decimal("19")))
-        sin_clasificar = self.crear_retiro("30")
-        otro_lote = Lote.objects.create(registrado_por=self.operador, bandejas=1, g_neonatos=Decimal("2"))
-        ocupado = self.crear_retiro("20", (Decimal("0"), Decimal("10"), Decimal("10")), lote=otro_lote)
-
-        ofrecidos = set(LoteForm().fields["retiros"].queryset)
-
-        self.assertIn(libre, ofrecidos)
-        self.assertNotIn(sin_clasificar, ofrecidos)
-        self.assertNotIn(ocupado, ofrecidos)
-
-    def test_guardar_asigna_y_libera_retiros(self):
-        primero = self.crear_retiro("40", (Decimal("1"), Decimal("20"), Decimal("19")))
-        segundo = self.crear_retiro("30", (Decimal("1"), Decimal("15"), Decimal("14")))
-
-        form = LoteForm(self.datos([primero, segundo]), instance=Lote(registrado_por=self.operador))
-        self.assertTrue(form.is_valid(), form.errors)
-        lote = form.save()
-        self.assertEqual(set(lote.retiros.all()), {primero, segundo})
-
-        form = LoteForm(self.datos([primero]), instance=lote)
-        self.assertTrue(form.is_valid(), form.errors)
-        form.save()
-        segundo.refresh_from_db()
-        self.assertIsNone(segundo.lote)
+class LarvasTests(DatosDePrueba):
+    def test_la_carga_de_la_semana_pide_solo_huevos_de_larva_y_bateas(self):
+        self.client.force_login(self.operador)
+        respuesta = self.client.post(
+            reverse("captura:lote_nuevo"), {"fecha_inicio": "2026-11-13", "g_neonatos": "5", "bandejas": "6"}
+        )
+        self.assertRedirects(respuesta, reverse("captura:lotes"))
+        lote = Lote.objects.get()
+        self.assertEqual((lote.g_neonatos, lote.bandejas, lote.registrado_por), (Decimal("5"), 6, self.operador))
+        self.assertContains(self.client.get(reverse("captura:lotes")), "Bateas armadas")
 
 
 class RegistroGranjaTests(DatosDePrueba):
-    def test_un_solo_registro_por_dia(self):
-        RegistroGranja.objects.create(
-            registrado_por=self.operador, fecha=date(2026, 10, 5), huevos=180, kg_larvas=Decimal("3")
+    def setUp(self):
+        super().setUp()
+        self.camino_verde = Granja.objects.get(nombre="Camino Verde")
+        self.igusquiza = Granja.objects.get(nombre="Igusquiza")
+
+    def form(self, granja, desde, hasta, huevos="300"):
+        datos = {"granja": granja.pk, "desde": desde, "fecha": hasta, "huevos": huevos}
+        return RegistroGranjaForm(datos, instance=RegistroGranja(registrado_por=self.operador))
+
+    def test_huevos_de_un_periodo_y_de_una_granja(self):
+        self.client.force_login(self.operador)
+        respuesta = self.client.post(
+            reverse("captura:granja_nuevo"),
+            {"granja": self.camino_verde.pk, "desde": "2026-10-01", "fecha": "2026-10-30", "huevos": "1200"},
         )
-        form = RegistroGranjaForm(
-            {"fecha": "2026-10-05", "huevos": "175", "kg_larvas": "2.5"},
-            instance=RegistroGranja(registrado_por=self.operador),
-        )
+        self.assertRedirects(respuesta, reverse("captura:granja"))
+        registro = RegistroGranja.objects.get()
+        self.assertEqual((registro.granja, registro.desde, registro.fecha), (self.camino_verde, date(2026, 10, 1), date(2026, 10, 30)))
+        self.assertContains(self.client.get(reverse("captura:granja")), "01/10 al 30/10/2026")
+
+    def test_dos_cargas_de_la_misma_granja_no_se_pisan(self):
+        self.assertTrue(self.form(self.camino_verde, "2026-10-01", "2026-10-15").is_valid())
+        self.form(self.camino_verde, "2026-10-01", "2026-10-15").save()
+        pisada = self.form(self.camino_verde, "2026-10-15", "2026-10-31")
+        self.assertFalse(pisada.is_valid())
+        self.assertIn("Ya hay huevos cargados de esa granja", str(pisada.errors))
+        # La otra granja sí puede cargar los mismos días, y la misma granja, los días siguientes.
+        self.assertTrue(self.form(self.igusquiza, "2026-10-01", "2026-10-15").is_valid())
+        self.assertTrue(self.form(self.camino_verde, "2026-10-16", "2026-10-31").is_valid())
+
+    def test_el_periodo_no_puede_terminar_antes_de_empezar(self):
+        self.assertFalse(self.form(self.camino_verde, "2026-10-15", "2026-10-01").is_valid())
+
+    def test_hay_que_elegir_la_granja_y_el_inicio(self):
+        form = RegistroGranjaForm({"fecha": "2026-10-15", "huevos": "10"}, instance=RegistroGranja(registrado_por=self.operador))
         self.assertFalse(form.is_valid())
-        self.assertIn("fecha", form.errors)
+        self.assertEqual(set(form.errors), {"granja", "desde"})
 
 
 class VistasTests(DatosDePrueba):
@@ -444,7 +446,7 @@ class FaseCeroTests(DatosDePrueba):
         RegistroGranja.objects.create(registrado_por=self.operador, fecha=date(2026, 9, 5), huevos=100, kg_larvas=Decimal("2"))
         RegistroGranja.objects.create(registrado_por=self.operador, fecha=date(2026, 10, 5), huevos=90, kg_larvas=Decimal("2"))
         respuesta, filas = self.exportar("captura:exportar_granja", desde="2026-09-01", hasta="2026-09-30", restaurante="R-001")
-        self.assertEqual(filas, ["2026-09-05;100;2,00;;"])
+        self.assertEqual(filas, ["2026-09-05;100;2,00;;;;"])
         self.assertIn('filename="granja_2026-09-01_2026-09-30.csv"', respuesta["Content-Disposition"])
 
     def test_un_texto_que_parece_formula_sale_escapado(self):

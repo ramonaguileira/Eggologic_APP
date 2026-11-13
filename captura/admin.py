@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Bulto, Lote, RegistroGranja, Retiro
+from .models import Bulto, Granja, Lote, RegistroGranja, Retiro
 
 
 class RegistroAdmin(admin.ModelAdmin):
@@ -41,5 +41,11 @@ class LoteAdmin(RegistroAdmin):
 
 @admin.register(RegistroGranja)
 class RegistroGranjaAdmin(RegistroAdmin):
-    list_display = ["fecha", "huevos", "kg_larvas", "lote"]
+    list_display = ["fecha", "desde", "granja", "huevos"]
     date_hierarchy = "fecha"
+
+
+@admin.register(Granja)
+class GranjaAdmin(admin.ModelAdmin):
+    list_display = ["nombre", "activa"]
+    list_editable = ["activa"]
