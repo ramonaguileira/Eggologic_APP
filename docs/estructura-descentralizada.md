@@ -157,10 +157,9 @@ Lo que contó Ramón: ella presta la plata; se le devuelve con el 15 % de todo l
 | --- | --- |
 | Producción | 60 huevos por día: unos 21.900 por año |
 | 15 % para La Nona | 3.285 huevos por año (9 por día) |
-| Contados a precio de venta | $ 35.000 por año: la deuda se paga en **5 años** |
-| Contados a $ 4 (efectivo) | $ 13.000 por año: 13 años |
+| Cada huevo descuenta $ 10 de la deuda (Ramón, 13/11) | $ 32.850 por año: la deuda se paga en **poco más de 5 años** |
 
-Entra en el plazo que quiere Ramón **si lo que ella recibe se cuenta a precio de venta**. Por eso importa dejar escrito a qué precio se cuenta. Lo que sume la huerta acorta el plazo.
+Entra en el plazo de 4 a 8 años que quiere Ramón. Lo que sume la huerta lo acorta; falta definir a qué valor se cuentan las verduras.
 
 Con 15 % comprometido sobre todo el predio, ahí hay lugar para un 10 % más como máximo antes de llegar al tope del 25 %.
 
@@ -304,7 +303,7 @@ Respondidas el 13/11: moneda (todo en pesos), pago en efectivo ($ 4 por huevo), 
 
 Siguen abiertas:
 
-1. ¿A qué precio se cuenta lo que recibe La Nona para ir bajando la deuda?
+1. ¿A qué valor se cuentan las verduras que reciba La Nona?
 2. ¿Hay algo escrito entre Lucas, Cami y vos sobre cómo se decide?
 3. ¿Quién trabaja en cada nodo y cómo cobra hoy?
 4. ¿Los cerdos van a comer larvas, residuos o alimento comprado?
