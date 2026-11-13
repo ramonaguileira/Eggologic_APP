@@ -78,7 +78,9 @@ Es el único problema que no se arregla con una fórmula. La Caja arranca con sa
 - que faltan ingresos cargados en Caja, o
 - que se pagaron gastos con plata de otro bolsillo.
 
-Hay que revisar movimiento por movimiento contra el banco o el efectivo. **Pregunta para Ramón.**
+Hay que revisar movimiento por movimiento contra el banco o el efectivo.
+
+Lo que se ve en la planilla (13/11): la Caja tiene 156 movimientos y el último es del 07/10, mientras que Ingresos y Egresos llegan a noviembre. Sus egresos suman 905.070, más que los 786.211 pagados en la hoja Egresos. Falta cargar lo posterior al 07/10 y conciliar la diferencia.
 
 ## Etapa B: datos a completar
 
@@ -97,20 +99,24 @@ Hay que revisar movimiento por movimiento contra el banco o el efectivo. **Pregu
 - saldo acumulado del 10%, con el arrastre entre períodos;
 - aviso cuando las chicas retiraron de más.
 
-**Propuesta de diseño (SUPUESTO, la confirma Ramón):**
+**Decisiones de Ramón (13/11):**
 
-1. Un modelo nuevo `PeriodoHuevos` (desde, hasta, cosechados, retira Ramón, retiran chicas, descartados), con una validación: lo que se retira más lo descartado no puede superar lo cosechado.
-2. La tasa del 10% vive en un solo lugar, `impacto/calculos.py` o una constante de configuración, no en el modelo.
-3. El saldo se calcula, no se guarda: 10% de lo cosechado de todos los períodos, menos lo retirado por las chicas.
-4. El saldo se muestra en la pantalla de granja, solo para operador y administración. **No va a Guardian ni a "Mi impacto".**
-5. La importación de septiembre a noviembre desde la planilla es opcional y manual (comando de gestión), si Ramón la quiere.
+- Las chicas son Ashley y Fiorella, de Camino Verde. El 10% es un **pago en especie**.
+- El período lo elige Ramón cada vez.
+- La planilla de huevos **se sigue llevando**: es lo que usan con las chicas. La app se conecta a la planilla, no la reemplaza.
 
-**Preguntas para Ramón antes de tocar el código** (cambian el diseño):
+**Propuesta de diseño (SUPUESTO, Ramón corrige):**
 
-1. ¿Quiénes son "las chicas" y el 10% corresponde a todo lo cosechado? ¿Lo regalan o es un pago en especie?
-2. ¿Los huevos de las chicas cuentan como "vendidos" o "entregados" a efectos del impacto y de los Eggos?
-3. ¿Se sigue la planilla como respaldo o se abandona cuando la app la reemplace?
-4. ¿El período lo elige Ramón (por ejemplo del 1 al 30) o hay uno fijo mensual?
+1. Un modelo nuevo `PeriodoHuevos` con desde, hasta, cosechados, retira Ramón, retiran las chicas y descartados. Validación: lo retirado más lo descartado no puede superar lo cosechado.
+2. **Conexión con la planilla:** un botón "Traer de la planilla" que lee la planilla en modo lectura (exportación CSV de la hoja compartida) y suma los días del período elegido. La app **no escribe** en la planilla.
+   - Sin dependencias nuevas ni claves de Google.
+   - Si la planilla cambia de forma, falla con un mensaje claro y se cargan los números a mano.
+   - Alternativa más pesada: la API de Google con cuenta de servicio, que necesita una clave en variables de entorno. Solo si hace falta escribir.
+3. La tasa del 10% vive en un solo lugar (`impacto/calculos.py`).
+4. El saldo se calcula, no se guarda: 10% de lo cosechado de todos los períodos, menos lo retirado por las chicas.
+5. El saldo se ve en la pantalla de granja, solo para operador y administración.
+6. **Privacidad:** los nombres de Ashley y Fiorella quedan solo en la base de la app. A Guardian y a "Mi impacto" no va ningún nombre.
+7. **Impacto (SUPUESTO):** lo que se llevan las chicas cuenta dentro de la producción total de huevos, pero **no** como huevos vendidos o entregados a clientes, ni genera Eggos. En el informe del circuito aparece como línea aparte, "pago en especie".
 
 ## Etapa D: pendientes de la app (ya anotados)
 
