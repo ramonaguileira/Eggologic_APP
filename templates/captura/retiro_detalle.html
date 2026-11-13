@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block titulo %}Retiro N.º {{ retiro.pk }} · Eggologic{% endblock %}
+
+{% block contenido %}
+  <section class="tarjeta angosta">
+    <h1>Retiro N.º {{ retiro.pk }}</h1>
+    <p>{{ retiro.restaurante.nombre }} · {{ retiro.fecha|date:"d/m/Y H:i" }} · <strong>{{ retiro.kg_levantados|floatformat:1 }} kg</strong></p>
+    {% if retiro.en_carga %}<p><span class="etiqueta">En carga</span></p>{% endif %}
+    <ol class="lista">
+      {% for bulto in retiro.bultos.all %}
+        <li><strong>{{ bulto.kg|floatformat:1 }} kg</strong> · <a href="{% url 'captura:bulto_foto' bulto.pk %}" target="_blank">foto</a> · {{ bulto.creado_en|date:"H:i" }}</li>
+      {% empty %}
+        <li class="tenue">Este retiro se cargó sin bultos.</li>
+      {% endfor %}
+    </ol>
+    {% if retiro.observaciones %}<p class="tenue">{{ retiro.observaciones|linebreaksbr }}</p>{% endif %}
+    <a href="{% url 'captura:retiros' %}">Volver a retiros</a>
+  </section>
+{% endblock %}

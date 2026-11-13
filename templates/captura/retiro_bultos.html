@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block titulo %}Retiro en carga · Eggologic{% endblock %}
+
+{% block contenido %}
+  <section class="tarjeta angosta">
+    <h1>Retiro de {{ retiro.restaurante.nombre }}</h1>
+    <p class="total">Total: <strong>{{ retiro.kg_levantados|floatformat:1 }} kg</strong> en {{ retiro.bultos.count }} bulto{{ retiro.bultos.count|pluralize }}</p>
+
+    <ol class="lista">
+      {% for bulto in retiro.bultos.all %}
+        <li>
+          <strong>{{ bulto.kg|floatformat:1 }} kg</strong> ·
+          <a href="{% url 'captura:bulto_foto' bulto.pk %}" target="_blank">foto</a>
+          {% if not forloop.first or not forloop.last %}
+            <form method="post" class="en-linea" onsubmit="return confirm('¿Quitar este bulto de {{ bulto.kg|floatformat:1 }} kg?')">
+              {% csrf_token %}
+              <input type="hidden" name="bulto" value="{{ bulto.pk }}">
+              <button type="submit" name="accion" value="quitar" class="enlace-oscuro">quitar</button>
+            </form>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+
+    <h2>Otro bulto</h2>
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      {% for campo in form %}
+        <div class="campo{% if campo.errors %} con-error{% endif %}">
+          <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+          {{ campo }}
+          {% if campo.errors %}<div class="error">{{ campo.errors }}</div>{% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="boton">+ Agregar bulto</button>
+    </form>
+
+    <hr>
+    <form method="post" onsubmit="return confirm('¿Terminar el retiro con {{ retiro.kg_levantados|floatformat:1 }} kg?')">
+      {% csrf_token %}
+      <button type="submit" name="accion" value="terminar" class="boton">Terminar retiro</button>
+    </form>
+    <p class="tenue">Al terminar, el retiro pasa a la planta para clasificar.</p>
+  </section>
+  <script src="{% static 'js/foto.js' %}" defer></script>
+{% endblock %}

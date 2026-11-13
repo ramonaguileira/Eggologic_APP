@@ -8,7 +8,7 @@
   {% if user.puede_retirar or user.puede_clasificar or user.puede_cargar_granja %}
     <div class="atajos">
       {% if user.puede_retirar %}<a class="boton" href="{% url 'captura:retiro_nuevo' %}">+ Retiro</a>{% endif %}
-      {% if user.puede_clasificar %}<a class="boton" href="{% url 'captura:lote_nuevo' %}">+ Lote</a>{% endif %}
+      {% if user.puede_clasificar %}<a class="boton" href="{% url 'captura:lote_nuevo' %}">+ Larvas</a>{% endif %}
       {% if user.puede_cargar_granja %}<a class="boton" href="{% url 'captura:granja_nuevo' %}">+ Granja</a>{% endif %}
     </div>
   {% endif %}
@@ -19,10 +19,9 @@
     <div class="cifra"><strong>{{ retiros.levantado|default:0|floatformat:1 }}</strong><span>kg levantados</span></div>
     <div class="cifra"><strong>{{ retiros.organicos|default:0|floatformat:1 }}</strong><span>kg orgánicos clasificados</span></div>
     <div class="cifra"><strong>{{ retiros.pct_impropios|default:0|floatformat:1 }} %</strong><span>de impropios</span></div>
-    <div class="cifra"><strong>{{ lotes.larvas|default:0|floatformat:1 }}</strong><span>kg de larvas cosechadas</span></div>
-    <div class="cifra"><strong>{{ lotes.frass|default:0|floatformat:1 }}</strong><span>kg de frass</span></div>
+    <div class="cifra"><strong>{{ larvas.g_huevos|default:0|floatformat:0 }}</strong><span>g de huevos de larva recibidos</span></div>
+    <div class="cifra"><strong>{{ larvas.bateas|default:0 }}</strong><span>bateas de larvas armadas</span></div>
     <div class="cifra"><strong>{{ granja.huevos_producidos|default:0 }}</strong><span>huevos producidos</span></div>
-    <div class="cifra"><strong>{{ granja.larvas_usadas|default:0|floatformat:1 }}</strong><span>kg de larvas a las gallinas</span></div>
   </div>
 
   {% if sin_clasificar %}
@@ -30,21 +29,6 @@
       Hay {{ sin_clasificar }} retiro{{ sin_clasificar|pluralize }} sin clasificar.
       <a href="{% url 'captura:retiros' %}">Ver retiros</a>
     </p>
-  {% endif %}
-
-  <h2>Lotes en curso</h2>
-  {% if lotes_en_curso %}
-    <ul class="lista">
-      {% for lote in lotes_en_curso %}
-        <li>
-          <strong>{{ lote }}</strong>:
-          {{ lote.kg_residuo|floatformat:1 }} kg de residuo, {{ lote.bandejas }} bandeja{{ lote.bandejas|pluralize }}.
-          {% if user.puede_clasificar %}<a href="{% url 'captura:lote_editar' lote.pk %}">Registrar cosecha</a>{% endif %}
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p class="tenue">No hay lotes en curso.</p>
   {% endif %}
 
   <h2>Exportar para CarboSur</h2>
@@ -63,5 +47,5 @@
     <button type="submit" class="boton" formaction="{% url 'captura:exportar_lotes' %}">lotes.csv</button>
     <button type="submit" class="boton" formaction="{% url 'captura:exportar_granja' %}">granja.csv</button>
   </form>
-  <p class="tenue">Sin fechas sale todo el historial. La granja es una sola para todos los restaurantes: su archivo se filtra solo por fecha.</p>
+  <p class="tenue">Sin fechas sale todo el historial. Las granjas no se separan por restaurante: su archivo se filtra solo por fecha.</p>
 {% endblock %}

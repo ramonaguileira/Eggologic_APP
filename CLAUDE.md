@@ -33,7 +33,7 @@ App piloto de Eggologic (Nodo 1, Maldonado): registra el circuito residuo de res
 - `cuentas/`: usuarios con rol, restaurantes (con código público) y clientes. Cada persona de campo ve solo su tarea (Ramón, 06/10): chofer (solo retiros), planta (clasificación y lotes), granja (registro diario); operador hace todo el campo; CarboSur ve todo sin editar.
 - `captura/`:
   - retiros: el chofer carga kg, foto y GPS automático; la planta clasifica después;
-  - lotes BSF, granja;
+  - larvas (carga semanal: huevos de larva y bateas) y granja (huevos por período y por granja);
   - panel y exportación CSV para CarboSur;
   - informe del circuito (trazabilidad, línea de base, números para ANDE), con código y nombre de cada restaurante (no va a Guardian);
   - fotos de los retiros guardadas en la base (`captura/almacen.py`).
@@ -71,6 +71,9 @@ python manage.py guardian_enviar   # manda a Guardian los reportes revisados (es
 | 3 | Guardian | Para revisar; envío de prueba hecho |
 | 4 | Entregables ANDE (demo 19/10/2026) | Para revisar |
 | Datos | Plan de datos tras la auditoría (fases 0 a 5, hasta marzo de 2027) | Fase 0 para revisar y publicada en Render (`docs/plan-datos-fase-0.md`) |
+| Arreglos | Errores y puntos flojos del estudio del 12/11 (`docs/arreglos-13-11.md`) | Para revisar, en la rama `claude/keen-heisenberg-xon3e4` |
+| Bultos y entregas | Retiro por bultos, diferencia a impropios y registrar entrega (`docs/bultos-y-entregas.md`) | Para revisar, en el PR #12 |
+| Larvas y granja | Carga semanal de larvas y huevos por período y por granja (`docs/larvas-y-granja.md`) | Para revisar, en el PR #12 |
 | 5 | Experiencia de cliente y restaurante: más simple, clara y estética en el celular; que el cliente se arregle solo (recuperar contraseña por email, entrar con el email, registro más corto) | Después de la respuesta de Marcel |
 
 Todas las etapas pasan a la revisión de Marcel (`docs/para-marcel.md`).
@@ -150,5 +153,30 @@ Cosas de MGS que aprendimos:
 - **Decisión de Ramón (16/10): el envío a Guardian pasa a ser diario y automático.** A definir antes de programarlo: si se mantiene la revisión humana (P-5) o se reemplaza por alertas; cada envío mintea FGET, y un día de un restaurante puede dar tan pocas tCO2e que el mint redondee a cero según los decimales del token; el automático corre como Cron Job de Render con `guardian_enviar`.
 - Usuarios en línea (14/10): `chofer`, `planta`, `granja`, `carbosur`, `ClienteTest1`, `ramon` e `info@eggologic.org`. `ramon` e `info@` comparten email: cambiar el de `ramon`. Falta el usuario Restaurante de El Popu.
 - Mientras no exista la Fase 1: el chofer carga en kg el neto pesado en planta (bruto − cajones × 2,2 kg), y la planta anota cajones y bruto en observaciones.
+
+**Hallazgos de uso real (Ramón, 24/10, tras dos semanas usando la app).** Decisiones:
+1. **Guardian diario y automático, todos los días a las 18:00** (hora de Montevideo). Se reporta todo, aunque algún dato salga mal: los errores se corrigen con un reporte de corrección, nunca editando el original. Ramón no encontró en la app dónde se enviaba a mano.
+2. **Retiro por bultos:** el chofer pesa de a un cajón (dos bolsas por cajón). Carga cada bulto con su peso, la app los suma, y al final saca una sola foto de todo y envía el retiro.
+3. **Clasificación en planta con kg y foto:** la planta pesa kg de restos vegetales, de residuos de plato y de impropios, sube una foto y envía.
+4. **Producción de huevos por período** (por ejemplo, del 1 al 30 de octubre, o 15 días), no por día. Ramón elige el período.
+5. **Varios lotes de larva por período:** al cargar la producción del período se eligen los lotes que alimentaron a las gallinas.
+
+**Decisiones de Ramón (12 y 13/11).**
+- **El envío a Guardian queda como está:** mensual, por restaurante, con el botón de Reportes. Reemplaza la decisión del envío diario automático. Octubre de R-001 quedó registrado el 12/11 (165,0 kg, 0,05 tCO2e).
+- **A Guardian importa el residuo:** kg levantados e impropios, con vegetales y plato separados. Lotes, granja y ventas quedan en la app.
+- **Tara:** Ramón tara la balanza con un cajón vacío, así que los pesos que se cargan ya son netos. No se descuenta la tara en la app.
+- **App de clientes:** Ramón quiere una app nueva para vender y dar Eggos. Queda para después de los arreglos y de la captura, a diseñar con Marcel; antes hay que definir qué es un Eggo para un cliente. La tienda actual queda mínima.
+- **Factor provisorio y credenciales por variable de entorno:** quedan así por ahora.
+- **Render (reporte del 12/11):** web y base en planes pagos, sin vencimiento. Un solo respaldo, del 05/11. Sin Cron Job. El Blueprint sigue la rama `claude/peaceful-bardeen-4k285s` con sincronización automática, no `main`.
+- **En línea (12/11):** 13 retiros de El Popu, sin lotes, sin registros de granja y sin pedidos. Cada bulto está cargado como un retiro aparte.
+- **Diferencia en la clasificación:** si impropios + vegetales + plato suma menos que lo levantado, la diferencia se carga a impropios como estimación. Vale también para los retiros ya cargados.
+- **Retiro por bultos:** un cajón por vez, cada uno con su peso y su foto, todos en un solo retiro del día. Los 13 retiros anteriores quedan como están.
+- **PR #12** (rama `claude/keen-heisenberg-xon3e4`): arreglos, bultos y registrar entrega. Lo aprueba Marcel.
+- **Dolor de Ramón (13/11):** cargar le lleva demasiado. Hay lotes, granja y entregas sin cargar, y residuos que procesó sin pesar. Lo que sigue tiene que hacer la carga más corta, no más completa.
+- **Respuestas de Ramón (13/11):** lo que se procesó sin pesar no se carga, ni como estimación. La fecha del retiro es siempre la de la carga: se carga en el día. La clasificación sigue en su pantalla aparte.
+- **Larvas y granja (13/11):** de las larvas se anota, por semana, los huevos de larva recibidos (en gramos) y las bateas armadas; cada batea lleva de 7 a 10 kg de residuo mezclado con afrechillo. De la granja, los huevos de un período y de qué granja vinieron. Camino Verde e Eguzquiza son las granjas donde están las gallinas; las larvas se crían en la planta de Ramón. Reemplaza los puntos 4 y 5 del 24/10.
+- **Granjas:** Camino Verde y Eguzquiza (nombre de la ruta que pasa enfrente; también se le dice Miramar Acres, por el barrio, o La Nona). En "Mi impacto", los kg de larvas se estiman a 2 kg por batea.
+- **Trazabilidad por lote:** se deja de anotar por ahora (retiros de cada lote, cosecha, kg de larvas a las gallinas). Los campos quedan en la base, sin uso.
+- **Orden de lo que sigue:** foto en la clasificación; Eggos en pantalla para el restaurante.
 
 **Restaurantes nuevos (resolución temporal, 06/10).** Se cargan en la app desde el primer día; el usuario en Guardian se crea cuando entran en serio al piloto, con el alta solo con el código. Mientras tanto sus meses esperan en **Reportes**. No habrá restaurantes nuevos antes del 19/10.

@@ -30,10 +30,8 @@
     <div class="cifra"><strong>{{ resumen.kg_levantados|floatformat:1 }}</strong><span>kg levantados</span></div>
     <div class="cifra"><strong>{{ resumen.kg_organicos|floatformat:1 }}</strong><span>kg orgánicos a bioconversión</span></div>
     <div class="cifra"><strong>{% if resumen.pct_impropios is not None %}{{ resumen.pct_impropios|floatformat:1 }} %{% else %}—{% endif %}</strong><span>de impropios</span></div>
-    <div class="cifra"><strong>{{ resumen.lotes_cosechados }}</strong><span>lotes BSF cosechados</span></div>
-    <div class="cifra"><strong>{{ resumen.kg_larvas|floatformat:1 }}</strong><span>kg de larvas</span></div>
-    <div class="cifra"><strong>{{ resumen.kg_frass|floatformat:1 }}</strong><span>kg de frass</span></div>
-    <div class="cifra"><strong>{{ resumen.kg_larvas_a_gallinas|floatformat:1 }}</strong><span>kg de larvas a las gallinas</span></div>
+    <div class="cifra"><strong>{{ resumen.g_huevos_larva|floatformat:0 }}</strong><span>g de huevos de larva BSF recibidos</span></div>
+    <div class="cifra"><strong>{{ resumen.bateas }}</strong><span>bateas de larvas armadas</span></div>
     <div class="cifra"><strong>{{ resumen.huevos }}</strong><span>huevos producidos</span></div>
     <div class="cifra"><strong>{{ resumen.tco2e_provisorio|floatformat:2 }}</strong><span>t de CO2e evitadas (provisorio)</span></div>
   </div>
@@ -67,28 +65,36 @@
     </table>
   </div>
 
-  <h2>Trazabilidad por lote</h2>
-  <p class="tenue">De qué restaurantes salió el residuo de cada lote BSF, qué rindió (kg de larva cada 100 kg de residuo) y cuántos huevos produjeron las gallinas con sus larvas.</p>
+  <h2>Larvas y granjas</h2>
+  <p class="tenue">Cada batea lleva de 7 a 10 kg de residuo mezclado con afrechillo. Las larvas alimentan a las gallinas de las granjas.</p>
   <div class="tabla">
     <table>
       <thead>
-        <tr><th>Lote</th><th>Inicio</th><th>Cosecha</th><th>Retiros</th><th>Restaurantes</th><th>kg residuo</th><th>kg larvas</th><th>Rendimiento</th><th>Huevos</th></tr>
+        <tr><th>Fecha</th><th>Huevos de larva recibidos (g)</th><th>Bateas armadas</th></tr>
       </thead>
       <tbody>
-        {% for fila in lotes %}
+        {% for carga in larvas %}
           <tr>
-            <td>N.º {{ fila.lote.pk }}</td>
-            <td>{{ fila.lote.fecha_inicio|date:"d/m" }}</td>
-            <td>{{ fila.lote.fecha_cosecha|date:"d/m"|default:"En curso" }}</td>
-            <td class="num">{{ fila.retiros }}</td>
-            <td>{{ fila.restaurantes|join:", "|default:"—" }}</td>
-            <td class="num">{{ fila.lote.kg_residuo|floatformat:1 }}</td>
-            <td class="num">{{ fila.lote.kg_larvas|floatformat:1|default:"—" }}</td>
-            <td class="num">{{ fila.lote.rendimiento|floatformat:1|default:"—" }}</td>
-            <td class="num">{{ fila.huevos }}</td>
+            <td>{{ carga.fecha_inicio|date:"d/m/Y" }}</td>
+            <td class="num">{{ carga.g_neonatos|floatformat:1 }}</td>
+            <td class="num">{{ carga.bandejas }}</td>
           </tr>
         {% empty %}
-          <tr><td colspan="9" class="tenue">No hay lotes que hayan empezado en el período.</td></tr>
+          <tr><td colspan="3" class="tenue">No hay cargas de larvas en el período.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="tabla">
+    <table>
+      <thead>
+        <tr><th>Granja</th><th>Huevos producidos</th></tr>
+      </thead>
+      <tbody>
+        {% for fila in granjas %}
+          <tr><td>{{ fila.granja__nombre|default:"Sin granja" }}</td><td class="num">{{ fila.huevos }}</td></tr>
+        {% empty %}
+          <tr><td colspan="2" class="tenue">No hay huevos cargados en el período.</td></tr>
         {% endfor %}
       </tbody>
     </table>

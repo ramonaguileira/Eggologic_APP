@@ -5,6 +5,7 @@
 {% block contenido %}
   <div class="encabezado">
     <h1>Todos los pedidos</h1>
+    <a class="boton" href="{% url 'tienda:entrega_nueva' %}">+ Registrar entrega</a>
   </div>
   
   {% if pedidos %}
@@ -13,7 +14,7 @@
         <thead>
           <tr>
             <th>N.º</th>
-            <th>Fecha</th>
+            <th>Pedido</th>
             <th>Cliente</th>
             <th>Total</th>
             <th>Pago</th>
@@ -31,10 +32,10 @@
               <td>{{ pedido.get_forma_pago_display }}</td>
               <td><span class="estado estado-{{ pedido.estado }}">{{ pedido.get_estado_display }}</span></td>
               <td>
-                {% if pedido.estado != pedido.Estado.ENTREGADO and user.es_admin %}
+                {% if pedido.estado == pedido.Estado.ENTREGADO %}
+                  {{ pedido.entregado_en|date:"d/m/Y" }}
+                {% elif pedido.estado != pedido.Estado.CANCELADO %}
                   <a href="{% url 'tienda:pedido_entregado' pedido.pk %}" class="boton pequeno">Marcar entregado</a>
-                {% else %}
-                  <span class="etiqueta">Entregado</span>
                 {% endif %}
               </td>
             </tr>

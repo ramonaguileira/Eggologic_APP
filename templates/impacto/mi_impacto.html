@@ -79,7 +79,7 @@
       <div class="circuito">
         <div class="paso"><span class="icono">🥕</span><strong>{{ compras.kg_rescatados|floatformat:1 }} kg</strong><span>de residuo rescatado</span></div>
         <span class="flecha" aria-hidden="true">→</span>
-        <div class="paso"><span class="icono">🪱</span><strong>{{ compras.kg_larva|floatformat:1 }} kg</strong><span>de larvas para las gallinas</span></div>
+        <div class="paso"><span class="icono">🪱</span><strong>larvas</strong><span>que comen las gallinas</span></div>
         <span class="flecha" aria-hidden="true">→</span>
         <div class="paso"><span class="icono">🥚</span><strong>{{ compras.huevos }}</strong><span>huevos en tu mesa</span></div>
       </div>
@@ -99,11 +99,11 @@
   <h2>Entre todos</h2>
   <div class="cifras">
     <div class="cifra"><strong>{{ comunidad.kg_rescatados|floatformat:"0g" }}</strong><span>kg de residuos rescatados</span></div>
-    <div class="cifra"><strong>{{ comunidad.kg_larvas|floatformat:"0g" }}</strong><span>kg de larvas criadas</span></div>
+    <div class="cifra"><strong>{{ comunidad.kg_larvas|floatformat:"0g" }}</strong><span>kg de larvas criadas (estimado)</span></div>
     <div class="cifra"><strong>{{ comunidad.huevos|floatformat:"0g" }}</strong><span>huevos producidos</span></div>
     <div class="cifra"><strong>{{ comunidad.restaurantes }}</strong><span>restaurantes participando</span></div>
   </div>
-  <p class="tenue nota">Las cifras se calculan con el promedio de todo el circuito Eggologic: residuo procesado, larvas criadas y huevos producidos.</p>
+  <p class="tenue nota">Las cifras se calculan con el promedio de todo el circuito Eggologic: residuo procesado y huevos producidos.</p>
 
   <script src="{% static 'js/impacto.js' %}" defer></script>
 {% endblock %}

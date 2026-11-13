@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block titulo %}Registrar entrega · Eggologic{% endblock %}
+
+{% block contenido %}
+  <h1>Registrar entrega</h1>
+  <p class="tenue">Para anotar huevos que ya entregaste. Queda como un pedido entregado y suma al impacto de quien los recibió.</p>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="error aviso-error">{{ form.non_field_errors }}</div>{% endif %}
+
+    <section class="tarjeta">
+      <h2>¿A quién y cuándo?</h2>
+      {% include "tienda/_campo.html" with campo=form.comprador %}
+      {% include "tienda/_campo.html" with campo=form.nombre_nuevo %}
+      {% include "tienda/_campo.html" with campo=form.email_nuevo %}
+      {% include "tienda/_campo.html" with campo=form.fecha %}
+    </section>
+
+    <div class="productos">
+      {% for producto, campo in form.campos_de_productos %}
+        <article class="producto" data-precio="{{ producto.precio|stringformat:'f' }}" data-huevos="{{ producto.huevos }}">
+          <h2>{{ producto.nombre }}</h2>
+          <p class="precio">$ {{ producto.precio|floatformat:"0g" }}</p>
+          <div class="cantidad">
+            <button type="button" class="menos" aria-label="Uno menos de {{ producto.nombre }}">−</button>
+            {{ campo }}
+            <button type="button" class="mas" aria-label="Uno más de {{ producto.nombre }}">+</button>
+          </div>
+          {% if campo.errors %}<div class="error">{{ campo.errors }}</div>{% endif %}
+        </article>
+      {% empty %}
+        <p class="tenue">No hay productos activos. Se cargan en Administración.</p>
+      {% endfor %}
+    </div>
+
+    <div class="resumen"><p class="total">Total: <strong id="total">—</strong></p></div>
+
+    <section class="tarjeta">
+      {% include "tienda/_campo.html" with campo=form.forma_pago %}
+      {% include "tienda/_campo.html" with campo=form.notas %}
+      <div class="acciones">
+        <button type="submit" class="boton">Registrar entrega</button>
+        <a href="{% url 'tienda:pedidos_admin' %}">Cancelar</a>
+      </div>
+    </section>
+  </form>
+
+  <script src="{% static 'js/tienda.js' %}" defer></script>
+{% endblock %}

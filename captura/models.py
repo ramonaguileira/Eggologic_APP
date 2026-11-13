@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator, MinValueValidator
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.formats import date_format, number_format
 
@@ -40,7 +41,9 @@ class RegistroBase(models.Model):
 class Retiro(RegistroBase):
     """Residuo que el chofer levanta en un restaurante, y cómo se clasifica.
 
-    El chofer carga el restaurante, los kg y una foto; la fecha y la ubicación se toman solas.
+    El chofer carga el restaurante y los bultos de a uno, cada uno con su peso y su foto (Ramón,
+    13/11: los cajones no se pueden apilar en la balanza). La app suma los bultos; la fecha y la
+    ubicación se toman solas. La balanza se tara con un cajón vacío, así que los pesos son netos.
     La clasificación se completa después, en la planta. En términos del FLW Standard: los
     restos vegetales se acercan a "partes no comestibles asociadas", los residuos de plato a
     "alimento", y los impropios quedan fuera del inventario (SUPUESTO, lo define CarboSur).
@@ -49,6 +52,9 @@ class Retiro(RegistroBase):
     restaurante = models.ForeignKey(Restaurante, on_delete=models.PROTECT, related_name="retiros")
     fecha = models.DateTimeField(default=timezone.now)
     kg_levantados = campo_kg("levantado (kg)")
+    # Mientras el chofer sigue agregando bultos. La planta clasifica recién cuando lo termina.
+    en_carga = models.BooleanField(default=False, editable=False)
+    # Los retiros anteriores a los bultos tienen una sola foto, acá. Los nuevos, una por bulto.
     foto = models.FileField(
         upload_to="retiros/%Y/%m/",
         blank=True,
@@ -65,6 +71,9 @@ class Retiro(RegistroBase):
     kg_impropios = campo_kg("impropios (kg)", null=True, blank=True)
     kg_restos_vegetales = campo_kg("restos vegetales (kg)", null=True, blank=True)
     kg_residuos_plato = campo_kg("residuos de plato (kg)", null=True, blank=True)
+    # Cuando la clasificación suma menos que lo levantado, la diferencia se carga a impropios como
+    # estimación (decisión de Ramón, 13/11). Lo que se pesó queda anotado en las observaciones.
+    impropios_estimados = models.BooleanField("impropios con estimación", default=False, editable=False)
 
     # Línea de base para CarboSur: lo que el restaurante descartó por otra vía (basura común)
     # desde el retiro anterior. Opcional. SUPUESTO: se informa en cada retiro.
@@ -102,6 +111,23 @@ class Retiro(RegistroBase):
             return None
         return self.kg_restos_vegetales + self.kg_residuos_plato
 
+    def sumar_bultos(self):
+        self.kg_levantados = sum((bulto.kg for bulto in self.bultos.all()), CERO)
+        self.save(update_fields=["kg_levantados", "actualizado_en"])
+
+    def cargar_diferencia_a_impropios(self):
+        """Si la clasificación suma menos que lo levantado, suma la diferencia a impropios."""
+        diferencia = self.kg_levantados - sum(self._clasificacion())
+        if diferencia <= 0:
+            return
+        nota = (
+            f"Impropios pesados: {number_format(self.kg_impropios, 2)} kg. Se sumaron "
+            f"{number_format(diferencia, 2)} kg de diferencia con lo levantado, como estimación."
+        )
+        self.kg_impropios += diferencia
+        self.impropios_estimados = True
+        self.observaciones = f"{self.observaciones}\n{nota}".strip()
+
     def clean(self):
         valores = self._clasificacion()
         cargados = [v for v in valores if v is not None]
@@ -116,18 +142,42 @@ class Retiro(RegistroBase):
             raise ValidationError("Este retiro está en un lote: la clasificación no se puede borrar.")
 
 
-class Lote(RegistroBase):
-    """Lote de bioconversión BSF: el residuo clasificado entra en bandejas con neonatos y sale
-    como larva y frass."""
+class Bulto(models.Model):
+    """Un cajón de un retiro, pesado solo en la balanza."""
 
-    fecha_inicio = models.DateField("fecha de inicio", default=timezone.localdate)
-    bandejas = models.PositiveIntegerField("bandejas generadas")
-    # SUPUESTO: los neonatos se miden en gramos.
+    retiro = models.ForeignKey(Retiro, on_delete=models.CASCADE, related_name="bultos")
+    kg = models.DecimalField("peso (kg)", max_digits=8, decimal_places=2, validators=[MinValueValidator(Decimal("0.01"))])
+    foto = models.FileField(
+        upload_to="retiros/%Y/%m/",
+        validators=[
+            FileExtensionValidator(["jpg", "jpeg", "png", "webp", "heic", "heif"]),
+            validar_tamano_foto,
+        ],
+    )
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["id"]
+
+    def __str__(self):
+        return f"Bulto de {number_format(self.kg, 1)} kg"
+
+
+class Lote(RegistroBase):
+    """Carga de larvas BSF en la planta: los huevos de larva que llegaron y las bateas que se
+    armaron. Ramón la anota una vez por semana (13/11).
+
+    Cada batea lleva de 7 a 10 kg de residuo mezclado con afrechillo.
+    """
+
+    fecha_inicio = models.DateField("fecha", default=timezone.localdate)
+    bandejas = models.PositiveIntegerField("bateas armadas")
     g_neonatos = models.DecimalField(
-        "neonatos utilizados (g)", max_digits=8, decimal_places=1, validators=NO_NEGATIVO
+        "huevos de larva recibidos (g)", max_digits=8, decimal_places=1, validators=NO_NEGATIVO
     )
 
-    # Se completan al cosechar.
+    # Sin uso en las pantallas desde el 13/11: la cosecha y los retiros de cada lote no se anotan
+    # por ahora (decisión de Ramón). Los campos quedan para cuando se retome la trazabilidad.
     fecha_cosecha = models.DateField("fecha de cosecha", null=True, blank=True)
     kg_larvas = campo_kg("larvas (kg)", null=True, blank=True)
     kg_frass = campo_kg("frass (kg)", null=True, blank=True)
@@ -136,7 +186,7 @@ class Lote(RegistroBase):
         ordering = ["-fecha_inicio", "-id"]
 
     def __str__(self):
-        return f"Lote N.º {self.pk} ({date_format(self.fecha_inicio, 'd/m/Y')})"
+        return f"Larvas N.º {self.pk} ({date_format(self.fecha_inicio, 'd/m/Y')})"
 
     @property
     def cosechado(self):
@@ -164,13 +214,30 @@ class Lote(RegistroBase):
             raise ValidationError("La cosecha no puede ser anterior al inicio del lote.")
 
 
-class RegistroGranja(RegistroBase):
-    """Producción del día en la granja (Camino Verde)."""
+class Granja(models.Model):
+    """Una granja donde están las gallinas. Las larvas se crían en la planta de Eggologic."""
 
-    # SUPUESTO: un solo registro por día para toda la granja.
-    fecha = models.DateField(default=timezone.localdate, unique=True)
+    nombre = models.CharField(max_length=80, unique=True)
+    activa = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["nombre"]
+
+    def __str__(self):
+        return self.nombre
+
+
+class RegistroGranja(RegistroBase):
+    """Huevos que produjo una granja en un período (una semana, quince días, un mes: lo elige
+    quien carga)."""
+
+    granja = models.ForeignKey(Granja, on_delete=models.PROTECT, null=True, related_name="registros")
+    # Los registros anteriores al 13/11 eran de un solo día: no tienen "desde".
+    desde = models.DateField(null=True, blank=True)
+    fecha = models.DateField("hasta", default=timezone.localdate)
     huevos = models.PositiveIntegerField("huevos producidos")
-    kg_larvas = campo_kg("larvas para las gallinas (kg)")
+    # Sin uso en las pantallas desde el 13/11: las larvas que comen las gallinas no se anotan por ahora.
+    kg_larvas = campo_kg("larvas para las gallinas (kg)", null=True, blank=True)
     lote = models.ForeignKey(
         Lote,
         on_delete=models.PROTECT,
@@ -178,7 +245,6 @@ class RegistroGranja(RegistroBase):
         blank=True,
         related_name="registros_granja",
         verbose_name="lote de las larvas",
-        help_text="Opcional: de qué lote salieron las larvas.",
     )
 
     class Meta:
@@ -188,6 +254,18 @@ class RegistroGranja(RegistroBase):
 
     def __str__(self):
         return f"Granja {date_format(self.fecha, 'd/m/Y')}"
+
+    def clean(self):
+        if not self.fecha:
+            return
+        desde = self.desde or self.fecha
+        if desde > self.fecha:
+            raise ValidationError("El período termina antes de empezar: revisá las fechas.")
+        # Dos cargas de la misma granja no pueden pisarse: los huevos se contarían dos veces.
+        empieza_antes_del_fin = Q(desde__lte=self.fecha) | Q(desde=None, fecha__lte=self.fecha)
+        pisadas = RegistroGranja.objects.filter(empieza_antes_del_fin, granja_id=self.granja_id, fecha__gte=desde)
+        if self.granja_id and pisadas.exclude(pk=self.pk).exists():
+            raise ValidationError("Ya hay huevos cargados de esa granja para esos días.")
 
 
 class Archivo(models.Model):

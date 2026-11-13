@@ -12,8 +12,8 @@ from django.utils import timezone
 
 from cuentas.models import Restaurante, Usuario
 
-from .forms import LoteForm, RegistroGranjaForm
-from .models import Archivo, Lote, RegistroGranja, Retiro
+from .forms import RegistroGranjaForm
+from .models import Archivo, Bulto, Granja, Lote, RegistroGranja, Retiro
 
 
 class DatosDePrueba(TestCase):
@@ -89,96 +89,178 @@ class LoteTests(DatosDePrueba):
             lote.full_clean()
 
 
-class LoteFormTests(DatosDePrueba):
-    def datos(self, retiros):
-        return {
-            "fecha_inicio": "2026-10-05",
-            "bandejas": "4",
-            "g_neonatos": "8",
-            "retiros": [r.pk for r in retiros],
-        }
-
-    def test_solo_ofrece_retiros_clasificados_y_libres(self):
-        libre = self.crear_retiro("40", (Decimal("1"), Decimal("20"), Decimal("19")))
-        sin_clasificar = self.crear_retiro("30")
-        otro_lote = Lote.objects.create(registrado_por=self.operador, bandejas=1, g_neonatos=Decimal("2"))
-        ocupado = self.crear_retiro("20", (Decimal("0"), Decimal("10"), Decimal("10")), lote=otro_lote)
-
-        ofrecidos = set(LoteForm().fields["retiros"].queryset)
-
-        self.assertIn(libre, ofrecidos)
-        self.assertNotIn(sin_clasificar, ofrecidos)
-        self.assertNotIn(ocupado, ofrecidos)
-
-    def test_guardar_asigna_y_libera_retiros(self):
-        primero = self.crear_retiro("40", (Decimal("1"), Decimal("20"), Decimal("19")))
-        segundo = self.crear_retiro("30", (Decimal("1"), Decimal("15"), Decimal("14")))
-
-        form = LoteForm(self.datos([primero, segundo]), instance=Lote(registrado_por=self.operador))
-        self.assertTrue(form.is_valid(), form.errors)
-        lote = form.save()
-        self.assertEqual(set(lote.retiros.all()), {primero, segundo})
-
-        form = LoteForm(self.datos([primero]), instance=lote)
-        self.assertTrue(form.is_valid(), form.errors)
-        form.save()
-        segundo.refresh_from_db()
-        self.assertIsNone(segundo.lote)
+class LarvasTests(DatosDePrueba):
+    def test_la_carga_de_la_semana_pide_solo_huevos_de_larva_y_bateas(self):
+        self.client.force_login(self.operador)
+        respuesta = self.client.post(
+            reverse("captura:lote_nuevo"), {"fecha_inicio": "2026-11-13", "g_neonatos": "5", "bandejas": "6"}
+        )
+        self.assertRedirects(respuesta, reverse("captura:lotes"))
+        lote = Lote.objects.get()
+        self.assertEqual((lote.g_neonatos, lote.bandejas, lote.registrado_por), (Decimal("5"), 6, self.operador))
+        self.assertContains(self.client.get(reverse("captura:lotes")), "Bateas armadas")
 
 
 class RegistroGranjaTests(DatosDePrueba):
-    def test_un_solo_registro_por_dia(self):
-        RegistroGranja.objects.create(
-            registrado_por=self.operador, fecha=date(2026, 10, 5), huevos=180, kg_larvas=Decimal("3")
+    def setUp(self):
+        super().setUp()
+        self.camino_verde = Granja.objects.get(nombre="Camino Verde")
+        self.igusquiza = Granja.objects.get(nombre="Eguzquiza")
+
+    def form(self, granja, desde, hasta, huevos="300"):
+        datos = {"granja": granja.pk, "desde": desde, "fecha": hasta, "huevos": huevos}
+        return RegistroGranjaForm(datos, instance=RegistroGranja(registrado_por=self.operador))
+
+    def test_huevos_de_un_periodo_y_de_una_granja(self):
+        self.client.force_login(self.operador)
+        respuesta = self.client.post(
+            reverse("captura:granja_nuevo"),
+            {"granja": self.camino_verde.pk, "desde": "2026-10-01", "fecha": "2026-10-30", "huevos": "1200"},
         )
-        form = RegistroGranjaForm(
-            {"fecha": "2026-10-05", "huevos": "175", "kg_larvas": "2.5"},
-            instance=RegistroGranja(registrado_por=self.operador),
-        )
+        self.assertRedirects(respuesta, reverse("captura:granja"))
+        registro = RegistroGranja.objects.get()
+        self.assertEqual((registro.granja, registro.desde, registro.fecha), (self.camino_verde, date(2026, 10, 1), date(2026, 10, 30)))
+        self.assertContains(self.client.get(reverse("captura:granja")), "01/10 al 30/10/2026")
+
+    def test_dos_cargas_de_la_misma_granja_no_se_pisan(self):
+        self.assertTrue(self.form(self.camino_verde, "2026-10-01", "2026-10-15").is_valid())
+        self.form(self.camino_verde, "2026-10-01", "2026-10-15").save()
+        pisada = self.form(self.camino_verde, "2026-10-15", "2026-10-31")
+        self.assertFalse(pisada.is_valid())
+        self.assertIn("Ya hay huevos cargados de esa granja", str(pisada.errors))
+        # La otra granja sí puede cargar los mismos días, y la misma granja, los días siguientes.
+        self.assertTrue(self.form(self.igusquiza, "2026-10-01", "2026-10-15").is_valid())
+        self.assertTrue(self.form(self.camino_verde, "2026-10-16", "2026-10-31").is_valid())
+
+    def test_el_periodo_no_puede_terminar_antes_de_empezar(self):
+        self.assertFalse(self.form(self.camino_verde, "2026-10-15", "2026-10-01").is_valid())
+
+    def test_hay_que_elegir_la_granja_y_el_inicio(self):
+        form = RegistroGranjaForm({"fecha": "2026-10-15", "huevos": "10"}, instance=RegistroGranja(registrado_por=self.operador))
         self.assertFalse(form.is_valid())
-        self.assertIn("fecha", form.errors)
+        self.assertEqual(set(form.errors), {"granja", "desde"})
 
 
 class VistasTests(DatosDePrueba):
     def foto(self):
         return SimpleUploadedFile("tacho.jpg", b"\xff\xd8\xff contenido de prueba", content_type="image/jpeg")
 
-    def test_chofer_carga_retiro_con_foto_y_ubicacion(self):
+    def cargar_bulto(self, kg, **extra):
+        datos = {"restaurante": self.restaurante.pk, "kg": kg, "foto": self.foto(), **extra}
+        return self.client.post(reverse("captura:retiro_nuevo"), datos)
+
+    def test_chofer_empieza_un_retiro_con_el_primer_bulto(self):
         self.client.force_login(self.operador)
-        respuesta = self.client.post(
-            reverse("captura:retiro_nuevo"),
-            {
-                "restaurante": self.restaurante.pk,
-                "kg_levantados": "42.5",
-                "foto": self.foto(),
-                "latitud": "-34.909700",
-                "longitud": "-54.865300",
-                "precision_m": "12",
-            },
-        )
-        self.assertRedirects(respuesta, reverse("captura:retiros"))
+        respuesta = self.cargar_bulto("18.4", latitud="-34.909700", longitud="-54.865300", precision_m="12")
         retiro = Retiro.objects.get()
-        self.assertEqual(retiro.kg_levantados, Decimal("42.5"))
+        self.assertRedirects(respuesta, reverse("captura:retiro_bultos", args=[retiro.pk]))
+        self.assertEqual(retiro.kg_levantados, Decimal("18.4"))
         self.assertEqual(retiro.registrado_por, self.operador)
         self.assertEqual(retiro.latitud, Decimal("-34.909700"))
-        self.assertTrue(retiro.foto.name.endswith(".jpg"))
-        self.assertFalse(retiro.clasificado)
+        self.assertTrue(retiro.en_carga)
+        self.assertTrue(retiro.bultos.get().foto.name.endswith(".jpg"))
 
-    def test_retiro_sin_foto_no_se_guarda(self):
+    def test_los_bultos_se_suman_en_un_solo_retiro(self):
         self.client.force_login(self.operador)
-        respuesta = self.client.post(
-            reverse("captura:retiro_nuevo"), {"restaurante": self.restaurante.pk, "kg_levantados": "20"}
-        )
+        self.cargar_bulto("18.4")
+        retiro = Retiro.objects.get()
+        url = reverse("captura:retiro_bultos", args=[retiro.pk])
+        # Mientras no lo termina, "Nuevo retiro" lo lleva al que está cargando.
+        self.assertRedirects(self.client.get(reverse("captura:retiro_nuevo")), url)
+        self.client.post(url, {"kg": "17.6", "foto": self.foto()})
+        self.client.post(url, {"kg": "13.7", "foto": self.foto()})
+        retiro.refresh_from_db()
+        self.assertEqual(retiro.kg_levantados, Decimal("49.7"))
+        self.assertEqual(retiro.bultos.count(), 3)
+
+        # Un bulto mal cargado se puede quitar antes de terminar.
+        self.client.post(url, {"accion": "quitar", "bulto": retiro.bultos.last().pk})
+        retiro.refresh_from_db()
+        self.assertEqual(retiro.kg_levantados, Decimal("36.0"))
+
+        respuesta = self.client.post(url, {"accion": "terminar"})
+        self.assertRedirects(respuesta, reverse("captura:retiros"))
+        retiro.refresh_from_db()
+        self.assertFalse(retiro.en_carga)
+        self.assertEqual(self.client.get(url).status_code, 404)
+
+    def test_el_ultimo_bulto_no_se_quita(self):
+        self.client.force_login(self.operador)
+        self.cargar_bulto("18.4")
+        retiro = Retiro.objects.get()
+        self.client.post(reverse("captura:retiro_bultos", args=[retiro.pk]), {"accion": "quitar", "bulto": retiro.bultos.get().pk})
+        self.assertEqual(retiro.bultos.count(), 1)
+
+    def test_otro_bulto_el_mismo_dia_va_al_mismo_retiro(self):
+        self.client.force_login(self.operador)
+        self.cargar_bulto("20")
+        retiro = Retiro.objects.get()
+        self.client.post(reverse("captura:retiro_bultos", args=[retiro.pk]), {"accion": "terminar"})
+        self.cargar_bulto("15")
+        retiro.refresh_from_db()
+        self.assertEqual(Retiro.objects.count(), 1)
+        self.assertEqual(retiro.kg_levantados, Decimal("35"))
+        self.assertTrue(retiro.en_carga)
+
+    def test_un_retiro_en_carga_no_se_clasifica(self):
+        self.client.force_login(self.operador)
+        self.cargar_bulto("20")
+        url = reverse("captura:retiro_clasificar", args=[Retiro.objects.get().pk])
+        self.assertEqual(self.client.get(url).status_code, 404)
+
+    def test_bulto_sin_foto_no_se_guarda(self):
+        self.client.force_login(self.operador)
+        respuesta = self.client.post(reverse("captura:retiro_nuevo"), {"restaurante": self.restaurante.pk, "kg": "20"})
         self.assertEqual(respuesta.status_code, 200)
         self.assertFalse(Retiro.objects.exists())
 
     def test_retiro_sin_ubicacion_se_guarda_igual(self):
         self.client.force_login(self.operador)
-        self.client.post(
-            reverse("captura:retiro_nuevo"),
-            {"restaurante": self.restaurante.pk, "kg_levantados": "20", "foto": self.foto()},
-        )
+        self.cargar_bulto("20")
         self.assertIsNone(Retiro.objects.get().latitud)
+
+    def test_el_chofer_ve_solo_las_fotos_del_retiro_que_esta_cargando(self):
+        chofer = Usuario.objects.create_user(username="chofer", password="clave-de-prueba-123", rol=Usuario.Rol.CHOFER)
+        otro = Usuario.objects.create_user(username="chofer2", password="clave-de-prueba-123", rol=Usuario.Rol.CHOFER)
+        self.client.force_login(chofer)
+        self.cargar_bulto("20")
+        retiro = Retiro.objects.get()
+        foto = reverse("captura:bulto_foto", args=[retiro.bultos.get().pk])
+        bultos = reverse("captura:retiro_bultos", args=[retiro.pk])
+        self.assertEqual(self.client.get(foto).status_code, 200)
+
+        self.client.force_login(otro)
+        self.assertEqual(self.client.get(foto).status_code, 403)
+        self.assertEqual(self.client.get(bultos).status_code, 403)
+
+        self.client.force_login(chofer)
+        self.assertRedirects(self.client.post(bultos, {"accion": "terminar"}), reverse("captura:retiro_nuevo"))
+        self.assertEqual(self.client.get(foto).status_code, 403)
+
+        self.client.force_login(self.operador)
+        self.assertEqual(self.client.get(foto).status_code, 200)
+        self.assertContains(self.client.get(reverse("captura:retiro_detalle", args=[retiro.pk])), "20,0 kg")
+        self.assertContains(self.client.get(reverse("captura:retiros")), "1 bulto")
+
+    def test_la_diferencia_con_lo_levantado_va_a_impropios_como_estimacion(self):
+        retiro = self.crear_retiro("25")
+        self.client.force_login(self.operador)
+        self.client.post(
+            reverse("captura:retiro_clasificar", args=[retiro.pk]),
+            {"kg_impropios": "1", "kg_restos_vegetales": "14", "kg_residuos_plato": "3"},
+        )
+        retiro.refresh_from_db()
+        self.assertEqual(retiro.kg_impropios, Decimal("8"))
+        self.assertEqual(retiro.kg_organicos, Decimal("17"))
+        self.assertTrue(retiro.impropios_estimados)
+        self.assertIn("Impropios pesados: 1,00 kg. Se sumaron 7,00 kg", retiro.observaciones)
+
+    def test_la_lista_muestra_primero_el_retiro_mas_nuevo(self):
+        viejo = self.crear_retiro("10", fecha=timezone.now() - timezone.timedelta(days=3))
+        nuevo = self.crear_retiro("20")
+        self.client.force_login(self.operador)
+        respuesta = self.client.get(reverse("captura:retiros"))
+        self.assertEqual([retiro.pk for retiro in respuesta.context["retiros"]], [nuevo.pk, viejo.pk])
 
     def test_planta_clasifica_un_retiro(self):
         retiro = self.crear_retiro("50")
@@ -190,6 +272,7 @@ class VistasTests(DatosDePrueba):
         self.assertRedirects(respuesta, reverse("captura:retiros"))
         retiro.refresh_from_db()
         self.assertEqual(retiro.kg_organicos, Decimal("48"))
+        self.assertFalse(retiro.impropios_estimados)
 
     def test_clasificacion_imposible_no_se_guarda(self):
         retiro = self.crear_retiro("10")
@@ -275,15 +358,6 @@ class AccesoPorRolTests(DatosDePrueba):
             ("captura:lote_nuevo", []), ("captura:granja_nuevo", []),
         ]:
             self.assertEqual(self.client.get(reverse(nombre_url, args=args)).status_code, 403, nombre_url)
-
-    def test_el_chofer_vuelve_al_formulario_despues_de_guardar(self):
-        chofer = Usuario.objects.create_user(username="chofer", password="clave-de-prueba-123", rol=Usuario.Rol.CHOFER)
-        self.client.force_login(chofer)
-        foto = SimpleUploadedFile("retiro.jpg", b"\xff\xd8\xff foto", content_type="image/jpeg")
-        respuesta = self.client.post(
-            reverse("captura:retiro_nuevo"), {"restaurante": self.restaurante.pk, "kg_levantados": "20", "foto": foto}
-        )
-        self.assertRedirects(respuesta, reverse("captura:retiro_nuevo"))
 
     def test_la_planta_clasifica_y_lleva_lotes_pero_no_la_granja(self):
         retiro = self.crear_retiro("50")
@@ -372,13 +446,13 @@ class FaseCeroTests(DatosDePrueba):
         RegistroGranja.objects.create(registrado_por=self.operador, fecha=date(2026, 9, 5), huevos=100, kg_larvas=Decimal("2"))
         RegistroGranja.objects.create(registrado_por=self.operador, fecha=date(2026, 10, 5), huevos=90, kg_larvas=Decimal("2"))
         respuesta, filas = self.exportar("captura:exportar_granja", desde="2026-09-01", hasta="2026-09-30", restaurante="R-001")
-        self.assertEqual(filas, ["2026-09-05;100;2,00;;"])
+        self.assertEqual(filas, ["2026-09-05;100;2,00;;;;"])
         self.assertIn('filename="granja_2026-09-01_2026-09-30.csv"', respuesta["Content-Disposition"])
 
     def test_un_texto_que_parece_formula_sale_escapado(self):
         self.retiro_el("2026-09-15 11:00", observaciones='=HYPERLINK("http://ejemplo.com")')
         _, filas = self.exportar("captura:exportar_retiros")
-        self.assertTrue(filas[0].endswith(';"\'=HYPERLINK(""http://ejemplo.com"")"'), filas[0])
+        self.assertIn(';"\'=HYPERLINK(""http://ejemplo.com"")";', filas[0])
 
     def test_un_lote_con_retiros_o_granja_no_se_puede_borrar(self):
         con_retiro = self.lote(date(2026, 9, 2), self.retiro_el("2026-09-01 11:00"))

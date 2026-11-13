@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
-from captura.models import Lote, RegistroGranja, Retiro
+from captura.models import Granja, Lote, RegistroGranja, Retiro
 from cuentas.models import Cliente, Restaurante, Usuario
 from tienda.models import ItemPedido, Pedido, Producto
 
@@ -54,8 +54,8 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(
             f"Listo: usuarios admin, operador, chofer, planta, granja, carbosur, cliente y restaurante; "
-            f"{Retiro.objects.count()} retiros, {Lote.objects.count()} lotes, "
-            f"{RegistroGranja.objects.count()} días de granja y {Pedido.objects.count()} pedidos."
+            f"{Retiro.objects.count()} retiros, {Lote.objects.count()} cargas de larvas, "
+            f"{RegistroGranja.objects.count()} semanas de granja y {Pedido.objects.count()} pedidos."
         ))
 
     def cargar_captura(self, operador, restaurantes):
@@ -81,31 +81,22 @@ class Command(BaseCommand):
                 )
                 retiros_por_semana.setdefault(dias_atras // 7, []).append(retiro)
 
-        # Un lote por semana; los de hace más de dos semanas ya están cosechados.
+        # Una carga de larvas y una de huevos por semana, como las anota Ramón.
+        camino_verde, _ = Granja.objects.get_or_create(nombre="Camino Verde")
         for semana, retiros in sorted(retiros_por_semana.items(), reverse=True):
-            inicio = timezone.localtime(retiros[0].fecha).date()
-            lote = Lote.objects.create(
+            fin = self.hoy - timedelta(days=semana * 7 + 1)
+            Lote.objects.create(
                 registrado_por=operador,
-                fecha_inicio=inicio,
+                fecha_inicio=fin,
                 bandejas=len(retiros) * 2,
                 g_neonatos=kg(len(retiros) * 2.5),
             )
-            Retiro.objects.filter(pk__in=[r.pk for r in retiros]).update(lote=lote)
-            if semana > 1:
-                lote.fecha_cosecha = inicio + timedelta(days=14)
-                lote.kg_larvas = kg(float(lote.kg_residuo) * self.azar.uniform(0.12, 0.18))
-                lote.kg_frass = kg(float(lote.kg_residuo) * self.azar.uniform(0.3, 0.4))
-                lote.save()
-
-        for dias_atras in range(DIAS, 0, -1):
-            dia = self.hoy - timedelta(days=dias_atras)
-            lote = Lote.objects.filter(fecha_cosecha__lte=dia).order_by("-fecha_cosecha").first()
             RegistroGranja.objects.create(
                 registrado_por=operador,
-                fecha=dia,
-                huevos=self.azar.randint(160, 200),
-                kg_larvas=kg(self.azar.uniform(2, 4)),
-                lote=lote,
+                granja=camino_verde,
+                desde=fin - timedelta(days=6),
+                fecha=fin,
+                huevos=self.azar.randint(1100, 1400),
             )
 
     def cargar_tienda(self, password, restaurante):
@@ -158,7 +149,8 @@ class Command(BaseCommand):
                 )
         # creado_en se completa solo al crear; para los datos de ejemplo se lleva al pasado.
         fecha = timezone.make_aware(datetime.combine(self.hoy - timedelta(days=dias_atras), time(10, 0)))
-        Pedido.objects.filter(pk=pedido.pk).update(creado_en=fecha)
+        entregado_en = fecha.date() if estado == Pedido.Estado.ENTREGADO else None
+        Pedido.objects.filter(pk=pedido.pk).update(creado_en=fecha, entregado_en=entregado_en)
 
     def crear_usuario(self, nombre_usuario, rol, password, superusuario=False, nombre=""):
         usuario, creado = Usuario.objects.get_or_create(

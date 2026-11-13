@@ -12,16 +12,17 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **opciones):
-        usuario = os.environ.get("DJANGO_SUPERUSER_EMAIL")
+        email = os.environ.get("DJANGO_SUPERUSER_EMAIL", "")
+        # Sin nombre de usuario, se usa el email (como en el registro de clientes).
+        usuario = os.environ.get("DJANGO_SUPERUSER_USERNAME") or email
         password = os.environ.get("DJANGO_SUPERUSER_PASSWORD")
         if not usuario or not password:
-            self.stdout.write("Sin DJANGO_SUPERUSER_EMAIL o DJANGO_SUPERUSER_PASSWORD: no se crea ningún usuario.")
+            self.stdout.write(
+                "Sin DJANGO_SUPERUSER_USERNAME (o _EMAIL) y DJANGO_SUPERUSER_PASSWORD: no se crea ningún usuario."
+            )
             return
         if Usuario.objects.filter(username=usuario).exists():
             self.stdout.write(f"El usuario {usuario} ya existe.")
             return
-        Usuario.objects.create_superuser(
-            username=usuario, email=os.environ.get("DJANGO_SUPERUSER_EMAIL", ""), password=password,
-            rol=Usuario.Rol.ADMIN,
-        )
+        Usuario.objects.create_superuser(username=usuario, email=email, password=password, rol=Usuario.Rol.ADMIN)
         self.stdout.write(f"Usuario de administración {usuario} creado.")
