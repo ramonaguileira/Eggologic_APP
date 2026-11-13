@@ -2,7 +2,7 @@
 
 **Estado:** propuesta en revisión (13/11/2026). **No hay nada construido.** Todo número que no dio Ramón está marcado `SUPUESTO`.
 
-**Confirmado por Ramón (13/11):** gallina de dos años a 3.600; los Eggos quedan fuera de Hedera; hoy hay unas 60 gallinas en postura; el envío no se cobra y cuesta poco porque se vende solo en la zona (El Tesoro y La Barra).
+**Confirmado por Ramón (13/11):** 1 Eggo = $ 1; 5 % de vuelta en compras; levante a 60 Eggos y 1 huevo extra por kilo; el impacto verificado se llama **Rescates**; Lucas está de acuerdo con vender producción por adelantado; la experiencia visual del punto 4; gallina de dos años a 3.600 pesos; los Eggos quedan fuera de Hedera; hoy hay unas 60 gallinas en postura; el envío no se cobra y cuesta poco porque se vende solo en la zona (El Tesoro y La Barra).
 
 Documento hermano: `docs/estructura-descentralizada.md` (cómo conviven los nodos, los socios y la central).
 
@@ -28,8 +28,8 @@ Cómo apoya la gente: comprando huevos (y pronto verduras y compost), suscribié
 
 ## 2. Cómo funciona, en un minuto
 
-1. **Entrar:** un botón grande, "Entrar con Google". Ya tiene su mundo, con un **pollito** de bienvenida (es solo la mascota: no pone huevos).
-2. **Adoptar una gallina:** cuesta Eggos. Si no le alcanzan, paga la diferencia con Mercado Pago en el mismo paso. El pollito se convierte en gallina.
+1. **Entrar:** una pantalla de carga simpática y un botón grande, "Entrar con Google". Ya tiene su **chacra**, todavía sin gallinas.
+2. **Adoptar una gallina:** cuesta Eggos. Si no le alcanzan, paga la diferencia con Mercado Pago en el mismo paso. La gallina llega a la chacra.
 3. **La gallina pone:** unos 4 huevos por semana (200 por año, garantizados). Los huevos se van juntando en el nido.
 4. **Cosechar y armar el maple:** toca los huevos y van al maple. **Con 15 huevos ya puede pedir su quincena**; con 30, un maple entero.
 5. **Residuos → larvas → más huevos:** pide un levante de residuos (se paga con Eggos). Recibe el aviso de que se están procesando, después le llegan larvas, se las da a la gallina y la gallina produce más (hasta 220 por año).
@@ -112,7 +112,8 @@ Se promete el piso (200) y no el techo (250) a propósito: la diferencia que pon
 | --- | --- | --- | --- | --- |
 | Sin socios | 0 % | $ 5,50 | $ 1.148 | $ 602 |
 | Camino Verde actual | 10 % | $ 6,11 | $ 904 | $ 297 |
-| Gallinero nuevo en Camino Verde | 25 % | $ 7,33 | $ 415 | **− $ 313** |
+| Gallinero nuevo, si el inversor recibe 10 % | 20 % | $ 6,88 | $ 598 | − $ 84 |
+| Gallinero nuevo, si el inversor recibe 15 % | 25 % | $ 7,33 | $ 415 | **− $ 313** |
 
 Conclusión: las gallinas adoptadas conviene asignarlas a los gallineros con menos porcentaje comprometido, y no sumar más porcentajes sobre el gallinero nuevo. Si el cliente paga por transferencia en vez de tarjeta, cada gallina deja $ 252 más.
 
@@ -128,7 +129,7 @@ Conclusión: las gallinas adoptadas conviene asignarlas a los gallineros con men
 
 - **Cupo** (`SUPUESTO`): los huevos prometidos a adoptantes (220 por gallina) no pasan del 70 % de lo que queda después de la parte de los socios, calculado con el piso de 200 huevos por gallina real. El resto es para la venta directa, los restaurantes y el colchón.
   - **Hoy (60 gallinas, 10 % a Camino Verde): hasta 34 gallinas adoptadas, que son $ 122.400 por adelantado.**
-  - Gallinero nuevo (50 gallinas, 25 % a socios): hasta 23, que son $ 82.800.
+  - Gallinero nuevo (50 gallinas): hasta 25 si los socios se llevan 20 % ($ 90.000), o hasta 23 si se llevan 25 % ($ 82.800).
 - **Máximo 4 gallinas por cuenta** (`SUPUESTO`): es consumo de una familia, no una inversión.
 - Los huevos acumulados se pueden pedir hasta 6 meses después de terminados los dos años (`SUPUESTO`).
 - Se puede ofrecer también una **gallina de 1 año** (200 huevos, 1.900 Eggos): entrada más barata y menos riesgo de inflación.
@@ -142,7 +143,7 @@ A 200 huevos por año, la gallina junta **15 huevos cada 27 días**: una quincen
 
 Los residuos no dan Eggos: **cuestan** Eggos (es un servicio) y **devuelven larvas**.
 
-| Regla | Valor (`SUPUESTO`) |
+| Regla | Valor (confirmado por Ramón, 13/11) |
 | --- | --- |
 | Precio de un levante | 60 Eggos |
 | Larvas que devuelve | 1 ración por kg orgánico clasificado |
@@ -172,21 +173,53 @@ Un tablero interno, "Economía de Eggos":
 
 ---
 
-## 4. Las pantallas
+## 4. La experiencia visual (pedido de Ramón, 13/11)
 
-Cinco pestañas, con íconos pixelados:
+**Una sola pantalla: la chacra.** No hay pestañas ni se "sale" nunca de ahí. Todo pasa encima de la chacra.
 
-| Pestaña | Qué tiene |
+### Al abrir
+
+1. **Pantalla de carga** con frases que van cambiando, al estilo de Los Sims: *"Ubicando gallinas…"*, *"Desenterrando larvas…"*, *"Llenando bebederos…"*, *"Preparando comederos…"*, *"Contando huevos…"*, *"Despertando al gallo…"*.
+2. **Si no tiene cuenta:** el botón "Entrar con Google". Un toque y está adentro.
+3. **Si ya tiene cuenta:** entra directo a su chacra.
+
+### La chacra
+
+- **Vacía (sin gallinas):** igual tiene vida. Un pajarito que cruza volando, un caracol que camina, el pasto que se mueve. Y el gallinero con un cartel que invita a adoptar.
+- **Con gallinas:** cada gallina anda por su cuenta: camina para un lado y para el otro, picotea, se echa, duerme de noche. Cada tanto aparece un bichito y la gallina sale corriendo a comérselo.
+- **Lo que puede hacer la persona:** ponerle comida, ponerle agua, hacerle una caricia, darle larvas, cosechar los huevos.
+
+Comida, agua y caricias son **solo cariño**: la gallina festeja, pero no cambian la producción ni pasa nada si no se hacen. Lo único que sube la producción son las larvas, que salen de residuos reales. Así el juego no obliga a nadie a entrar.
+
+### Los botones son cosas de la chacra
+
+En lugar de pestañas, se toca un objeto del dibujo. Cada uno lleva un cartelito con su nombre, para que se entienda sin adivinar:
+
+| Objeto en la chacra | Qué abre |
 | --- | --- |
-| **Mundo** | La gallina (o el pollito), el nido, el maple, las larvas y un cartel con novedades reales de la granja |
-| **Tienda** | Huevos, verduras, compost; suscripción; adoptar gallina; mis pedidos |
-| **Residuos** | Pedir levante, ver el estado (pedido → retirado → procesando → larvas listas) |
-| **Impacto** | Tablero personal |
-| **Yo** | Eggos y movimientos, mis gallinas, ajustes, ayuda |
+| **Gallinero** | Mis gallinas (nombre, huevos puestos, producción, sanidad) y adoptar otra |
+| **Nido y maple** | Mis huevos: cosechar y pedir la quincena o el maple |
+| **Puesto de feria** | Tienda: huevos, verduras, compost, suscripción, mis pedidos |
+| **Balde de residuos** | Pedir un levante y ver cómo va (pedido → retirado → procesando → larvas listas) |
+| **Pizarrón** | Mi impacto |
+| **Buzón** | Mi cuenta, mis Eggos y sus movimientos, ayuda |
 
-**La gallina.** Camina, pone, come, duerme de noche. Una ficha simple: nombre, en qué gallinero vive, huevos puestos, producción (200 a 220 por año) y **sanidad**, que refleja el estado real del plantel que carga la persona de granja (`SUPUESTO`). Nunca se enferma ni se muere por no entrar.
+Arriba, siempre a la vista: el saldo de Eggos y los huevos acumulados.
 
-**Sin obligaciones.** Si no entra, los huevos lo esperan en el nido. Si le llegan larvas y no se las da, a los pocos días la gallina se las come sola. Hay un botón "Cosechar todo".
+### Cómo se abre cada cosa
+
+Al tocar un objeto, sube un **panel** desde abajo que ocupa unos tres cuartos de la pantalla. Arriba se sigue viendo la chacra, con las gallinas andando. Se cierra tocando afuera o deslizando hacia abajo. Comprar, pagar, pedir un levante: todo pasa dentro del panel.
+
+### Por qué esto es barato de hacer
+
+- **Un solo componente de panel**, reutilizado para todo. El contenido de cada panel es una pantalla común y corriente (listas, botones, formularios).
+- **La chacra es un dibujo de fondo con objetos encima.** Sin motor de juegos: imágenes y animaciones con CSS.
+- **El comportamiento de la gallina es una lista corta de estados** (caminar, picotear, perseguir un bichito, echarse, dormir) que se eligen al azar cada pocos segundos. Son unas cien líneas en un solo archivo.
+- **Menos código que con pestañas:** no hay navegación entre pantallas.
+
+Para restaurantes es la misma chacra; el balde es más grande y el pizarrón muestra sus Rescates.
+
+**Una aclaración sobre Google y la tarjeta:** entrar con Google crea la cuenta en un toque, pero no trae la tarjeta. Lo que hace rápido el pago es Mercado Pago: quien ya tiene cuenta ahí paga con la tarjeta que tiene guardada, sin escribirla.
 
 ---
 
@@ -293,7 +326,7 @@ No soy abogado ni contador; esto es para llevarles las preguntas correctas.
   | Se compra | Sí | No: solo se gana con kilos medidos |
   | Para quién | Clientes | Restaurantes (y más adelante hogares) |
 
-- **Nombre para el impacto verificado, en lugar de FGET.** Propuesta: **Rescates**. *1 Rescate = 1 kg de residuo orgánico rescatado y verificado.* Se entiende sin explicar ("El Popu lleva 1.240 Rescates"), está en español y no suena a plata. "Waste Coins" tiene dos problemas: la regla del proyecto de no decir "coin", y que "coin" sugiere algo que se compra y se vende, justo lo que este registro no es. Alternativas: "Kilos Verificados" (más técnico), "Ciclos" (más poético, menos claro).
+- **Nombre para el impacto verificado, en lugar de FGET: Rescates** (confirmado por Ramón, 13/11). *1 Rescate = 1 kg de residuo orgánico rescatado y verificado.* Se entiende sin explicar ("El Popu lleva 1.240 Rescates"), está en español y no suena a plata. "Waste Coins" tiene dos problemas: la regla del proyecto de no decir "coin", y que "coin" sugiere algo que se compra y se vende, justo lo que este registro no es. Alternativas: "Kilos Verificados" (más técnico), "Ciclos" (más poético, menos claro).
   - En Hedera el token se sigue llamando FGET (en tCO2e) mientras dure la policy actual: no se puede renombrar sin una versión nueva. En pantalla ya se puede mostrar como "Rescates" calculados por kilo.
   - En la policy v2, el token pasa a ser por kilo y se llama Rescate (símbolo `RESC`), con el mint compensatorio que ya estaba previsto.
   - Más adelante, el CIN (certificado de impacto circular) se emite a partir de los Rescates.
@@ -339,18 +372,14 @@ No soy abogado ni contador; esto es para llevarles las preguntas correctas.
 
 ## 12. Preguntas para Ramón
 
-Respondidas el 13/11: precio de la gallina, entregas, gallinas en postura, Eggos fuera de Hedera.
+Respondidas el 13/11: precio de la gallina (pesos), entregas, gallinas en postura, Eggos fuera de Hedera, nombre "Rescates", 5 % de vuelta, levante a 60 Eggos y 1 huevo por kilo, acuerdo de Lucas.
 
 Siguen abiertas:
 
-1. **Los 3.600 son pesos uruguayos,** ¿no? (En el audio salió como euros.)
-2. **Nombre del impacto verificado:** ¿"Rescates"?
-3. **Del costo de $ 5 a $ 6 por huevo,** ¿cuánto es alimento, cuánto la gallina y cuánto trabajo?
-4. **Eggos por compras:** ¿5 % o 10 %?
-5. **Levante de residuos:** ¿60 Eggos? ¿1 huevo extra por kilo, o 2 como en tu ejemplo?
-6. **¿Sumamos la gallina de un año** (200 huevos, 1.900 Eggos)?
-7. **Mercado Pago:** ¿tenés cuenta de vendedor a nombre de la empresa?
-8. **¿Lucas está de acuerdo** con vender producción por adelantado? Es una deuda de la empresa.
+1. **Del costo de $ 5 a $ 6 por huevo,** ¿cuánto es alimento, cuánto la gallina y cuánto trabajo? ¿Incluye tu tiempo?
+2. **¿Sumamos la gallina de un año** (200 huevos, 1.900 Eggos)?
+3. **Mercado Pago:** ¿tenés cuenta de vendedor a nombre de la empresa?
+4. **¿Probamos la adopción sin app,** con 5 o 10 clientes conocidos, antes de construir? (Ver la devolución.)
 
 ## 13. Puntos para Marcel
 
