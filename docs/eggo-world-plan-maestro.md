@@ -534,16 +534,14 @@ Repaso de todo el plan contra el código de la app actual.
 
 Conviene arreglar estas tres cosas en un PR corto antes de empezar.
 
-#### Lo que falta definir
+#### Lo que se definió (Ramón, 13/11)
 
-Cambian el diseño:
-
-1. **Disponibilidad.** La app no sabe cuántos huevos hay para vender, y la prioridad de los socios depende de eso. Propuesta: Ramón carga cada semana cuántos huevos hay disponibles; los socios pueden pedir un día antes que el resto.
-2. **Levantes de hogares.** ¿Quién pesa el balde y cuándo? Propuesta: el chofer lo pesa al retirarlo (como hace hoy con los bultos) y eso alcanza; no pasa por la clasificación de planta. Se retira en el mismo viaje que entrega huevos.
-3. **Cuándo llegan las larvas.** Propuesta: 14 días después del levante, fijo. La alternativa es atarlo a la cosecha real del lote, que es más fiel pero más complicado.
-4. **Días y zonas de reparto.** ¿Hay días fijos? La app necesita decirle al cliente cuándo le llega.
-5. **Restaurantes.** Propuesta: Eggo World arranca solo para consumidores; El Popu sigue en la app actual hasta la etapa W4.
-6. **Qué planillas usa hoy Ramón** fuera de la app, para ver si alguna tiene que salir de acá.
+1. **Disponibilidad:** un número fijo de huevos disponibles, que arranca en **200** y que Ramón puede cambiar desde administración. Sin planificación semanal por ahora: al principio la van a usar una o dos personas. Cada pedido descuenta del número; la prioridad de los socios se programa cuando haga falta.
+2. **Levantes de hogares:** el chofer pesa el balde al retirarlo y eso alcanza; no pasa por la clasificación de planta.
+3. **Larvas:** llegan 14 días después del levante, fijo.
+4. **Reparto:** al hacer el pedido, la app muestra una **cuenta regresiva** con un plazo estimado (`SUPUESTO`: 24 horas, configurable). Después, desde administración, Eggologic puede poner el día y la hora exactos ("martes a las 11") y el cliente lo ve actualizado.
+5. **Restaurantes:** por ahora, solo consumidores. El Popu sigue en la app actual.
+6. **Planillas de Ramón:** no se conecta ninguna por ahora; queda anotado que más adelante se van a conectar. (En el repo no hay ninguna: cuando llegue el momento, Ramón las pasa de nuevo.)
 
 Menores (se deciden al construir y se marcan `SUPUESTO`):
 
