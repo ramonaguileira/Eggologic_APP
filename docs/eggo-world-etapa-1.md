@@ -50,10 +50,9 @@ Las apps de siempre no importan nada de estas (hay un test que lo verifica). En 
 
 | Qué | Estado |
 | --- | --- |
-| Entrar con Google | Programado y con tests, pero **no probado contra Google de verdad**: falta el identificador (ver punto 2) |
-| Mercado Pago | Programado y con tests, pero **no probado contra Mercado Pago de verdad**: falta la credencial. Hay que probarlo con credenciales de prueba antes de cobrar |
+| Entrar con Google | Programado, con tests, y con el identificador de cliente real (`GOOGLE_CLIENT_ID`) ya generado por Ramón el 13/11. **Falta probarlo contra Google de verdad** después del merge |
+| Mercado Pago | Programado y con tests. Ramón generó una aplicación y un Access Token **de prueba** el 13/11 (con su cuenta personal, hasta que la SAS tenga la suya). **Falta probarlo contra Mercado Pago de verdad** después del merge |
 | Probado en celulares reales | No. Se probó en un navegador de escritorio simulando un celular. Falta probar en iPhone y Android |
-| Cancelar un pedido | No devuelve los Eggos ni los huevos disponibles. Si se cancela uno, hay que corregirlo a mano (un ajuste en Administración) |
 | Tienda de siempre | No descuenta de los huevos disponibles; solo descuentan los pedidos de Eggo World |
 
 **No construido:**
@@ -69,7 +68,7 @@ Las apps de siempre no importan nada de estas (hay un test que lo verifica). En 
 | Restaurantes en Eggo World | Decidido: por ahora solo consumidores |
 | Avisos por email | No |
 | Renovar o cancelar una gallina desde la app | No. Se hace desde Administración |
-| Términos y política de privacidad | No están redactados |
+| Términos y política de privacidad | **Hecho el 14/11:** `/privacidad/` y `/terminos/`, enlazados en el pie de toda la app. Es un primer texto escrito por Claude, marcado como borrador; falta que lo revise un abogado |
 | Tarjeta para compartir, premios visibles por nivel, sonido | No |
 | Animación de la gallina poniendo el huevo, camioncito | No |
 | Límite de pedidos por minuto en la API | No |
@@ -148,5 +147,34 @@ Otros:
 ## 6. Preguntas
 
 1. ¿Probás la chacra y me decís qué cambiar del dibujo y de los textos?
-2. Cancelar un pedido: ¿lo hago automático (devuelve Eggos y huevos)? Es lo primero que arreglaría.
-3. ¿Qué sigue: nodos y producción por período, prioridad y precio congelado del socio, verduras, o avisos por email?
+2. ¿Qué sigue: nodos y producción por período, prioridad y precio congelado del socio, verduras, o avisos por email?
+
+## 7. Segunda tanda (14/11/2026), mientras se espera el merge de Marcel
+
+Con el PR #13 todavía sin mergear, Ramón pidió seguir con dos cosas que no dependían de eso.
+
+### Cancelar un pedido ya devuelve lo que había descontado
+
+Pantalla nueva en Administración, **Cancelar pedido** (en el detalle de cada pedido). Al cancelar:
+
+- Si el pedido era de Eggo World, devuelve sus huevos al cupo disponible.
+- Si se había pagado con Eggos, devuelve el saldo al cliente.
+- Un pedido pagado con plata (transferencia, Mercado Pago, al recibir) no devuelve nada automático: esa devolución se sigue coordinando por fuera de la app, como siempre.
+- Un pedido de la tienda de siempre (no de Eggo World) no toca el cupo de huevos disponibles al cancelarse, porque tampoco lo tocó al crearse.
+
+Para que esto funcione, se sumó un campo `de_eggo_world` a `Pedido` (migración `tienda/0003`), que marca si un pedido pasó por `mundo.crear_pedido` (y por lo tanto descontó huevos disponibles) o si vino de la tienda de toda la vida.
+
+La lógica vive en `mundo.servicio.cancelar_pedido`, y la pantalla en `mundo/views.py` (no en `tienda/views.py`, para no romper la regla de que las apps de siempre no dependan de las nuevas).
+
+### Textos de privacidad y de términos
+
+Dos páginas públicas (no hace falta estar logueado), enlazadas en el pie de toda la app:
+
+- `/privacidad/`: qué datos se guardan, para qué se usan, con quién se comparten (Google, Mercado Pago, y el registro verificable del impacto, al que nunca van datos personales) y cómo pedir que se borren.
+- `/terminos/`: qué es la app, cómo funcionan los Eggos, que adoptar una gallina es comprar producto por adelantado y no una inversión, cancelaciones y contacto.
+
+**Es un primer texto, escrito por Claude y marcado como borrador en el propio HTML (comentario `SUPUESTO`).** Hace falta que un abogado lo revise antes de que la app tenga mucho uso, y antes de publicar la app de Google (que pide un enlace a la política de privacidad en su página de marca).
+
+### Tests
+
+160 (antes 152): 6 nuevos de cancelar pedidos y 2 de las páginas legales. Todos en verde.

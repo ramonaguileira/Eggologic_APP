@@ -112,6 +112,17 @@ class PermisosTests(TestCase):
         self.assertEqual(self.client.get(reverse("captura:retiro_nuevo")).status_code, 403)
 
 
+class PaginasLegalesTests(TestCase):
+    def test_privacidad_y_terminos_se_ven_sin_estar_logueado(self):
+        self.assertEqual(self.client.get(reverse("privacidad")).status_code, 200)
+        self.assertEqual(self.client.get(reverse("terminos")).status_code, 200)
+
+    def test_estan_enlazadas_desde_el_pie_de_pagina(self):
+        respuesta = self.client.get(reverse("login"))
+        self.assertContains(respuesta, reverse("privacidad"))
+        self.assertContains(respuesta, reverse("terminos"))
+
+
 class CrearAdminTests(TestCase):
     def test_crea_el_admin_una_sola_vez_y_solo_con_las_variables(self):
         with patch.dict(os.environ, {"DJANGO_SUPERUSER_EMAIL": "", "DJANGO_SUPERUSER_PASSWORD": ""}):

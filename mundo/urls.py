@@ -8,6 +8,7 @@ urlpatterns = [
     path("", views.panel, name="panel"),
     path("recargas/<int:recarga_id>/", views.recarga_resolver, name="recarga_resolver"),
     path("pedidos/<int:pedido_id>/entrega/", views.pedido_entrega, name="pedido_entrega"),
+    path("pedidos/<int:pedido_id>/cancelar/", views.pedido_cancelar, name="pedido_cancelar"),
     path("levantes/", views.levantes, name="levantes"),
     path("levantes/<int:levante_id>/retirar/", views.levante_retirar, name="levante_retirar"),
     path("exportar/movimientos.csv", views.exportar_movimientos, name="exportar_movimientos"),

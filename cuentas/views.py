@@ -45,6 +45,16 @@ def registrarse(request):
         return redirect("impacto:mi_impacto")
     return render(request, "registration/registrarse.html", {"form": form})
 
+def privacidad(request):
+    """Pública: no hace falta estar logueado. Texto en templates/legales/privacidad.html."""
+    return render(request, "legales/privacidad.html")
+
+
+def terminos(request):
+    """Pública: no hace falta estar logueado. Texto en templates/legales/terminos.html."""
+    return render(request, "legales/terminos.html")
+
+
 @login_required
 def primera_entrega(request):
     """Recolecta datos de entrega para clientes nuevos en su primera entrega."""

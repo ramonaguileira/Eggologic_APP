@@ -87,6 +87,19 @@ def recarga_resolver(request, recarga_id):
 
 
 @requiere(Usuario.es_admin)
+def pedido_cancelar(request, pedido_id):
+    """Cancela un pedido. Si era de Eggo World, devuelve los huevos y, si se pagó con Eggos, el saldo."""
+    pedido = get_object_or_404(Pedido, pk=pedido_id)
+    if request.method == "POST":
+        if servicio.cancelar_pedido(pedido):
+            messages.success(request, "El pedido se canceló. Se devolvió lo que había descontado.")
+        else:
+            messages.info(request, "Ese pedido ya estaba cancelado.")
+        return redirect("tienda:pedido_admin_detalle", pedido_id=pedido.pk)
+    return render(request, "mundo/pedido_cancelar.html", {"pedido": pedido})
+
+
+@requiere(Usuario.es_admin)
 @require_POST
 def pedido_entrega(request, pedido_id):
     """Pone el día y la hora exactos de entrega de un pedido; el cliente lo ve actualizado."""

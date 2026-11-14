@@ -257,6 +257,72 @@ class AdministracionTests(TestCase):
         self.assertIn("Clota", self.client.get(reverse("mundo:exportar_gallinas")).content.decode())
 
 
+class CancelarPedidoTests(TestCase):
+    def setUp(self):
+        self.ana = crear_cliente()
+        self.quincena = crear_quincena()
+        self.admin = Usuario.objects.create_user(username="admin", rol=Usuario.Rol.ADMIN)
+
+    def test_cancelar_devuelve_los_huevos_al_cupo(self):
+        servicio.crear_pedido(self.ana, [(self.quincena, 2)], Pedido.FormaPago.CONTRA_ENTREGA, "Calle 1", "099")
+        pedido = Pedido.objects.get()
+        self.assertEqual(Ajustes.actuales().huevos_disponibles, 170)
+        self.assertTrue(servicio.cancelar_pedido(pedido))
+        self.assertEqual(Ajustes.actuales().huevos_disponibles, 200)
+        pedido.refresh_from_db()
+        self.assertEqual(pedido.estado, Pedido.Estado.CANCELADO)
+
+    def test_cancelar_devuelve_los_eggos_si_se_pago_con_eggos(self):
+        con_saldo(self.ana, 500)
+        pedido = servicio.crear_pedido(self.ana, [(self.quincena, 1)], Pedido.FormaPago.EGGOS, "Calle 1", "099")
+        self.assertEqual(eggos.saldo(self.ana), 500 - pedido.total)
+        servicio.cancelar_pedido(pedido)
+        self.assertEqual(eggos.saldo(self.ana), 500)
+
+    def test_cancelar_dos_veces_no_devuelve_dos_veces(self):
+        pedido = servicio.crear_pedido(self.ana, [(self.quincena, 1)], Pedido.FormaPago.CONTRA_ENTREGA, "Calle 1", "099")
+        self.assertTrue(servicio.cancelar_pedido(pedido))
+        self.assertFalse(servicio.cancelar_pedido(pedido))
+        # Devolvió los 15 huevos una sola vez (200 - 15 + 15 = 200, no 215).
+        self.assertEqual(Ajustes.actuales().huevos_disponibles, 200)
+
+    def test_cancelar_la_gallina_libera_el_cupo_de_huevos(self):
+        self.gallina = Gallina.objects.create(
+            usuario=self.ana, nombre="Clota", plan="dos_anios", estado=Gallina.Estado.ACTIVA,
+            inicio=timezone.localdate() - timedelta(days=60), pago_hasta=timezone.localdate() + timedelta(days=670),
+        )
+        pedido = servicio.pedir_huevos(self.ana, 30, "Calle 1", "099")
+        self.assertEqual(servicio.huevos_para_pedir(self.ana), 2)  # 32 puestos - 30 pedidos
+        servicio.cancelar_pedido(pedido)
+        self.assertEqual(servicio.huevos_para_pedir(self.ana), 32)
+        self.assertEqual(Ajustes.actuales().huevos_disponibles, 200)
+
+    def test_un_pedido_de_la_tienda_de_siempre_no_toca_los_huevos_disponibles(self):
+        from tienda.models import ItemPedido
+
+        pedido = Pedido.objects.create(
+            usuario=self.ana, forma_pago=Pedido.FormaPago.CONTRA_ENTREGA, direccion="x", telefono="1"
+        )
+        ItemPedido.objects.create(
+            pedido=pedido, producto=self.quincena, cantidad=1, precio_unitario=self.quincena.precio, huevos_por_unidad=15
+        )
+        self.assertFalse(pedido.de_eggo_world)
+        servicio.cancelar_pedido(pedido)
+        # No tenía nada descontado de Ajustes: cancelarlo no debe inflar el cupo.
+        self.assertEqual(Ajustes.actuales().huevos_disponibles, 200)
+
+    def test_solo_administracion_puede_cancelar_desde_la_pantalla(self):
+        pedido = servicio.crear_pedido(self.ana, [(self.quincena, 1)], Pedido.FormaPago.CONTRA_ENTREGA, "Calle 1", "099")
+        self.client.force_login(self.ana)
+        self.assertEqual(self.client.get(reverse("mundo:pedido_cancelar", args=[pedido.pk])).status_code, 403)
+        self.client.force_login(self.admin)
+        respuesta = self.client.get(reverse("mundo:pedido_cancelar", args=[pedido.pk]))
+        self.assertContains(respuesta, "Cancelar pedido")
+        self.client.post(reverse("mundo:pedido_cancelar", args=[pedido.pk]))
+        pedido.refresh_from_db()
+        self.assertEqual(pedido.estado, Pedido.Estado.CANCELADO)
+
+
 class SeparacionTests(TestCase):
     def test_la_app_de_siempre_no_importa_nada_de_eggo_world(self):
         """Si un día se borra Eggo World, el resto tiene que seguir andando."""

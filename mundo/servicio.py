@@ -171,6 +171,7 @@ def crear_pedido(usuario, items, forma_pago, direccion, telefono, notas=""):
         telefono=telefono,
         notas=notas,
         entrega_estimada=timezone.now() + timedelta(hours=ajustes.horas_de_entrega),
+        de_eggo_world=True,
     )
     for producto, cantidad in items:
         ItemPedido.objects.create(
@@ -189,6 +190,35 @@ def crear_pedido(usuario, items, forma_pago, direccion, telefono, notas=""):
         except eggos.SaldoInsuficiente:
             raise NoSePuede("No te alcanzan los Eggos. Podés recargar o pagar con plata.")
     return pedido
+
+
+@transaction.atomic
+def cancelar_pedido(pedido):
+    """Cancela un pedido de Eggo World y deshace lo que había descontado.
+
+    Devuelve los huevos al cupo disponible (si era de Eggo World) y, si se había pagado con
+    Eggos, los devuelve al cliente. Un pedido pagado con plata (Mercado Pago, transferencia,
+    al recibir) no devuelve nada automático: esa plata se devuelve por fuera, a mano.
+    Devuelve False si el pedido ya estaba cancelado (no hace nada dos veces).
+    """
+    pedido = Pedido.objects.select_for_update().get(pk=pedido.pk)
+    if pedido.estado == Pedido.Estado.CANCELADO:
+        return False
+    if pedido.de_eggo_world:
+        ajustes = Ajustes.objects.select_for_update().get(pk=Ajustes.actuales().pk)
+        ajustes.huevos_disponibles += pedido.huevos
+        ajustes.save()
+    if pedido.forma_pago == Pedido.FormaPago.EGGOS:
+        eggos.mover(
+            pedido.usuario,
+            int(pedido.total),
+            Movimiento.Motivo.AJUSTE,
+            f"Pedido N.º {pedido.pk} cancelado",
+            f"cancelacion-pedido-{pedido.pk}",
+        )
+    pedido.estado = Pedido.Estado.CANCELADO
+    pedido.save()
+    return True
 
 
 def pedir_huevos(usuario, huevos, direccion, telefono):

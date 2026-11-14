@@ -59,5 +59,10 @@
     {% endfor %}
     {% block contenido %}{% endblock %}
   </main>
+
+  <footer class="pie">
+    <a href="{% url 'privacidad' %}">Privacidad</a>
+    <a href="{% url 'terminos' %}">Términos y condiciones</a>
+  </footer>
 </body>
 </html>

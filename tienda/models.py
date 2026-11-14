@@ -43,6 +43,9 @@ class Pedido(models.Model):
     notas = models.TextField(blank=True)
     # Día y hora de entrega. Arranca con un plazo estimado y Eggologic lo puede ajustar.
     entrega_estimada = models.DateTimeField("entrega estimada", null=True, blank=True)
+    # Si viene de Eggo World, descontó huevos de mundo.Ajustes.huevos_disponibles al crearse
+    # (ver mundo/servicio.py): hay que devolverlos si se cancela. Los de la tienda de siempre no.
+    de_eggo_world = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["-creado_en"]

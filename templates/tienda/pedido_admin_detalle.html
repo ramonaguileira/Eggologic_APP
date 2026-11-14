@@ -58,6 +58,9 @@
     {% if pedido.estado != pedido.Estado.ENTREGADO and user.es_admin %}
       <a href="{% url 'tienda:pedido_entregado' pedido.pk %}" class="boton">Marcar como entregado</a>
     {% endif %}
+    {% if pedido.estado != pedido.Estado.CANCELADO and pedido.estado != pedido.Estado.ENTREGADO and user.es_admin %}
+      <a href="{% url 'mundo:pedido_cancelar' pedido.pk %}" class="boton no-accion">Cancelar pedido</a>
+    {% endif %}
     <a href="{% url 'tienda:pedidos_admin' %}" class="boton no-accion">Volver</a>
   </div>
 {% endblock %}

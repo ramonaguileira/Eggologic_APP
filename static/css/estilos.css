@@ -265,3 +265,19 @@ form input[type="radio"] { width: auto; margin-right: 0.4rem; }
   table { font-size: 0.8rem; }
   a { color: inherit; text-decoration: none; }
 }
+
+/* Pie de página con los enlaces legales, visible en toda la app. */
+.pie {
+  max-width: 960px;
+  margin: 2rem auto 1rem;
+  padding: 1rem;
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: var(--tenue);
+  border-top: 1px solid var(--borde);
+}
+.pie a { color: inherit; }
+@media print {
+  .pie { display: none; }
+}
