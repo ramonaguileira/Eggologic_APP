@@ -79,3 +79,13 @@ python manage.py runserver
 - Un reporte por restaurante por mes, revisado por una persona.
 - Fotos en la base mientras Render sea gratis.
 - Nivel D afuera: incentivos a escala, emisión del CIN y modelo no custodial.
+
+## Eggo World (13/11)
+
+Es una parte nueva y separada: la chacra en pixel art para clientes. El resumen de lo construido, los supuestos y lo que falta está en [eggo-world-etapa-1.md](eggo-world-etapa-1.md); el diseño, en [eggo-world-plan-maestro.md](eggo-world-plan-maestro.md).
+
+- Tres apps Django nuevas (`eggos`, `mundo`, `api`) y la carpeta `eggo-world/` con la app del cliente, en HTML, CSS y JavaScript sin compilar.
+- Las apps de las etapas 1 a 4 no importan nada de las nuevas; lo verifica `mundo.tests.SeparacionTests`.
+- Está apagada por defecto (`EGGO_WORLD_ACTIVO`). Apagada, sus direcciones responden 404.
+- Orden sugerido de lectura: `eggos/reglas.py`, `eggos/servicio.py`, `mundo/models.py`, `mundo/servicio.py`, `api/views.py`.
+- Lo que más conviene mirar: el aviso de Mercado Pago (`api/views.py`), la verificación de Google (`api/google.py`) y las funciones que mueven Eggos.

@@ -14,7 +14,11 @@ class PedidoForm(forms.Form):
     telefono = forms.CharField(label="Teléfono", max_length=40)
     forma_pago = forms.ChoiceField(
         label="Forma de pago",
-        choices=Pedido.FormaPago.choices,
+        # La tienda de siempre ofrece solo estas dos; las otras formas de pago son de Eggo World.
+        choices=[
+            (Pedido.FormaPago.CONTRA_ENTREGA, Pedido.FormaPago.CONTRA_ENTREGA.label),
+            (Pedido.FormaPago.TRANSFERENCIA, Pedido.FormaPago.TRANSFERENCIA.label),
+        ],
         widget=forms.RadioSelect,
         initial=Pedido.FormaPago.CONTRA_ENTREGA,
     )

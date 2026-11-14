@@ -36,6 +36,10 @@ INSTALLED_APPS = [
     "tienda",
     "impacto",
     "guardian",
+    # Eggo World. Las apps de arriba no importan nada de estas tres.
+    "eggos",
+    "mundo",
+    "api",
 ]
 
 MIDDLEWARE = [
@@ -62,6 +66,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "mundo.contexto.eggo_world",
             ],
         },
     },
@@ -110,7 +115,8 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+# La app de Eggo World (carpeta eggo-world/) se sirve como archivos estáticos, bajo static/mundo/.
+STATICFILES_DIRS = [BASE_DIR / "static", ("mundo", BASE_DIR / "eggo-world")]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STORAGES = {
     # Las fotos de los retiros van a la base (ver captura/almacen.py).
@@ -133,6 +139,13 @@ TIENDA_DATOS_TRANSFERENCIA = os.environ.get(
 # se leen en guardian/cliente.py (GUARDIAN_PROPONENTE_EMAIL, GUARDIAN_R001_EMAIL, etc.).
 GUARDIAN_URL = os.environ.get("GUARDIAN_URL", "")
 GUARDIAN_POLICY_ID = os.environ.get("GUARDIAN_POLICY_ID", "")
+
+# Eggo World. Con el interruptor apagado, sus direcciones no existen y la app sigue como siempre.
+EGGO_WORLD_ACTIVO = os.environ.get("EGGO_WORLD_ACTIVO", "False") == "True"
+# Para el botón "Entrar con Google": el identificador de cliente (no es secreto).
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
+# Credencial de Mercado Pago. Es secreta: va solo en variables de entorno.
+MERCADOPAGO_ACCESS_TOKEN = os.environ.get("MERCADOPAGO_ACCESS_TOKEN", "")
 
 if not DEBUG:
     # Render atiende el https y le pasa el pedido a Django por http, avisando con este header.

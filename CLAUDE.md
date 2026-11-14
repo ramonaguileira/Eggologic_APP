@@ -39,6 +39,7 @@ App piloto de Eggologic (Nodo 1, Maldonado): registra el circuito residuo de res
   - fotos de los retiros guardadas en la base (`captura/almacen.py`).
 - `tienda/`: productos y pedidos (pago contra entrega o transferencia).
 - `impacto/`: "Mi impacto" de clientes y restaurantes. Todas las fórmulas están en `impacto/calculos.py`, incluido el factor provisorio de CO2e.
+- `eggos/`, `mundo/`, `api/` y `eggo-world/`: **Eggo World**, la chacra en pixel art para clientes (se abre en `/mundo/`). Todos sus números están en `eggos/reglas.py`. Las apps de arriba no importan nada de estas. Se prende con `EGGO_WORLD_ACTIVO=True`. Qué se hizo y qué falta: `docs/eggo-world-etapa-1.md`.
 - `guardian/`: cliente de la API de MGS, reporte mensual por restaurante (lo revisa una persona en **Reportes**) y los comandos `guardian_estado` y `guardian_enviar`.
 - `docs/`:
   - propuesta aprobada (`etapa-0-propuesta.md`);
@@ -57,6 +58,8 @@ python manage.py migrate
 python manage.py cargar_demo --password "<contraseña de prueba>"
 python manage.py test
 python manage.py runserver
+EGGO_WORLD_ACTIVO=True python manage.py runserver   # con Eggo World prendido, en /mundo/
+python eggo-world/arte/dibujar.py   # vuelve a dibujar los sprites (necesita Pillow)
 python manage.py guardian_estado   # revisa la conexión con Guardian sin escribir nada
 python manage.py guardian_enviar   # manda a Guardian los reportes revisados (escribe en el Guardian real)
 ```
@@ -72,6 +75,8 @@ python manage.py guardian_enviar   # manda a Guardian los reportes revisados (es
 | 4 | Entregables ANDE (demo 19/10/2026) | Para revisar |
 | Datos | Plan de datos tras la auditoría (fases 0 a 5, hasta marzo de 2027) | Fase 0 para revisar y publicada en Render (`docs/plan-datos-fase-0.md`) |
 | 5 | Experiencia de cliente y restaurante: más simple, clara y estética en el celular; que el cliente se arregle solo (recuperar contraseña por email, entrar con el email, registro más corto) | Después de la respuesta de Marcel |
+
+| Eggo World | Chacra en pixel art para clientes: adoptar gallinas, juntar y pedir huevos, tienda con dos precios, Eggos, levantes de residuos (pedido de Ramón, 13/11). Reemplaza a la Etapa 5 | Primera construcción para revisar (`docs/eggo-world-etapa-1.md`), apagada hasta poner `EGGO_WORLD_ACTIVO`. Google y Mercado Pago sin probar de verdad |
 
 Todas las etapas pasan a la revisión de Marcel (`docs/para-marcel.md`).
 
@@ -150,5 +155,33 @@ Cosas de MGS que aprendimos:
 - **Decisión de Ramón (16/10): el envío a Guardian pasa a ser diario y automático.** A definir antes de programarlo: si se mantiene la revisión humana (P-5) o se reemplaza por alertas; cada envío mintea FGET, y un día de un restaurante puede dar tan pocas tCO2e que el mint redondee a cero según los decimales del token; el automático corre como Cron Job de Render con `guardian_enviar`.
 - Usuarios en línea (14/10): `chofer`, `planta`, `granja`, `carbosur`, `ClienteTest1`, `ramon` e `info@eggologic.org`. `ramon` e `info@` comparten email: cambiar el de `ramon`. Falta el usuario Restaurante de El Popu.
 - Mientras no exista la Fase 1: el chofer carga en kg el neto pesado en planta (bruto − cajones × 2,2 kg), y la planta anota cajones y bruto en observaciones.
+
+**Hallazgos de uso real (Ramón, 24/10, tras dos semanas usando la app).** Decisiones:
+1. **Guardian diario y automático, todos los días a las 18:00** (hora de Montevideo). Se reporta todo, aunque algún dato salga mal: los errores se corrigen con un reporte de corrección, nunca editando el original. Ramón no encontró en la app dónde se enviaba a mano.
+2. **Retiro por bultos:** el chofer pesa de a un cajón (dos bolsas por cajón). Carga cada bulto con su peso, la app los suma, y al final saca una sola foto de todo y envía el retiro.
+3. **Clasificación en planta con kg y foto:** la planta pesa kg de restos vegetales, de residuos de plato y de impropios, sube una foto y envía.
+4. **Producción de huevos por período** (por ejemplo, del 1 al 30 de octubre, o 15 días), no por día. Ramón elige el período.
+5. **Varios lotes de larva por período:** al cargar la producción del período se eligen los lotes que alimentaron a las gallinas.
+
+**Eggo World y estructura descentralizada (Ramón, 13/11). Solo planes, nada construido.** Dos documentos: `docs/eggo-world-plan-maestro.md` y `docs/estructura-descentralizada.md`.
+- Eggo World tiene dos objetivos: pagos adelantados (adoptar una gallina = pagar por adelantado su producción de 2 años) y educar. Juego liviano: un toque de color, nadie colgado jugando. El pixel art lo dibuja Claude.
+- Datos de Ramón: producir un huevo cuesta $ 5 a $ 6; una gallina pone 200 a 250 huevos por año; los residuos hoy no le dan ganancia (las larvas comen sobre todo afrechillo): son inversión en educación.
+- Los Eggos tienen valor real y se pueden comprar; pagos con Mercado Pago (tarjeta y suscripción). Los residuos no dan Eggos: el levante se paga con Eggos y devuelve larvas que suben la producción de la gallina.
+- Propuestas sin confirmar (SUPUESTO): 1 Eggo = $ 1; gallina de 2 años a 3.600 Eggos con 400 huevos garantizados; 5 % de vuelta en compras; Eggos solo en la base de la app, no en Hedera (choca con la decisión del 12/10 de mostrar FGET como Eggos: decidir con Marcel y CarboSur).
+- **Confirmado por Ramón (13/11):** gallina de 2 años a 3.600 (confirmar que son pesos); Eggos fuera de Hedera; unas 60 gallinas en postura; envíos gratis y baratos, solo en la zona (El Tesoro y La Barra). Esto reemplaza la decisión del 12/10 de mostrar FGET como "Eggos": falta el nombre nuevo del impacto verificado (propuesta de Claude: "Rescates", 1 por kg; Ramón sugirió "Waste Coins"). Avisar a Marcel y a CarboSur.
+- **Empresa y socios (Ramón, 13/11):** Lucas 50 %; Ramón y Cami 50 %. Camino Verde presta la tierra y recibe el 10 % de la producción. La Nona invierte en infraestructura y recibe el 15 %. El gallinero nuevo (50 gallinas, 3.000, a confirmar si son dólares) lo paga un inversor que recibe el 15 %, con derecho de recompra para Eggologic.
+- **Más confirmaciones de Ramón (13/11):** los 3.600 son pesos; 1 Eggo = $ 1; 5 % de vuelta en compras; levante a 60 Eggos y 1 huevo extra por kg; el impacto verificado en Hedera se llama **Rescates** (1 por kg; el token sigue siendo FGET hasta la policy v2); Lucas está de acuerdo con vender producción por adelantado.
+- **Experiencia visual de Eggo World (Ramón, 13/11):** pantalla de carga con frases tipo Los Sims; una sola pantalla, la chacra, de la que nunca se sale; sin pestañas: los botones son objetos de la chacra y abren un panel encima; chacra vacía con pajarito y caracol; gallinas con comportamiento (caminan, comen bichitos) a las que se les da comida, agua y caricias. Poco código y fácil para Marcel.
+- **Acuerdos con socios (Ramón, 13/11):** todo en pesos (gallinero nuevo: $ 120.000). El gallinero es del inversor; las gallinas y la reposición, de Eggologic; puede vender sus huevos; si quiere efectivo se le paga la ganancia (unos $ 4 por huevo); Ramón evalúa bajarle de 15 % a 10 %. La Nona presta la plata: 15 % de todo el predio hasta devolverle, después 10 %.
+- **Ramón (13/11, última tanda):** Eggologic es una SAS ya constituida. El costo de $ 5 a $ 6 por huevo no incluye su tiempo. Todavía no habló con el inversor del gallinero. La Nona prestó 4.340 (a confirmar si son dólares). Cree tener cuenta de vendedor de Mercado Pago a nombre de la empresa. No quiere probar la adopción a mano: quiere construir Eggo World directamente cuando el plan esté cerrado. **Sigue sin construirse nada hasta que lo diga.**
+- **Ramón (13/11, cierre del plan):** La Nona prestó USD 4.340; se esperan unos 60 huevos por día ahí y devolverle en 4 a 8 años; a ella no la apura. Gallinas de dos años, de un año y mensual (por suscripción). El código de Eggo World va en una carpeta `eggo-world/` de este repo (decisión delegada a Claude).
+- **Ramón (13/11, después del cierre):** el abogado y el contador dijeron que no hay problema con la gallina prepaga. Cada huevo que recibe La Nona descuenta $ 10 de su deuda. La identidad visual la arma Ramón en Claude Design con el prompt de `docs/eggo-world-prompt-identidad.md`; cuando la traiga, se sigue con el código.
+- **Arte de Eggo World (Ramón, 13/11):** primer paquete de Claude Design en `docs/eggo-world-arte/`: paleta de 16 colores (verde Eggologic `#1d583b`, yema `#f5b921`, contorno tinta `#0c2a1f`) y 15 sprites quietos en grilla de 16×16. Faltan animaciones, balde, maple, chacra vertical, tipografías y piezas de interfaz (lista en el plan, punto 8). El logo real es un huevo de línea blanca con espiral sobre verde oscuro, con la frase "Huevos regenerativos".
+- **Precios y socios de Eggo World (Ramón, 13/11):** se puede usar solo para comprar huevos. Pagando con plata: precio lleno y 3 % de vuelta en Eggos (ya no 5 %). Pagando con Eggos: 5,5 % menos; 7,5 % menos con la insignia de socio. Recarga en paquetes de 500, 1.000 o 2.000. Socio = un mes entero con 1.000 Eggos o más: descuento mayor, prioridad de stock, acceso primero y precio congelado. Sin intereses. El arte que falta lo dibuja Claude en el estilo del paquete.
+- **Últimas definiciones antes de construir (Ramón, 13/11):** disponibilidad como número fijo editable desde administración (arranca en 200 huevos); el chofer pesa el balde de hogares al retirarlo; larvas a los 14 días; cuenta regresiva de entrega (24 h por defecto) que administración puede reemplazar por día y hora exactos; Eggo World arranca solo para consumidores; las planillas de Ramón se conectan más adelante. El plan está cerrado; falta la orden de Ramón para empezar a construir.
+- **Construcción (13/11):** Ramón pidió construir todo de una, sin revisiones intermedias. Quedó hecho y apagado; la lista de lo que falta está en `docs/eggo-world-etapa-1.md`. La chacra es HTML, CSS y JavaScript sin compilar, servida por Django en `/mundo/` (no React ni un sitio aparte).
+- **Segunda tanda, mientras se espera el merge (Ramón, 14/11):** se agregó, en el mismo PR #13, que cancelar un pedido devuelva los Eggos y los huevos disponibles (pantalla en Administración), y dos páginas públicas de privacidad y de términos (`/privacidad/`, `/terminos/`), con un primer texto de Claude sin revisión legal todavía. 160 tests.
+- **Puesta en marcha (Ramón, 13/11):** el merge del PR #13 lo hace Marcel. Google: proyecto "Eggo World" creado con `info@eggologic.org`, en modo prueba (solo entran los usuarios de prueba; falta publicarlo, y para eso hacen falta los textos de privacidad y términos). Mercado Pago: al principio se cobra con la cuenta personal de Ramón (avisó a Lucas y al contador); primero con credenciales de prueba. **Pendiente: abrir la cuenta de Mercado Pago de la SAS y cambiar el token antes de ofrecer gallinas en serio.**
+- Nodos: incubadora (casa de Ramón), planta BSF (terreno lindero), Camino Verde (gallinas; viene otro gallinero con un socio inversor), La Nona / Iguzquiza / Miramar Acres (nuevo, con huerta); cerdos en unos meses. La app necesita un modelo `Nodo`, a sumar junto con la producción por período.
 
 **Restaurantes nuevos (resolución temporal, 06/10).** Se cargan en la app desde el primer día; el usuario en Guardian se crea cuando entran en serio al piloto, con el alta solo con el código. Mientras tanto sus meses esperan en **Reportes**. No habrá restaurantes nuevos antes del 19/10.

@@ -1,0 +1,185 @@
+/* Eggo World. Los colores salen de paleta.css (variables --egg-*).
+   --u es el tamaño en pantalla de un píxel del dibujo; lo calcula js/chacra.js. */
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--egg-tinta);
+  color: var(--egg-tinta);
+  font-family: "Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.4;
+  overscroll-behavior: none;
+}
+[hidden] { display: none !important; }
+.pixel { image-rendering: pixelated; }
+/* Jersey 15: pixelada, con tildes y ñ, y con números que se leen bien (los precios importan). */
+h1, h2, h3, .titulo, .contador, .cartel, .boton, #frase, .numero, .zzz, .cantidad button {
+  font-family: "Jersey 15", "Courier New", monospace;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+
+#app {
+  --u: 4px;
+  position: relative;
+  height: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  overflow: hidden;
+  background: var(--egg-verde-eggologic);
+}
+
+/* --- Carga y entrada --- */
+.pantalla {
+  position: absolute; inset: 0; z-index: 50;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  padding: 24px; text-align: center;
+  background: var(--egg-verde-eggologic); color: var(--egg-blanco);
+}
+.pantalla h1 { font-size: 52px; margin: 0; }
+.pantalla p { margin: 0; max-width: 300px; color: var(--egg-cascara); }
+#frase { font-size: 26px; min-height: 32px; }
+.flota { animation: flotar 1.2s steps(2) infinite; }
+@keyframes flotar { 50% { transform: translateY(-8px); } }
+#boton-google { min-height: 44px; }
+
+/* --- Botones --- */
+.boton {
+  display: inline-block; border: 0; text-decoration: none; text-align: center;
+  padding: 10px 18px; font-size: 24px;
+  background: var(--egg-yema); color: var(--egg-tinta);
+  /* Borde de píxeles: sombras duras, sin desenfoque. */
+  box-shadow: 0 -4px 0 var(--egg-tinta), 0 4px 0 var(--egg-tinta), -4px 0 0 var(--egg-tinta), 4px 0 0 var(--egg-tinta),
+    inset 0 -4px 0 var(--egg-ambar);
+  margin: 4px;
+}
+.boton:active { transform: translateY(2px); box-shadow: 0 -4px 0 var(--egg-tinta), 0 4px 0 var(--egg-tinta), -4px 0 0 var(--egg-tinta), 4px 0 0 var(--egg-tinta); }
+.boton.secundario { background: var(--egg-cascara); box-shadow: 0 -4px 0 var(--egg-tinta), 0 4px 0 var(--egg-tinta), -4px 0 0 var(--egg-tinta), 4px 0 0 var(--egg-tinta), inset 0 -4px 0 var(--egg-paja); }
+.boton.ancho { display: block; width: calc(100% - 8px); }
+.boton:disabled { background: var(--egg-paja); color: var(--egg-nido); box-shadow: 0 -4px 0 var(--egg-nido), 0 4px 0 var(--egg-nido), -4px 0 0 var(--egg-nido), 4px 0 0 var(--egg-nido); cursor: default; }
+.enlace { color: inherit; background: none; border: 0; padding: 6px; text-decoration: underline; font-size: 15px; }
+.chico { font-size: 14px; }
+.tenue { color: #5d6b5f; }
+
+/* --- La chacra --- */
+/* z-index: 0 encierra las capas de la chacra, para que nada del dibujo tape el panel. */
+#chacra { position: absolute; inset: 0; overflow: hidden; z-index: 0; }
+#cielo { position: absolute; inset: 0 0 auto 0; height: 42%; background: var(--egg-cascara); transition: background 1s; }
+#suelo {
+  position: absolute; inset: 42% 0 0 0;
+  background: var(--egg-pradera);
+  /* Franjas de pasto más claro al fondo, para dar profundidad sin degradados. */
+  box-shadow: inset 0 calc(var(--u) * 3) 0 var(--egg-brote), inset 0 calc(var(--u) * 5) 0 #46945a;
+}
+.noche #cielo { background: var(--egg-tinta); }
+.noche #suelo { background: var(--egg-verde-eggologic); box-shadow: inset 0 calc(var(--u) * 3) 0 var(--egg-pradera), inset 0 calc(var(--u) * 5) 0 #25684a; }
+.noche .de-dia, .dia .de-noche { display: none; }
+#cosas { position: absolute; inset: 0; z-index: 1; }
+
+.cosa {
+  position: absolute; padding: 0; border: 0; background: none;
+  background-repeat: no-repeat; background-size: auto 100%;
+  image-rendering: pixelated;
+  width: calc(var(--w) * var(--u)); height: calc(var(--h) * var(--u));
+  left: calc(var(--x) * var(--u)); top: calc(var(--y) * var(--u));
+}
+.cosa.espejo { transform: scaleX(-1); }
+button.cosa { -webkit-tap-highlight-color: transparent; }
+button.cosa:active { transform: translateY(2px); }
+/* El cartelito con el nombre de cada objeto, para que se entienda sin adivinar. */
+.cartel {
+  position: absolute; left: 50%; top: 100%; transform: translateX(-50%); white-space: nowrap;
+  margin-top: 4px; padding: 0 7px; font-size: 18px;
+  background: var(--egg-cascara); color: var(--egg-tinta);
+  box-shadow: 0 -2px 0 var(--egg-tinta), 0 2px 0 var(--egg-tinta), -2px 0 0 var(--egg-tinta), 2px 0 0 var(--egg-tinta);
+}
+.cartel.llama { background: var(--egg-yema); animation: flotar 1.2s steps(2) infinite; }
+/* Pastitos y flores van siempre al fondo, para no tapar carteles. */
+.adorno { z-index: 0 !important; pointer-events: none; }
+.globo { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); pointer-events: none; animation: subir 1s steps(5) forwards; }
+@keyframes subir { to { transform: translate(-50%, -18px); opacity: 0; } }
+.estrella { position: absolute; width: var(--u); height: var(--u); background: var(--egg-yema-luz); animation: titilar 2s steps(2) infinite; }
+@keyframes titilar { 50% { opacity: .3; } }
+.nube { animation: pasar 90s linear infinite; }
+@keyframes pasar { from { margin-left: -30%; } to { margin-left: 110%; } }
+.zzz { position: absolute; left: 70%; bottom: 90%; font-size: 18px; color: var(--egg-cascara); animation: titilar 2s steps(2) infinite; }
+
+#arriba {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 20;
+  display: flex; align-items: center; gap: 10px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 0;
+}
+.contador {
+  display: flex; align-items: center; gap: 6px; border: 0; padding: 2px 12px 2px 8px; font-size: 28px;
+  background: var(--egg-cascara);
+  box-shadow: 0 -3px 0 var(--egg-tinta), 0 3px 0 var(--egg-tinta), -3px 0 0 var(--egg-tinta), 3px 0 0 var(--egg-tinta);
+}
+#insignia { margin-left: auto; }
+
+/* --- El panel --- */
+#fondo-panel { position: absolute; inset: 0; z-index: 30; }
+#panel {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 76%; z-index: 31;
+  display: flex; flex-direction: column;
+  background: var(--egg-cascara);
+  box-shadow: 0 -4px 0 var(--egg-tinta), 0 -8px 0 var(--egg-yema);
+  animation: asomar .18s steps(4);
+}
+@keyframes asomar { from { transform: translateY(100%); } }
+#panel > header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--egg-verde-eggologic); color: var(--egg-blanco); }
+#panel h2 { margin: 0; font-size: 34px; line-height: 1; }
+#cerrar { border: 0; background: none; color: var(--egg-blanco); font-size: 34px; line-height: 1; padding: 0 6px; }
+#panel-cuerpo { flex: 1; overflow-y: auto; padding: 14px 14px calc(24px + env(safe-area-inset-bottom, 0px)); -webkit-overflow-scrolling: touch; }
+#panel-cuerpo h3 { font-size: 26px; line-height: 1.1; margin: 20px 0 8px; color: var(--egg-verde-eggologic); }
+#panel-cuerpo h3:first-child { margin-top: 0; }
+#panel-cuerpo p { margin: 0 0 10px; }
+
+.tarjeta { background: var(--egg-blanco); padding: 12px; margin-bottom: 10px; box-shadow: 0 0 0 2px var(--egg-paja); }
+.fila { display: flex; align-items: center; gap: 12px; }
+.fila > .crece { flex: 1; min-width: 0; }
+.numero { font-size: 40px; color: var(--egg-verde-eggologic); line-height: 1; font-variant-numeric: tabular-nums; }
+.cifras { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cifras .tarjeta { margin: 0; }
+.precio { font-weight: 700; white-space: nowrap; }
+.precio-eggos { display: inline-flex; align-items: center; gap: 4px; padding: 1px 6px; background: var(--egg-yema-luz); font-weight: 700; white-space: nowrap; }
+.elegir { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.elegir label { flex: 1 1 30%; text-align: center; padding: 10px 6px; background: var(--egg-blanco); box-shadow: 0 0 0 2px var(--egg-paja); cursor: pointer; }
+.elegir input { position: absolute; opacity: 0; }
+.elegir input:checked + span { font-weight: 700; }
+.elegir label:has(input:checked) { box-shadow: 0 0 0 3px var(--egg-verde-eggologic); background: var(--egg-yema-luz); }
+.elegir label:has(input:focus-visible) { outline: 3px solid var(--egg-ambar); }
+.campo { display: block; margin: 10px 0; font-weight: 700; }
+.campo input, .campo textarea { display: block; width: 100%; margin-top: 4px; padding: 10px; font: inherit; font-weight: 400; border: 2px solid var(--egg-nido); background: var(--egg-blanco); color: inherit; border-radius: 0; }
+.cantidad { display: flex; align-items: center; gap: 8px; }
+.cantidad button { width: 40px; height: 40px; border: 0; background: var(--egg-verde-eggologic); color: var(--egg-blanco); font-size: 28px; }
+.cantidad span { min-width: 24px; text-align: center; font-weight: 700; font-size: 18px; }
+.maple { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 10px; background: var(--egg-paja); box-shadow: 0 0 0 3px var(--egg-nido); max-width: 280px; margin: 0 auto 12px; }
+.maple.grande { grid-template-columns: repeat(6, 1fr); }
+.maple i { aspect-ratio: 1; background: var(--egg-nido); border-radius: 50%; display: grid; place-items: center; }
+.maple i.lleno { background: var(--egg-nido) url("arte/huevo.png") center / 70% no-repeat; image-rendering: pixelated; }
+.pasos { display: flex; justify-content: space-between; gap: 4px; margin: 12px 0; }
+.pasos li { flex: 1; list-style: none; text-align: center; font-size: 13px; padding-top: 22px; position: relative; color: #5d6b5f; }
+.pasos li::before { content: ""; position: absolute; top: 0; left: 50%; width: 16px; height: 16px; margin-left: -8px; background: var(--egg-paja); box-shadow: 0 0 0 2px var(--egg-nido); }
+.pasos li.hecho { color: var(--egg-tinta); font-weight: 700; }
+.pasos li.hecho::before { background: var(--egg-yema); box-shadow: 0 0 0 2px var(--egg-tinta); }
+.pasos { padding: 0; }
+.barra { height: 14px; background: var(--egg-paja); box-shadow: 0 0 0 2px var(--egg-nido); margin: 6px 0 10px; }
+.barra i { display: block; height: 100%; background: var(--egg-yema); }
+.lista { list-style: none; padding: 0; margin: 0; }
+.lista li { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--egg-paja); }
+.mas { color: var(--egg-pradera); font-weight: 700; }
+.menos { color: var(--egg-cresta); font-weight: 700; }
+.retrato { width: 64px; height: 64px; background-size: auto 100%; background-repeat: no-repeat; image-rendering: pixelated; flex: none; }
+.destacado { background: var(--egg-yema-luz); padding: 10px 12px; margin-bottom: 10px; }
+
+#aviso {
+  position: absolute; left: 12px; right: 12px; top: calc(64px + env(safe-area-inset-top, 0px)); z-index: 60;
+  padding: 12px 14px; background: var(--egg-tinta); color: var(--egg-blanco); text-align: center;
+  box-shadow: 0 0 0 3px var(--egg-yema);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flota, .nube, .estrella, .zzz, #panel { animation: none; }
+}
