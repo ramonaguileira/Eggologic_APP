@@ -8,6 +8,7 @@ urlpatterns = [
     path("mundo/", views.chacra, name="chacra"),
     path("api/v1/estado/", views.estado, name="estado"),
     path("api/v1/entrar/google/", views.entrar_con_google, name="entrar_con_google"),
+    path("api/v1/entrar/google/redireccion/", views.entrar_con_google_redireccion, name="entrar_con_google_redireccion"),
     path("api/v1/salir/", views.salir, name="salir"),
     path("api/v1/perfil/", views.guardar_perfil, name="guardar_perfil"),
     path("api/v1/gallinas/adoptar/", views.adoptar, name="adoptar"),

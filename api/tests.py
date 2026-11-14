@@ -82,6 +82,47 @@ class ApiTests(TestCase):
         with patch("api.google.requests.get", return_value=respuesta(bueno)):
             self.assertEqual(self.enviar("entrar_con_google", {"credential": "x"}).status_code, 200)
 
+    # --- Entrar con Google, modo redirección (el que usa la chacra de verdad) ---
+
+    def enviar_redireccion(self, datos=None, csrf="x"):
+        self.client.cookies["g_csrf_token"] = csrf
+        cuerpo = {"g_csrf_token": csrf, "credential": "x"}
+        cuerpo.update(datos or {})
+        return self.client.post(reverse("api:entrar_con_google_redireccion"), cuerpo)
+
+    def test_redireccion_crea_la_cuenta_y_lleva_a_la_chacra(self):
+        with google_dice(email="nueva@example.com"):
+            respuesta = self.enviar_redireccion()
+        self.assertRedirects(respuesta, reverse("api:chacra"))
+        self.assertTrue(Usuario.objects.filter(email="nueva@example.com", rol=Usuario.Rol.CLIENTE).exists())
+        self.assertEqual(self.client.get(reverse("api:estado")).status_code, 200)
+
+    def test_redireccion_sin_g_csrf_token_que_coincida_no_entra(self):
+        self.client.cookies["g_csrf_token"] = "uno"
+        with google_dice():
+            respuesta = self.client.post(
+                reverse("api:entrar_con_google_redireccion"), {"g_csrf_token": "otro", "credential": "x"}
+            )
+        self.assertRedirects(respuesta, reverse("api:chacra") + "?error=No+pudimos+entrar+con+Google.+Prob%C3%A1+de+nuevo.")
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_redireccion_con_comprobante_invalido_no_entra(self):
+        respuesta = lambda datos: type("R", (), {"status_code": 200, "json": lambda self: datos})()
+        with patch("api.google.requests.get", return_value=respuesta({"aud": "otra-app"})):
+            respuesta = self.enviar_redireccion()
+        self.assertIn("error=", respuesta.url)
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_redireccion_no_deja_entrar_cuentas_del_equipo(self):
+        Usuario.objects.create_user(username="ramon", email="jefe@example.com", rol=Usuario.Rol.ADMIN)
+        with google_dice(email="jefe@example.com"):
+            respuesta = self.enviar_redireccion()
+        self.assertIn("error=", respuesta.url)
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_la_pagina_lleva_el_identificador_de_google_para_el_boton_declarativo(self):
+        self.assertContains(self.client.get(reverse("api:chacra")), 'data-client_id="cliente-de-prueba"')
+
     # --- El estado y las acciones ---
 
     def test_el_estado_trae_todo_lo_que_muestra_la_chacra(self):

@@ -6,11 +6,13 @@ las cuentas en eggos/servicio.py, mundo/servicio.py e impacto/calculos.py.
 
 import json
 from functools import wraps
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib.auth import login, logout
 from django.db import transaction
 from django.http import Http404, HttpResponse, JsonResponse
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
@@ -84,13 +86,8 @@ def chacra(request):
 # --- Entrar y salir ------------------------------------------------------------------------
 
 
-@activo
-@require_POST
-def entrar_con_google(request):
-    try:
-        datos = google.verificar(json.loads(request.body or "{}").get("credential"))
-    except (google.ComprobanteInvalido, ValueError):
-        return JsonResponse({"error": "No pudimos entrar con Google. Probá de nuevo."}, status=400)
+def _usuario_de_google(datos):
+    """A partir de lo que confirmó Google, busca o crea el cliente. Devuelve (usuario, error)."""
     # Si ya había una cuenta con ese email, se entra a esa: el cliente conserva su historial.
     # Si hubiera más de una, se prefiere la que usa el email como nombre de usuario.
     conocidos = Usuario.objects.filter(email__iexact=datos["email"]).order_by("pk")
@@ -101,11 +98,56 @@ def entrar_con_google(request):
         usuario.set_unusable_password()
         usuario.save()
         Cliente.objects.create(usuario=usuario)
-    elif usuario.rol != Usuario.Rol.CLIENTE or not usuario.is_active:
+        return usuario, None
+    if usuario.rol != Usuario.Rol.CLIENTE or not usuario.is_active:
         # Las cuentas del equipo y de restaurantes no entran por acá.
-        return JsonResponse({"error": "Esa cuenta entra por la app de Eggologic de siempre."}, status=403)
+        return None, "Esa cuenta entra por la app de Eggologic de siempre."
+    return usuario, None
+
+
+@activo
+@require_POST
+def entrar_con_google(request):
+    """Entrada por JavaScript (fetch), con el comprobante en el cuerpo. Sin usar hoy desde la
+    chacra (ver entrar_con_google_redireccion), se deja por si hace falta desde otro cliente."""
+    try:
+        datos = google.verificar(json.loads(request.body or "{}").get("credential"))
+    except (google.ComprobanteInvalido, ValueError):
+        return JsonResponse({"error": "No pudimos entrar con Google. Probá de nuevo."}, status=400)
+    usuario, error = _usuario_de_google(datos)
+    if error:
+        return JsonResponse({"error": error}, status=403)
     login(request, usuario, backend="django.contrib.auth.backends.ModelBackend")
     return JsonResponse({"ok": True})
+
+
+def _a_la_chacra_con_error(mensaje):
+    return redirect(reverse("api:chacra") + "?" + urlencode({"error": mensaje}))
+
+
+@activo
+@csrf_exempt
+@require_POST
+def entrar_con_google_redireccion(request):
+    """A donde Google manda el navegador después de elegir la cuenta (ux_mode "redirect").
+
+    Es una navegación de verdad, hecha por Google, no un pedido de nuestro JavaScript: por eso
+    no lleva el token CSRF de Django. En su lugar se usa el que manda Google (g_csrf_token), como
+    recomienda su guía: tiene que venir igual en la cookie y en el formulario.
+    """
+    if not request.POST.get("g_csrf_token") or request.POST.get("g_csrf_token") != request.COOKIES.get(
+        "g_csrf_token"
+    ):
+        return _a_la_chacra_con_error("No pudimos entrar con Google. Probá de nuevo.")
+    try:
+        datos = google.verificar(request.POST.get("credential"))
+    except google.ComprobanteInvalido:
+        return _a_la_chacra_con_error("No pudimos entrar con Google. Probá de nuevo.")
+    usuario, error = _usuario_de_google(datos)
+    if error:
+        return _a_la_chacra_con_error(error)
+    login(request, usuario, backend="django.contrib.auth.backends.ModelBackend")
+    return redirect("api:chacra")
 
 
 @activo

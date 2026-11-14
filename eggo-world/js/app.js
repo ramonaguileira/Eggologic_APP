@@ -169,26 +169,15 @@ function mostrar(id) {
 function mostrarEntrada() {
   cerrar();
   mostrar("entrada");
+  // El botón de Google se arma solo (ver los data-* en el HTML): acá solo mostramos el aviso
+  // si no hay identificador de Google cargado, y el error si Google nos devolvió uno.
   const cliente = document.querySelector('meta[name="google-client-id"]').content;
-  const listo = () => window.google && window.google.accounts;
-  let intentos = 0;
-  const esperar = setInterval(() => {
-    if (!cliente || intentos++ > 40) {
-      clearInterval(esperar);
-      $("sin-google").hidden = false;
-    } else if (listo()) {
-      clearInterval(esperar);
-      window.google.accounts.id.initialize({
-        client_id: cliente,
-        callback: async (respuesta) => {
-          mostrar("carga");
-          if (await hacer("entrar/google/", { credential: respuesta.credential })) arrancar();
-          else mostrar("entrada");
-        },
-      });
-      window.google.accounts.id.renderButton($("boton-google"), { theme: "filled_blue", size: "large", text: "continue_with", locale: "es" });
-    }
-  }, 150);
+  $("sin-google").hidden = !!cliente;
+  const parametros = new URLSearchParams(location.search);
+  if (parametros.get("error")) {
+    avisar(parametros.get("error"), 8000);
+    history.replaceState(null, "", location.pathname);
+  }
 }
 
 async function arrancar() {

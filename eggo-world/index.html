@@ -29,7 +29,15 @@
       <img class="pixel" src="arte/eggo-linea.png" width="88" height="108" alt="">
       <h1>Eggo World</h1>
       <p>Tu chacra en Eggologic: adoptá una gallina, juntá huevos y pedilos cuando quieras.</p>
-      <div id="boton-google"></div>
+      <!-- Google escanea estos dos elementos solo, al cargar el script de más abajo. Con
+           ux_mode "redirect" la cuenta se elige en una página de Google de verdad (no un
+           popup), así no depende de que el navegador permita cookies de terceros. -->
+      <div id="g_id_onload"
+           data-client_id="__GOOGLE_CLIENT_ID__"
+           data-login_uri="/api/v1/entrar/google/redireccion/"
+           data-ux_mode="redirect"
+           data-auto_prompt="false"></div>
+      <div id="boton-google" class="g_id_signin" data-type="standard" data-theme="filled_blue" data-size="large" data-text="continue_with" data-locale="es"></div>
       <p id="sin-google" class="chico" hidden>Entrar con Google todavía no está disponible.</p>
       <a class="boton secundario" href="/ingresar/?next=/mundo/">Entrar con email</a>
       <a class="enlace" href="/registrarse/">Crear una cuenta con email</a>
