@@ -75,6 +75,8 @@ class Gallina(models.Model):
     pago_hasta = models.DateField(null=True, blank=True)
     # Si no alcanzaban los Eggos, la recarga por la diferencia. Al acreditarse, la gallina se activa.
     recarga = models.OneToOneField(Recarga, on_delete=models.SET_NULL, null=True, blank=True, related_name="gallina")
+    # La regaló Eggologic: no se cobró. Sirve para las cuentas, la gallina funciona igual.
+    regalada = models.BooleanField(default=False)
     creada_en = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -116,6 +118,26 @@ class Gallina(models.Model):
 
     def produccion_anual(self, hoy=None):
         return reglas.HUEVOS_POR_ANIO + self.bono_de_este_anio(hoy)
+
+
+class HuevosRegalados(models.Model):
+    """Huevos que Eggologic le regala a un cliente. Se suman a los que juntaron sus gallinas."""
+
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="huevos_regalados")
+    cantidad = models.PositiveIntegerField(validators=[MinValueValidator(1)])
+    nota = models.CharField(max_length=200, blank=True)
+    regalados_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="+"
+    )
+    creado_en = models.DateTimeField("fecha", auto_now_add=True)
+
+    class Meta:
+        ordering = ["-creado_en"]
+        verbose_name = "huevos regalados"
+        verbose_name_plural = "huevos regalados"
+
+    def __str__(self):
+        return f"{self.cantidad} huevos para {self.usuario}"
 
 
 class RacionDeLarvas(models.Model):

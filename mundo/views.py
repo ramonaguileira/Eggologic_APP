@@ -19,7 +19,7 @@ from eggos.models import Movimiento, Recarga
 from tienda.models import Pedido
 
 from . import servicio
-from .models import Ajustes, Gallina, Levante
+from .models import Ajustes, Gallina, HuevosRegalados, Levante
 
 
 class AjustesForm(forms.ModelForm):
@@ -50,6 +50,7 @@ def panel(request):
     economia = {
         "comprados": _suma(movimientos.filter(motivo=Movimiento.Motivo.RECARGA)),
         "ganados": _suma(movimientos.filter(motivo=Movimiento.Motivo.VUELTA)),
+        "regalados": _suma(movimientos.filter(motivo=Movimiento.Motivo.REGALO)),
         "usados": -_suma(movimientos.filter(cantidad__lt=0)),
         # El saldo de todos los clientes: es lo que Eggologic debe en productos.
         "en_circulacion": _suma(movimientos),
@@ -84,6 +85,70 @@ def recarga_resolver(request, recarga_id):
         )
         messages.success(request, "Recarga cancelada.")
     return redirect("mundo:panel")
+
+
+class RegalarForm(forms.Form):
+    QUE = [
+        ("eggos", "Regalar Eggos"),
+        ("cargar", "Cargar Eggos que ya pagó (efectivo o transferencia por fuera de la app)"),
+        ("huevos", "Regalar huevos"),
+        ("gallina", "Regalar una gallina"),
+    ]
+
+    cliente = forms.ModelChoiceField(queryset=Usuario.objects.none())
+    que = forms.ChoiceField(label="Qué", choices=QUE, widget=forms.RadioSelect)
+    cantidad = forms.IntegerField(
+        label="Cantidad (Eggos o huevos)", min_value=1, max_value=100000, required=False
+    )
+    plan = forms.ChoiceField(label="Plan de la gallina", choices=Gallina.Plan.choices, required=False)
+    nombre = forms.CharField(label="Nombre de la gallina", max_length=30, required=False)
+    color = forms.ChoiceField(label="Color de la gallina", choices=Gallina.Color.choices, required=False)
+    nota = forms.CharField(
+        label="Nota", max_length=200, required=False, help_text="El cliente la ve en sus movimientos de Eggos."
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        clientes = Usuario.objects.filter(rol=Usuario.Rol.CLIENTE, is_active=True).order_by("username")
+        self.fields["cliente"].queryset = clientes
+        self.fields["cliente"].label_from_instance = lambda u: f"{u.get_full_name() or u.username} ({u.email})"
+
+    def clean(self):
+        datos = super().clean()
+        if datos.get("que") == "gallina":
+            if not datos.get("nombre", "").strip():
+                self.add_error("nombre", "Ponele un nombre a la gallina.")
+        elif not datos.get("cantidad"):
+            self.add_error("cantidad", "Anotá la cantidad.")
+        return datos
+
+
+@requiere(Usuario.es_admin)
+def regalar(request):
+    """Eggologic le regala (o le carga) Eggos, huevos o una gallina a un cliente."""
+    form = RegalarForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        datos = form.cleaned_data
+        cliente, que = datos["cliente"], datos["que"]
+        quien = cliente.get_full_name() or cliente.username
+        if que in ("eggos", "cargar"):
+            servicio.regalar_eggos(cliente, datos["cantidad"], que == "cargar", datos["nota"])
+            hecho = f"{datos['cantidad']} Eggos {'cargados' if que == 'cargar' else 'regalados'} a {quien}."
+        elif que == "huevos":
+            servicio.regalar_huevos(cliente, datos["cantidad"], datos["nota"], request.user)
+            hecho = f"{datos['cantidad']} huevos regalados a {quien}."
+        else:
+            gallina = servicio.regalar_gallina(cliente, datos["plan"], datos["nombre"], datos["color"])
+            hecho = f"{gallina.nombre} ya está en la chacra de {quien}."
+        messages.success(request, hecho)
+        return redirect("mundo:regalar")
+    contexto = {
+        "form": form,
+        "regalos_de_eggos": Movimiento.objects.filter(motivo=Movimiento.Motivo.REGALO).select_related("usuario")[:15],
+        "huevos_regalados": HuevosRegalados.objects.select_related("usuario")[:15],
+        "gallinas_regaladas": Gallina.objects.filter(regalada=True).select_related("usuario").order_by("-creada_en")[:15],
+    }
+    return render(request, "mundo/regalar.html", contexto)
 
 
 @requiere(Usuario.es_admin)

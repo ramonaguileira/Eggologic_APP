@@ -262,7 +262,12 @@ def _estado(usuario):
             "huevos_por_anio": reglas.HUEVOS_POR_ANIO,
             "bono_maximo": reglas.BONO_MAXIMO_POR_ANIO,
         },
-        "huevos": {"para_pedir": mundo.huevos_para_pedir(usuario), "minimo": reglas.HUEVOS_PARA_PEDIR},
+        "huevos": {
+            "para_pedir": mundo.huevos_para_pedir(usuario),
+            # Nunca baja: con esto la chacra sabe cuántos huevos nuevos hay para juntar.
+            "juntados_en_total": mundo.huevos_juntados(usuario),
+            "minimo": reglas.HUEVOS_PARA_PEDIR,
+        },
         "larvas": mundo.larvas_disponibles(usuario),
         "levantes": [_levante(l) for l in Levante.objects.filter(usuario=usuario)[:5]],
         "precio_del_levante": reglas.PRECIO_DEL_LEVANTE,
@@ -369,7 +374,8 @@ def _datos_de_entrega(request):
     perfil = _perfil(request.user)
     direccion = str(request.datos.get("direccion") or perfil.direccion).strip()[:200]
     telefono = str(request.datos.get("telefono") or perfil.telefono).strip()[:40]
-    if direccion and telefono and (direccion, telefono) != (perfil.direccion, perfil.telefono):
+    # Solo se guardan si faltaban: después, "otra dirección" vale para ese pedido y nada más.
+    if direccion and telefono and not (perfil.direccion and perfil.telefono):
         perfil.direccion, perfil.telefono = direccion, telefono
         perfil.save()
     return direccion, telefono

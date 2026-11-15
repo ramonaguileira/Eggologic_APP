@@ -39,7 +39,7 @@ App piloto de Eggologic (Nodo 1, Maldonado): registra el circuito residuo de res
   - fotos de los retiros guardadas en la base (`captura/almacen.py`).
 - `tienda/`: productos y pedidos (pago contra entrega o transferencia).
 - `impacto/`: "Mi impacto" de clientes y restaurantes. Todas las fórmulas están en `impacto/calculos.py`, incluido el factor provisorio de CO2e.
-- `eggos/`, `mundo/`, `api/` y `eggo-world/`: **Eggo World**, la chacra en pixel art para clientes (se abre en `/mundo/`). Todos sus números están en `eggos/reglas.py`. Las apps de arriba no importan nada de estas. Se prende con `EGGO_WORLD_ACTIVO=True`. Qué se hizo y qué falta: `docs/eggo-world-etapa-1.md`.
+- `eggos/`, `mundo/`, `api/` y `eggo-world/`: **Eggo World**, la chacra en pixel art para clientes (se abre en `/mundo/`). Todos sus números están en `eggos/reglas.py`. Las apps de arriba no importan nada de estas. Se prende con `EGGO_WORLD_ACTIVO=True`. Qué se hizo y qué falta: `docs/eggo-world-etapa-1.md`. Desde el 15/11: tienda por pasos (rubros → cantidad → dirección → pago), recorrido de la primera vez, huevos para juntar y pantalla **Regalar o cargar** en Administración. Falta, por pedido de Ramón: cargar productos y liberar rubros desde Administración (plan maestro, punto 10).
 - `guardian/`: cliente de la API de MGS, reporte mensual por restaurante (lo revisa una persona en **Reportes**) y los comandos `guardian_estado` y `guardian_enviar`.
 - `docs/`:
   - propuesta aprobada (`etapa-0-propuesta.md`);

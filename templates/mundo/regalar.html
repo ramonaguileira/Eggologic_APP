@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block titulo %}Regalar o cargar · Eggo World{% endblock %}
+
+{% block contenido %}
+  <div class="encabezado">
+    <h1>Regalar o cargar</h1>
+    <a class="boton secundario" href="{% url 'mundo:panel' %}">Volver a Eggo World</a>
+  </div>
+
+  <section class="tarjeta">
+    <p class="tenue">El cliente lo ve en su chacra la próxima vez que entra. Un regalo no se puede borrar: si te equivocás, avisá y se corrige con un ajuste.</p>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {% for campo in form %}
+        <div class="campo">
+          {{ campo.label_tag }} {{ campo }}
+          {% if campo.help_text %}<p class="tenue">{{ campo.help_text }}</p>{% endif %}
+          {{ campo.errors }}
+        </div>
+      {% endfor %}
+      <button class="boton">Confirmar</button>
+    </form>
+  </section>
+
+  {% if regalos_de_eggos or huevos_regalados or gallinas_regaladas %}
+    <section class="tarjeta">
+      <h2>Últimos regalos</h2>
+      <div class="tabla">
+        <table>
+          <thead><tr><th>Fecha</th><th>Cliente</th><th>Regalo</th><th>Nota</th></tr></thead>
+          <tbody>
+            {% for m in regalos_de_eggos %}
+              <tr><td>{{ m.creado_en|date:"d/m/Y" }}</td><td>{{ m.usuario.get_full_name|default:m.usuario.username }}</td><td>{{ m.cantidad }} Eggos</td><td>{{ m.detalle }}</td></tr>
+            {% endfor %}
+            {% for h in huevos_regalados %}
+              <tr><td>{{ h.creado_en|date:"d/m/Y" }}</td><td>{{ h.usuario.get_full_name|default:h.usuario.username }}</td><td>{{ h.cantidad }} huevos</td><td>{{ h.nota }}</td></tr>
+            {% endfor %}
+            {% for g in gallinas_regaladas %}
+              <tr><td>{{ g.creada_en|date:"d/m/Y" }}</td><td>{{ g.usuario.get_full_name|default:g.usuario.username }}</td><td>Gallina {{ g.nombre }} ({{ g.get_plan_display|lower }})</td><td></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}

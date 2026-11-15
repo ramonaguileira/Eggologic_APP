@@ -5,6 +5,7 @@
 {% block contenido %}
   <div class="encabezado">
     <h1>Eggo World</h1>
+    <a class="boton" href="{% url 'mundo:regalar' %}">Regalar o cargar</a>
     {% if levantes_pedidos %}<a class="boton" href="{% url 'mundo:levantes' %}">{{ levantes_pedidos }} levante{{ levantes_pedidos|pluralize }} por retirar</a>{% endif %}
   </div>
   {% if not eggo_world_activo %}
@@ -68,6 +69,7 @@
     <div class="cifras">
       <div class="cifra"><strong>{{ economia.comprados }}</strong><span>comprados (recargas)</span></div>
       <div class="cifra"><strong>{{ economia.ganados }}</strong><span>ganados por compras</span></div>
+      <div class="cifra"><strong>{{ economia.regalados }}</strong><span>regalados por Eggologic</span></div>
       <div class="cifra"><strong>{{ economia.usados }}</strong><span>usados</span></div>
       <div class="cifra"><strong>{{ socios|length }}</strong><span>socios este mes</span></div>
     </div>

@@ -12,6 +12,7 @@ class Movimiento(models.Model):
         GALLINA = "gallina", "Gallina"
         LEVANTE = "levante", "Levante de residuos"
         AJUSTE = "ajuste", "Ajuste de Eggologic"
+        REGALO = "regalo", "Regalo de Eggologic"
 
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="movimientos_eggos")
     cantidad = models.IntegerField(help_text="Positivo suma, negativo resta.")

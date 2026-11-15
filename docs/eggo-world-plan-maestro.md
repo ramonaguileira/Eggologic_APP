@@ -457,6 +457,17 @@ No soy abogado ni contador; esto es para llevarles las preguntas correctas.
 
 ---
 
+### Falta: productos y rubros nuevos desde Administración (Ramón, 15/11)
+
+Pedido de Ramón, para después de terminar lo de los huevos. Hoy la tienda de la chacra muestra los rubros Huevos, Huerta, Carnes, Hierbas, Frutas y Miel, con solo Huevos prendido; la lista está fija en `eggo-world/js/paneles.js` (`RUBROS`).
+
+- Que Ramón cargue productos nuevos desde Administración, cada uno con su rubro.
+- Que Ramón libere un rubro (lo prenda) cuando tenga productos.
+- Que cada rubro tenga sus pasos de compra, con la misma forma que los huevos: qué y cuánto → dónde → cómo pagás. Los pasos de dirección y de pago ya sirven para cualquier rubro; falta el primero.
+- A definir antes: cómo se vende cada rubro (por unidad, por kilo, por atado) y si descuenta de un stock, como los huevos.
+
+Ya hecho el 15/11: regalar Eggos, huevos y gallinas, y cargar Eggos pagados por fuera (Administración → Eggo World → "Regalar o cargar").
+
 ## 11. Riesgos
 
 | Riesgo | Cómo se cuida |

@@ -186,6 +186,24 @@ class ApiTests(TestCase):
         self.assertEqual(self.enviar("pedir", datos).status_code, 200)
         self.assertEqual(self.ana.cliente.__class__.objects.get(usuario=self.ana).direccion, "Ruta 10")
 
+    def test_otra_direccion_vale_para_ese_pedido_y_no_cambia_la_guardada(self):
+        self.client.force_login(self.ana)
+        items = [{"producto": self.quincena.pk, "cantidad": 1}]
+        datos = {"items": items, "forma_pago": "contra_entrega", "direccion": "Lo de mi madre", "telefono": "099"}
+        self.assertEqual(self.enviar("pedir", datos).status_code, 200)
+        self.assertEqual(Pedido.objects.get().direccion, "Lo de mi madre")
+        self.assertEqual(Cliente.objects.get(usuario=self.ana).direccion, "Calle 1")
+
+    def test_el_estado_cuenta_los_huevos_juntados_en_total(self):
+        # Con este número la chacra sabe cuántos huevos nuevos hay para juntar: no baja al canjear.
+        from mundo import servicio as mundo
+
+        self.client.force_login(self.ana)
+        mundo.regalar_huevos(self.ana, 20)
+        self.enviar("pedir_huevos", {"huevos": 15})
+        huevos = self.client.get(reverse("api:estado")).json()["huevos"]
+        self.assertEqual((huevos["juntados_en_total"], huevos["para_pedir"]), (20, 5))
+
     def test_datos_raros_no_rompen_nada(self):
         self.client.force_login(self.ana)
         for nombre, datos in [

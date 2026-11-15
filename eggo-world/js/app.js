@@ -2,7 +2,8 @@
 
 import { enviar, traerEstado } from "./api.js";
 import { armar } from "./chacra.js";
-import { eleccion, limpio, paneles } from "./paneles.js";
+import { compra, eleccion, paneles } from "./paneles.js";
+import { recorrido, yaVioElRecorrido } from "./tour.js";
 
 const $ = (id) => document.getElementById(id);
 let estado = null;
@@ -30,14 +31,47 @@ function avisar(texto, cuanto = 4000) {
 
 // --- Pintar ---------------------------------------------------------------------------------
 
+// --- Huevos para juntar ---------------------------------------------------------------------
+// Cada huevo nuevo aparece suelto en la chacra y el cliente lo toca para mandarlo al maple.
+// Cuántos lleva juntados se recuerda en el teléfono: es un juego, las cuentas las hace el servidor.
+// SUPUESTO: como mucho quedan 5 por juntar; si se acumulan más, los demás se juntan solos.
+
+const MAXIMO_DE_SUELTOS = 5;
+let juntados = null;
+
+function guardarJuntados() {
+  try { localStorage.setItem(`eggo-juntados-${estado.yo.email}`, juntados); } catch { /* sin memoria, vale por esta visita */ }
+}
+
+function contarSueltos(nuevo) {
+  if (juntados === null) {
+    try { juntados = Number(localStorage.getItem(`eggo-juntados-${nuevo.yo.email}`) ?? NaN); } catch { juntados = NaN; }
+  }
+  const total = nuevo.huevos.juntados_en_total;
+  const tope = Math.min(MAXIMO_DE_SUELTOS, Math.max(nuevo.huevos.para_pedir, 0));
+  if (!(juntados >= total - tope && juntados <= total)) juntados = total - tope;
+  return total - juntados;
+}
+
+function juntarHuevo() {
+  juntados += 1;
+  eleccion.sueltos -= 1;
+  guardarJuntados();
+  $("huevos").textContent = (estado.huevos.para_pedir - eleccion.sueltos).toLocaleString("es-UY");
+  if (abierto === "huevos") pintarPanel();
+}
+
 function pintar(nuevo) {
+  const sueltos = contarSueltos(nuevo);
   const cambiaronLasGallinas = !estado || JSON.stringify(nuevo.gallinas.map((g) => [g.id, g.estado, g.color])) !== JSON.stringify(estado.gallinas.map((g) => [g.id, g.estado, g.color]));
-  const cambiaronLosHuevos = !estado || nuevo.huevos.para_pedir !== estado.huevos.para_pedir || nuevo.levantes.length !== estado.levantes.length;
+  const cambiaronLosHuevos = !estado || nuevo.huevos.para_pedir !== estado.huevos.para_pedir || sueltos !== eleccion.sueltos || nuevo.levantes.length !== estado.levantes.length;
   estado = nuevo;
+  eleccion.sueltos = sueltos;
+  guardarJuntados();
   $("saldo").textContent = estado.eggos.saldo.toLocaleString("es-UY");
-  $("huevos").textContent = estado.huevos.para_pedir.toLocaleString("es-UY");
+  $("huevos").textContent = (estado.huevos.para_pedir - sueltos).toLocaleString("es-UY");
   $("insignia").hidden = !estado.eggos.socio;
-  if (cambiaronLasGallinas || cambiaronLosHuevos) armar(estado, abrir);
+  if (cambiaronLasGallinas || cambiaronLosHuevos) armar(estado, abrir, sueltos, juntarHuevo);
   if (abierto) pintarPanel();
 }
 
@@ -49,9 +83,11 @@ function pintarPanel() {
   cuerpo.scrollTop = altura;
 }
 
-function abrir(panel) {
+// La tienda se abre en el primer paso, salvo que se pida otro (el botón "Quiero encargar huevos").
+function abrir(panel, paso = "rubros") {
   abierto = panel;
-  if (panel === "tienda" && !eleccion.pago) eleccion.pago = estado.eggos.saldo > 0 ? "eggos" : estado.tienda.mercado_pago ? "mercado_pago" : "contra_entrega";
+  if (panel === "tienda") eleccion.paso = paso;
+  if (panel !== "tienda" && panel !== "recargar") eleccion.faltan = 0;
   $("panel").hidden = $("fondo-panel").hidden = false;
   pintarPanel();
   $("panel-cuerpo").scrollTop = 0;
@@ -96,13 +132,15 @@ function datosDeEntrega() {
 }
 
 const ACCIONES = {
-  mas: (el) => { eleccion.carrito[el.dataset.id] = Math.min((eleccion.carrito[el.dataset.id] || 0) + 1, 50); pintarPanel(); },
-  menos: (el) => { eleccion.carrito[el.dataset.id] = Math.max((eleccion.carrito[el.dataset.id] || 0) - 1, 0); pintarPanel(); },
+  mas: () => { eleccion.cantidad = compra(estado).cantidad + 1; pintarPanel(); },
+  menos: () => { eleccion.cantidad = compra(estado).cantidad - 1; pintarPanel(); },
+  paso: (el) => { eleccion.paso = el.dataset.paso; pintarPanel(); $("panel-cuerpo").scrollTop = 0; },
+  recorrido: () => { cerrar(); recorrido(); },
   recargar: (el) => {
     const medio = $("panel-cuerpo").querySelector('input[name="medioRecarga"]:checked');
     hacer("recargas/", { paquete: Number(el.dataset.paquete), medio: medio && medio.value });
   },
-  "pedir-huevos": (el) => hacer("huevos/pedir/", { huevos: Number(el.dataset.huevos), ...datosDeEntrega() }, "¡Pedido hecho! Mirá cuándo llega en la Tienda."),
+  "pedir-huevos": (el) => hacer("huevos/pedir/", { huevos: Number(el.dataset.huevos), ...datosDeEntrega() }, "¡Canje hecho! Mirá cuándo llega en Mis pedidos."),
   "dar-larvas": (el) => hacer("larvas/dar/", { gallina: Number(el.dataset.id), cantidad: Number(el.dataset.cantidad) }, "¡Qué festín! Va a poner más huevos."),
   renombrar: (el) => {
     const nombre = window.prompt("¿Cómo se llama?", el.dataset.nombre);
@@ -116,11 +154,24 @@ const FORMULARIOS = {
     const respuesta = await hacer("gallinas/adoptar/", datos);
     if (respuesta && !respuesta.pago) { cerrar(); avisar(`¡${datos.nombre} ya está en tu chacra!`); }
   },
-  pedir: async (datos) => {
-    const items = Object.entries(eleccion.carrito).map(([producto, cantidad]) => ({ producto: Number(producto), cantidad }));
-    const respuesta = await hacer("pedidos/", { ...datos, items, forma_pago: datos.pago }, "¡Pedido hecho! Abajo ves cuándo llega.");
-    if (respuesta) eleccion.carrito = {};
-    if (respuesta && abierto) pintarPanel();
+  direccion: (datos) => {
+    if (datos.direccion) eleccion.direccion = datos.direccion.trim();
+    if (datos.telefono) eleccion.telefono = datos.telefono.trim();
+    eleccion.paso = "pago";
+    pintarPanel();
+  },
+  pedir: async () => {
+    const c = compra(estado);
+    const pedido = { items: [{ producto: c.producto.id, cantidad: c.cantidad }], forma_pago: eleccion.pago };
+    // Con "otra dirección", o si todavía no había ninguna guardada, va la que se escribió recién.
+    if (eleccion.donde === "otra" || !estado.yo.direccion || !estado.yo.telefono) {
+      pedido.direccion = eleccion.direccion;
+      pedido.telefono = eleccion.telefono || estado.yo.telefono;
+    }
+    const respuesta = await hacer("pedidos/", pedido);
+    if (!respuesta) return;
+    Object.assign(eleccion, { paso: "listo", cantidad: 1, donde: "mia", direccion: "", pago: null, faltan: 0 });
+    if (abierto) pintarPanel();
   },
   levante: (datos) => hacer("levantes/", datos, "¡Listo! Pasamos a buscar tu balde."),
   perfil: (datos) => hacer("perfil/", datos, "Datos guardados."),
@@ -129,7 +180,7 @@ const FORMULARIOS = {
 
 document.addEventListener("click", (evento) => {
   const abre = evento.target.closest("[data-abrir]");
-  if (abre) return abrir(abre.dataset.abrir);
+  if (abre) return abrir(abre.dataset.abrir, abre.dataset.paso);
   const accion = evento.target.closest("button[data-accion]");
   if (accion && ACCIONES[accion.dataset.accion]) ACCIONES[accion.dataset.accion](accion);
 });
@@ -143,6 +194,14 @@ document.addEventListener("submit", (evento) => {
 document.addEventListener("change", (evento) => {
   if (evento.target.type !== "radio" || !(evento.target.name in eleccion)) return;
   eleccion[evento.target.name] = evento.target.value;
+  // Pagar con Eggos sin tener suficientes lleva derecho a cargarlos.
+  if (evento.target.name === "pago" && evento.target.value === "eggos") {
+    const faltan = compra(estado).totalEggos - estado.eggos.saldo;
+    if (faltan > 0) {
+      Object.assign(eleccion, { pago: null, faltan });
+      return abrir("recargar");
+    }
+  }
   const nombre = $("panel-cuerpo").querySelector('input[name="nombre"]');
   const escrito = nombre && nombre.value;
   pintarPanel();
@@ -156,7 +215,7 @@ document.addEventListener("keydown", (evento) => evento.key === "Escape" && cerr
 let ajustar = null;
 window.addEventListener("resize", () => {
   clearTimeout(ajustar);
-  ajustar = setTimeout(() => estado && armar(estado, abrir), 200);
+  ajustar = setTimeout(() => estado && armar(estado, abrir, eleccion.sueltos, juntarHuevo), 200);
 });
 
 // --- Entrar ---------------------------------------------------------------------------------
@@ -187,6 +246,8 @@ async function arrancar() {
     await new Promise((seguir) => setTimeout(seguir, Math.max(0, 1500 - (Date.now() - inicio))));
     mostrar("chacra");
     pintar(nuevo);
+    // La primera vez, un recorrido corto por los botones.
+    if (!yaVioElRecorrido()) recorrido();
   } catch (error) {
     if (error.sinEntrar) mostrarEntrada();
     else { mostrar("entrada"); avisar(error.message, 8000); }

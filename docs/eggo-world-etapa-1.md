@@ -178,3 +178,66 @@ Dos páginas públicas (no hace falta estar logueado), enlazadas en el pie de to
 ### Tests
 
 160 (antes 152): 6 nuevos de cancelar pedidos y 2 de las páginas legales. Todos en verde.
+
+## 8. Tercera tanda (15/11/2026): tienda por pasos, recorrido, huevos para juntar y regalos
+
+Ramón probó la chacra en el servicio de prueba y pidió estos cambios.
+
+### 1. Qué se construyó y qué quedó afuera
+
+**En la chacra:**
+
+- **Recorrido de la primera vez** (`eggo-world/js/tour.js`): nueve carteles que van resaltando cada botón y dicen para qué sirve. Se puede saltar, y se vuelve a ver desde Mi cuenta ("Ver el recorrido de nuevo").
+- **Botón "Quiero encargar huevos"**, arriba y siempre a la vista. Va derecho a elegir la cantidad.
+- **Tienda por pasos**, de a una pregunta por pantalla:
+  1. Rubros: Huevos prendido; Huerta, Carnes, Hierbas, Frutas y Miel apagados ("pronto").
+  2. ¿Cuántos huevos?: quincena o maple, y la cantidad con − y +. Botón **Elegir**.
+  3. ¿Dónde te los llevamos?: si ya hay dirección, "En mi dirección" u "Otra dirección"; si no, se pide dirección y teléfono. Botón **Elegir**.
+  4. ¿Cómo pagás?: Efectivo, Transferencia, Tarjeta y Eggos (con "5,5 % off" chiquito). Botón **Encargar**.
+  5. "¡Pedido hecho!", con cuándo llega.
+  Lo ya elegido queda arriba en una línea, y tocándolo se cambia.
+- **Pagar con Eggos sin saldo** abre sola la pantalla **Cargar Eggos**, con cuánto falta y un "Volver al pedido".
+- **La vuelta del 3 % ya no se menciona** en ninguna pantalla.
+- **"Huevos" pasó a llamarse "Canjear huevos"**, con un maple de 15 que se va llenando (los maples ya completos se cuentan aparte).
+- **Huevos para juntar:** cada huevo nuevo aparece suelto en el pasto; al tocarlo vuela al nido y suma al maple.
+- Pantallas nuevas **Mis pedidos** y **Cargar Eggos** (antes estaban al final de la tienda).
+
+**En la app de siempre (Administración → Eggo World → "Regalar o cargar"):**
+
+- Regalar Eggos, cargar Eggos que el cliente ya pagó por fuera, regalar huevos y regalar una gallina (empieza a poner ese día, sin cobrar).
+- El panel suma la cifra de Eggos regalados.
+
+**Quedó afuera, anotado en el plan maestro (punto 10):** que Ramón cargue productos nuevos y libere rubros desde Administración, y los pasos de compra de cada rubro. Pedido expreso de Ramón: primero se termina lo de los huevos.
+
+### 2. Cómo correrlo
+
+Igual que antes. Hay dos migraciones nuevas (`eggos/0002_regalos`, `mundo/0002_regalos`), que Render corre solo al publicar.
+
+### 3. Tests
+
+172, todos en verde (antes 165): regalos (5) y dirección y conteo de huevos (2). El recorrido, la tienda por pasos y los huevos para juntar se probaron a mano en un navegador con tamaño de celular; no tienen tests automáticos porque son JavaScript.
+
+### 4. SUPUESTOS
+
+- **La vuelta del 3 % se sigue acreditando**; solo se dejó de anunciar. El cliente la ve en sus movimientos como "Vuelta por una compra".
+- **Juntar huevos es un juego:** qué huevos ya se juntaron se recuerda en el teléfono, no en el servidor. Como mucho quedan 5 por juntar; si se acumulan más, los demás se juntan solos. En un teléfono nuevo vuelven a aparecer hasta 5.
+- **Los huevos sueltos no se pueden canjear hasta juntarlos** (el contador y el maple no los cuentan).
+- "Efectivo" es el pago al recibir. "Tarjeta" es Mercado Pago, y se ve apagada mientras no esté la credencial.
+- **"Otra dirección" vale para ese pedido** y no cambia la guardada, que se edita en Mi cuenta. Usa el teléfono guardado.
+- Un pedido es de un solo envase (tantas quincenas o tantos maples), no mezclado.
+- **Los regalos no miran el cupo de adopciones, el máximo de 4 gallinas ni el tope de 10.000 Eggos.** La gallina mensual regalada es un mes gratis; después se cobra del saldo como cualquiera.
+- Los huevos regalados se canjean desde el nido, como los de una gallina, y descuentan de los huevos disponibles recién al canjearse.
+- Un regalo no se borra desde la pantalla: se corrige con un ajuste.
+
+### 5. Puntos para Marcel
+
+- `api/views.py`, `_datos_de_entrega`: la dirección del pedido ya no pisa la del perfil si el perfil estaba completo.
+- `mundo/servicio.py`: `huevos_juntados` (gallinas + regalados) y las tres funciones de regalo.
+- `mundo/models.py`: `HuevosRegalados` y `Gallina.regalada`. `eggos/models.py`: motivo `REGALO`.
+- `eggo-world/js/app.js`: el conteo de huevos sueltos con `localStorage`.
+
+### 6. Preguntas
+
+1. ¿La vuelta del 3 % se sigue dando sin anunciarla, o se elimina?
+2. ¿Los huevos sin juntar bloquean el canje, como quedó, o se canjean igual?
+3. ¿El recorrido dice lo que querés? Los textos están en `eggo-world/js/tour.js`.

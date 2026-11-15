@@ -2,7 +2,13 @@
 // Los botones llevan data-accion; js/app.js escucha los toques y llama al servidor.
 
 // Lo que el cliente va eligiendo en pantalla y todavía no mandó.
-export const eleccion = { carrito: {}, pago: null, plan: "dos_anios", color: "blanca", medio: null, medioRecarga: null };
+export const eleccion = {
+  // La tienda avanza de a un paso: rubros → cantidad → direccion → pago → listo.
+  paso: "rubros", producto: null, cantidad: 1, donde: "mia", direccion: "", telefono: "", pago: null, faltan: 0,
+  plan: "dos_anios", color: "blanca", medio: null, medioRecarga: null,
+  // Huevos que están en la chacra esperando que los junten (lo lleva js/app.js).
+  sueltos: 0,
+};
 
 const n = (numero) => Number(numero).toLocaleString("es-UY", { maximumFractionDigits: 1 });
 // Para escribir texto del usuario dentro del HTML sin que se rompa.
@@ -11,11 +17,12 @@ export const limpio = (texto) =>
 const fecha = (iso) => new Date(iso).toLocaleDateString("es-UY", { day: "numeric", month: "long" });
 const eggo = '<img class="pixel" src="arte/eggo-chico.png" width="13" height="16" alt="">';
 
+// Cada opción es [valor, texto] o [valor, texto, apagada].
 function opciones(nombre, lista, elegida) {
   return `<div class="elegir">${lista
     .map(
-      ([valor, texto]) =>
-        `<label><input type="radio" name="${nombre}" value="${valor}" ${valor === elegida ? "checked" : ""}><span>${texto}</span></label>`
+      ([valor, texto, apagada]) =>
+        `<label class="${apagada ? "apagada" : ""}"><input type="radio" name="${nombre}" value="${valor}" ${String(valor) === String(elegida) ? "checked" : ""} ${apagada ? "disabled" : ""}><span>${texto}</span></label>`
     )
     .join("")}</div>`;
 }
@@ -99,61 +106,138 @@ function gallinas(estado) {
 // --- Huevos ---------------------------------------------------------------------------------
 
 function huevos(estado) {
-  const hay = estado.huevos.para_pedir;
-  if (!estado.gallinas.length) {
+  // Los que todavía están sueltos en la chacra no cuentan hasta que se juntan.
+  const hay = Math.max(estado.huevos.para_pedir - eleccion.sueltos, 0);
+  if (!estado.gallinas.length && !estado.huevos.juntados_en_total) {
     return `<p>Acá se juntan los huevos de tus gallinas. Todavía no tenés ninguna.</p>
       <button class="boton ancho" data-abrir="gallinas">Adoptar una gallina</button>`;
   }
-  const casilleros = hay > 15 ? 30 : 15;
-  const maple = Array.from({ length: casilleros }, (_, i) => `<i class="${i < hay ? "lleno" : ""}"></i>`).join("");
+  // Un maple de 15 que se va llenando; los que ya se completaron se cuentan aparte.
+  const enMaple = hay && hay % 15 === 0 ? 15 : hay % 15;
+  const completos = (hay - enMaple) / 15;
+  const maple = Array.from({ length: 15 }, (_, i) => `<i class="${i < enMaple ? "lleno" : ""}"></i>`).join("");
   const tamanos = [...new Set(estado.productos.map((p) => p.huevos))].sort((a, b) => a - b);
   const botones = tamanos
-    .map((t) => `<button class="boton" data-accion="pedir-huevos" data-huevos="${t}" ${hay < t ? "disabled" : ""}>Pedir ${t}</button>`)
+    .map((t) => `<button class="boton" data-accion="pedir-huevos" data-huevos="${t}" ${hay < t ? "disabled" : ""}>Canjear ${t}</button>`)
     .join("");
+  const minimo = estado.huevos.minimo;
   return `<p class="fila"><span class="numero">${n(hay)}</span> <span>huevos juntados</span></p>
-    <div class="maple ${casilleros === 30 ? "grande" : ""}">${maple}</div>
-    <p>${hay >= estado.huevos.minimo ? "Ya podés pedirlos. Te los llevamos sin costo." : `Con ${estado.huevos.minimo} ya los podés pedir. Faltan ${estado.huevos.minimo - hay}.`}</p>
+    <div class="maple">${maple}</div>
+    ${completos ? `<p class="centro"><strong>+ ${completos} ${completos === 1 ? "maple completo" : "maples completos"} de 15</strong></p>` : ""}
+    ${eleccion.sueltos ? `<p class="destacado">Hay ${eleccion.sueltos} ${eleccion.sueltos === 1 ? "huevo recién puesto" : "huevos recién puestos"} en la chacra. Tocalos para mandarlos al maple.</p>` : ""}
+    <p>${hay >= minimo ? "Ya podés canjearlos. Te los llevamos sin costo." : `Con ${minimo} ya los podés canjear. Faltan ${minimo - hay}.`}</p>
     <form data-accion="entrega">${entrega(estado)}</form>
     <div>${botones}</div>`;
 }
 
 // --- Tienda ---------------------------------------------------------------------------------
 
+// Lo único que se vende hoy son huevos. Los demás rubros se ven apagados hasta que se liberen.
+const RUBROS = [
+  ["huevos", "Huevos", true], ["huerta", "Huerta"], ["carnes", "Carnes"],
+  ["hierbas", "Hierbas"], ["frutas", "Frutas"], ["miel", "Miel"],
+];
+
+// El producto y la cantidad que el cliente lleva elegidos.
+export function compra(estado) {
+  // Solo cuentan los envases que se pueden llenar con los huevos que hay.
+  const caben = estado.productos.filter((p) => p.huevos <= estado.tienda.huevos_disponibles);
+  const producto = caben.find((p) => String(p.id) === String(eleccion.producto)) || caben[0];
+  if (!producto) return null;
+  const cantidad = Math.max(1, Math.min(eleccion.cantidad, 50, Math.floor(estado.tienda.huevos_disponibles / producto.huevos)));
+  return { producto, cantidad, total: producto.precio * cantidad, totalEggos: producto.precio_eggos * cantidad };
+}
+
+// Un paso ya resuelto: queda en una línea y se puede tocar para cambiarlo.
+const resuelto = (paso, texto) =>
+  `<button class="resuelto" data-accion="paso" data-paso="${paso}"><span>${texto}</span><span class="chico">cambiar</span></button>`;
+
 function tienda(estado) {
-  const conEggos = eleccion.pago === "eggos";
-  let total = 0;
-  const productos = estado.productos
-    .map((p) => {
-      const cantidad = eleccion.carrito[p.id] || 0;
-      total += cantidad * (conEggos ? p.precio_eggos : p.precio);
-      return `<div class="tarjeta fila">
-        <div class="crece"><strong>${limpio(p.nombre)}</strong><br><span class="chico tenue">${limpio(p.descripcion) || p.huevos + " huevos"}</span><br>
-          <span class="precio">$ ${n(p.precio)}</span> o <span class="precio-eggos">${eggo}${n(p.precio_eggos)}</span></div>
-        <div class="cantidad"><button data-accion="menos" data-id="${p.id}" aria-label="Uno menos">−</button><span>${cantidad}</span><button data-accion="mas" data-id="${p.id}" aria-label="Uno más">+</button></div>
-      </div>`;
-    })
-    .join("");
-  const pagos = [["eggos", `Eggos<br><span class="chico">tenés ${n(estado.eggos.saldo)}</span>`]];
-  if (estado.tienda.mercado_pago) pagos.push(["mercado_pago", "Tarjeta"]);
-  pagos.push(["transferencia", "Transferencia"], ["contra_entrega", "Al recibir"]);
-  const pedidos = estado.pedidos
+  const paso = eleccion.paso;
+  if (paso === "rubros") {
+    const rubros = RUBROS.map(([rubro, nombre, abierto]) =>
+      abierto
+        ? `<button class="rubro" data-accion="paso" data-paso="cantidad"><img class="pixel" src="arte/huevo.png" width="28" height="32" alt="">${nombre}</button>`
+        : `<button class="rubro" disabled>${nombre}<span class="chico">pronto</span></button>`
+    ).join("");
+    return `<div class="rubros">${rubros}</div>
+      ${estado.pedidos.length ? '<button class="enlace" data-abrir="pedidos">Mis pedidos</button>' : ""}`;
+  }
+
+  const c = compra(estado);
+  if (!c) {
+    return "<p>Por ahora no quedan huevos para encargar. Volvé a mirar en unos días.</p>";
+  }
+  const queCompra = `${c.cantidad} × ${limpio(c.producto.nombre)}`;
+
+  if (paso === "cantidad") {
+    const lleno = (c.cantidad + 1) * c.producto.huevos > estado.tienda.huevos_disponibles || c.cantidad >= 50;
+    return `<h3>¿Cuántos huevos?</h3>
+      ${opciones("producto", estado.productos.map((p) => [p.id, `<strong>${limpio(p.nombre)}</strong><br><span class="chico">${p.huevos} huevos</span>`, p.huevos > estado.tienda.huevos_disponibles]), c.producto.id)}
+      <div class="cantidad grande"><button data-accion="menos" aria-label="Uno menos" ${c.cantidad <= 1 ? "disabled" : ""}>−</button><span>${c.cantidad}</span><button data-accion="mas" aria-label="Uno más" ${lleno ? "disabled" : ""}>+</button></div>
+      <p class="centro tenue">${n(c.cantidad * c.producto.huevos)} huevos · $ ${n(c.total)}</p>
+      <button class="boton ancho" data-accion="paso" data-paso="direccion">Elegir</button>`;
+  }
+
+  const tieneDireccion = estado.yo.direccion && estado.yo.telefono;
+  if (paso === "direccion") {
+    const campoDireccion = `<label class="campo">Dirección de entrega<input name="direccion" required maxlength="200" value="${limpio(eleccion.direccion)}" autocomplete="street-address"></label>`;
+    const pregunta = tieneDireccion
+      ? `${opciones("donde", [["mia", `<strong>En mi dirección</strong><br><span class="chico">${limpio(estado.yo.direccion)}</span>`], ["otra", "<strong>Otra dirección</strong>"]], eleccion.donde)}
+         ${eleccion.donde === "otra" ? campoDireccion : ""}`
+      : `${campoDireccion}
+         <label class="campo">Teléfono<input name="telefono" type="tel" required maxlength="40" value="${limpio(eleccion.telefono)}" autocomplete="tel"></label>`;
+    return `${resuelto("cantidad", queCompra)}
+      <h3>¿Dónde te los llevamos?</h3>
+      <form data-accion="direccion">${pregunta}
+        <button class="boton ancho">Elegir</button>
+        <p class="chico tenue centro">Entregamos en El Tesoro y La Barra.</p></form>`;
+  }
+
+  const donde = tieneDireccion && eleccion.donde === "mia" ? estado.yo.direccion : eleccion.direccion;
+  if (paso === "pago") {
+    const conEggos = eleccion.pago === "eggos";
+    const pagos = [
+      ["contra_entrega", "<strong>Efectivo</strong>"],
+      ["transferencia", "<strong>Transferencia</strong>"],
+      estado.tienda.mercado_pago ? ["mercado_pago", "<strong>Tarjeta</strong>"] : ["mercado_pago", '<strong>Tarjeta</strong><br><span class="chico">pronto</span>', true],
+      ["eggos", `<strong>Eggos</strong><br><span class="chico">${n(estado.eggos.descuento)} % off</span>`],
+    ];
+    return `${resuelto("cantidad", queCompra)}${resuelto("direccion", limpio(donde))}
+      <h3>¿Cómo pagás?</h3>
+      <form data-accion="pedir">${opciones("pago", pagos, eleccion.pago)}
+        ${eleccion.pago ? `<p class="fila"><span class="crece">Total</span><span class="numero">${conEggos ? eggo + " " + n(c.totalEggos) : "$ " + n(c.total)}</span></p>` : ""}
+        <button class="boton ancho" ${eleccion.pago ? "" : "disabled"}>Encargar</button></form>`;
+  }
+
+  // Listo: el pedido recién hecho es el primero de la lista.
+  const pedido = estado.pedidos[0];
+  return `<div class="centro"><img class="pixel flota" src="arte/huevo.png" width="42" height="48" alt="">
+      <h3>¡Pedido hecho!</h3>
+      ${pedido ? `<p>${limpio(pedido.items.join(", "))}<br><strong>${llegada(pedido)}</strong></p>` : ""}
+      ${pedido && pedido.forma_pago === "transferencia" ? `<p class="destacado">Transferí $ ${n(pedido.total)}.<br>${limpio(estado.tienda.datos_transferencia)}</p>` : ""}
+      <button class="boton" data-abrir="pedidos">Mis pedidos</button>
+      <button class="boton secundario" data-abrir="tienda">Encargar más</button></div>`;
+}
+
+function pedidos(estado) {
+  const lista = estado.pedidos
     .map((p) => `<li><span>${limpio(p.items.join(", "))}<br><span class="chico tenue">${p.forma_pago_texto}</span></span><strong>${llegada(p)}</strong></li>`)
     .join("");
+  return lista ? `<ul class="lista">${lista}</ul>` : `<p>Todavía no hiciste ningún pedido.</p>
+    <button class="boton ancho" data-abrir="tienda" data-paso="cantidad">Quiero encargar huevos</button>`;
+}
+
+function recargar(estado) {
   const paquetes = estado.eggos.paquetes.map((p) => `<button class="boton" data-accion="recargar" data-paquete="${p}">${n(p)}</button>`).join("");
-  return `<p class="destacado">Con Eggos pagás <strong>${n(estado.eggos.descuento)} % menos</strong>${estado.eggos.socio ? ", por ser socio" : ""}. Con plata te vuelve el ${n(estado.eggos.vuelta)} % en Eggos.</p>
-    ${productos || "<p>Todavía no hay productos cargados.</p>"}
-    <form data-accion="pedir">
-      <h3>Cómo pagás</h3>${opciones("pago", pagos, eleccion.pago)}
-      ${entrega(estado)}
-      <p class="fila"><span class="crece">Total</span><span class="numero">${conEggos ? eggo + " " : "$ "}${n(total)}</span></p>
-      <button class="boton ancho" ${total ? "" : "disabled"}>Pedir</button>
-      <p class="chico tenue">Hay ${n(estado.tienda.huevos_disponibles)} huevos disponibles. Entregamos en El Tesoro y La Barra.</p>
-    </form>
-    <h3>Recargar Eggos</h3>
-    <p>Se cargan en paquetes: 1 Eggo = $ 1.</p>
+  return `${eleccion.faltan ? `<p class="destacado">Te faltan <strong>${n(eleccion.faltan)} Eggos</strong> para este pedido. Cargá y seguí.</p>` : ""}
+    <p class="fila"><img class="pixel" src="arte/eggo.png" width="44" height="54" alt=""><span><span class="numero">${n(estado.eggos.saldo)}</span> Eggos</span></p>
+    <p>Se cargan en paquetes: 1 Eggo = $ 1. Con Eggos todo sale ${n(estado.eggos.descuento)} % menos.</p>
+    <h3>¿Cómo pagás la carga?</h3>
     ${opciones("medioRecarga", mediosDePago(estado), eleccion.medioRecarga || mediosDePago(estado)[0][0])}
+    <h3>¿Cuántos Eggos?</h3>
     <div>${paquetes}</div>
-    ${pedidos ? `<h3>Mis pedidos</h3><ul class="lista">${pedidos}</ul>` : ""}`;
+    ${eleccion.faltan ? '<button class="enlace" data-abrir="tienda" data-paso="pago">Volver al pedido</button>' : ""}`;
 }
 
 // --- Residuos y larvas ----------------------------------------------------------------------
@@ -231,7 +315,7 @@ function cuenta(estado) {
     .join("");
   return `<div class="tarjeta fila"><img class="pixel" src="arte/eggo.png" width="44" height="54" alt="">
       <div class="crece"><div class="numero">${n(e.saldo)}</div>Eggos</div>
-      <button class="boton" data-abrir="tienda">Recargar</button></div>
+      <button class="boton" data-abrir="recargar">Cargar</button></div>
     <div class="tarjeta fila"><img class="pixel" src="arte/insignia.png" width="33" height="36" alt="" style="${e.socio ? "" : "filter:grayscale(1);opacity:.5"}">
       <div class="crece">${
         e.socio
@@ -246,15 +330,19 @@ function cuenta(estado) {
       <label class="campo">Teléfono<input name="telefono" type="tel" value="${limpio(estado.yo.telefono)}" autocomplete="tel"></label>
       <button class="boton secundario">Guardar</button>
     </form>
+    ${estado.pedidos.length ? '<button class="boton secundario" data-abrir="pedidos">Mis pedidos</button>' : ""}
     ${movimientos ? `<h3>Movimientos de Eggos</h3><ul class="lista">${movimientos}</ul>` : ""}
+    <button class="enlace" data-accion="recorrido">Ver el recorrido de nuevo</button>
     <p class="chico tenue">${limpio(estado.yo.email)}</p>
     <button class="enlace" data-accion="salir">Salir de la cuenta</button>`;
 }
 
 export const paneles = {
   gallinas: { titulo: "Gallinas", pintar: gallinas },
-  huevos: { titulo: "Huevos", pintar: huevos },
+  huevos: { titulo: "Canjear huevos", pintar: huevos },
   tienda: { titulo: "Tienda", pintar: tienda },
+  pedidos: { titulo: "Mis pedidos", pintar: pedidos },
+  recargar: { titulo: "Cargar Eggos", pintar: recargar },
   residuos: { titulo: "Residuos", pintar: residuos },
   impacto: { titulo: "Impacto", pintar: impacto },
   cuenta: { titulo: "Mi cuenta", pintar: cuenta },

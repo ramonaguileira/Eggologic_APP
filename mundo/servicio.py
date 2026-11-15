@@ -10,7 +10,7 @@ from eggos import reglas, servicio as eggos
 from eggos.models import Movimiento, Recarga
 from tienda.models import ItemPedido, Pedido, Producto
 
-from .models import Ajustes, Gallina, Levante, RacionDeLarvas
+from .models import Ajustes, Gallina, HuevosRegalados, Levante, RacionDeLarvas
 
 
 class NoSePuede(Exception):
@@ -124,9 +124,15 @@ def huevos_pedidos(usuario):
     return items.aggregate(total=Sum(F("cantidad") * F("huevos_por_unidad")))["total"] or 0
 
 
-def huevos_para_pedir(usuario, hoy=None):
+def huevos_juntados(usuario, hoy=None):
+    """Todos los huevos que le tocaron al cliente hasta hoy: los de sus gallinas y los regalados."""
     puestos = sum(gallina.huevos_puestos(hoy) for gallina in Gallina.objects.filter(usuario=usuario))
-    return puestos - huevos_pedidos(usuario)
+    regalados = HuevosRegalados.objects.filter(usuario=usuario).aggregate(total=Sum("cantidad"))["total"] or 0
+    return puestos + regalados
+
+
+def huevos_para_pedir(usuario, hoy=None):
+    return huevos_juntados(usuario, hoy) - huevos_pedidos(usuario)
 
 
 # --- Pedidos -----------------------------------------------------------------------------
@@ -231,6 +237,40 @@ def pedir_huevos(usuario, huevos, direccion, telefono):
     if huevos < reglas.HUEVOS_PARA_PEDIR or resto:
         raise NoSePuede("Esa cantidad no se puede armar con los envases que tenemos.")
     return crear_pedido(usuario, items, Pedido.FormaPago.GALLINA, direccion, telefono)
+
+
+# --- Regalos de Eggologic ----------------------------------------------------------------
+# SUPUESTO: los regalos no miran el cupo de adopciones, el máximo de gallinas por cuenta ni el
+# tope de saldo. Los decide una persona de Eggologic, caso por caso.
+
+
+def regalar_eggos(usuario, cantidad, ya_pagados=False, nota=""):
+    """Suma Eggos a un cliente. Con `ya_pagados` es una carga (los pagó por fuera de la app)."""
+    if cantidad <= 0:
+        raise NoSePuede("Anotá cuántos Eggos.")
+    motivo = Movimiento.Motivo.RECARGA if ya_pagados else Movimiento.Motivo.REGALO
+    return eggos.mover(usuario, cantidad, motivo, nota[:200] or ("Cargados por Eggologic" if ya_pagados else ""))
+
+
+def regalar_gallina(usuario, plan, nombre, color):
+    """Una gallina que empieza a poner hoy, sin cobrar. La mensual regalada es un mes gratis."""
+    nombre = (nombre or "").strip()[:30]
+    if plan not in reglas.PLANES or not nombre:
+        raise NoSePuede("Elegí el plan y ponele un nombre a la gallina.")
+    if color not in Gallina.Color.values:
+        color = Gallina.Color.BLANCA
+    hoy = timezone.localdate()
+    return Gallina.objects.create(
+        usuario=usuario, plan=plan, nombre=nombre, color=color, regalada=True, estado=Gallina.Estado.ACTIVA,
+        inicio=hoy, pago_hasta=hoy + timedelta(days=reglas.PLANES[plan]["dias"]),
+    )
+
+
+def regalar_huevos(usuario, cantidad, nota="", quien=None):
+    """Huevos que el cliente canjea desde el nido, igual que los de sus gallinas."""
+    if cantidad <= 0:
+        raise NoSePuede("Anotá cuántos huevos.")
+    return HuevosRegalados.objects.create(usuario=usuario, cantidad=cantidad, nota=nota[:200], regalados_por=quien)
 
 
 # --- Residuos y larvas -------------------------------------------------------------------

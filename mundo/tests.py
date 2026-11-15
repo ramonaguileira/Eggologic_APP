@@ -257,6 +257,49 @@ class AdministracionTests(TestCase):
         self.assertIn("Clota", self.client.get(reverse("mundo:exportar_gallinas")).content.decode())
 
 
+class RegalosTests(TestCase):
+    def setUp(self):
+        self.ana = crear_cliente()
+        self.admin = Usuario.objects.create_user(username="admin", rol=Usuario.Rol.ADMIN)
+        self.quincena = crear_quincena()
+
+    def regalar(self, **datos):
+        self.client.force_login(self.admin)
+        return self.client.post(reverse("mundo:regalar"), {"cliente": self.ana.pk, **datos})
+
+    def test_solo_administracion_regala(self):
+        self.client.force_login(self.ana)
+        self.assertEqual(self.client.get(reverse("mundo:regalar")).status_code, 403)
+        self.client.force_login(self.admin)
+        self.assertContains(self.client.get(reverse("mundo:regalar")), "Regalar Eggos")
+
+    def test_regalar_eggos_y_cargar_los_que_ya_pago(self):
+        self.regalar(que="eggos", cantidad=300, nota="Bienvenida")
+        self.regalar(que="cargar", cantidad=500)
+        self.assertEqual(eggos.saldo(self.ana), 800)
+        motivos = set(Movimiento.objects.filter(usuario=self.ana).values_list("motivo", "cantidad"))
+        self.assertEqual(motivos, {("regalo", 300), ("recarga", 500)})
+
+    def test_los_huevos_regalados_se_canjean_como_los_de_la_gallina(self):
+        self.regalar(que="huevos", cantidad=15)
+        self.assertEqual(servicio.huevos_para_pedir(self.ana), 15)
+        servicio.pedir_huevos(self.ana, 15, "Calle 1", "099")
+        self.assertEqual(servicio.huevos_para_pedir(self.ana), 0)
+        self.assertEqual(servicio.huevos_juntados(self.ana), 15)
+
+    def test_regalar_una_gallina_no_cobra_y_empieza_a_poner(self):
+        self.regalar(que="gallina", plan="un_anio", nombre="Regalona", color="negra")
+        gallina = Gallina.objects.get(usuario=self.ana)
+        self.assertEqual((gallina.estado, gallina.regalada, gallina.color), (Gallina.Estado.ACTIVA, True, "negra"))
+        self.assertEqual(gallina.pago_hasta, timezone.localdate() + timedelta(days=365))
+        self.assertEqual(eggos.saldo(self.ana), 0)
+
+    def test_sin_cantidad_o_sin_nombre_no_regala_nada(self):
+        self.assertContains(self.regalar(que="eggos"), "Anotá la cantidad")
+        self.assertContains(self.regalar(que="gallina", plan="un_anio"), "Ponele un nombre")
+        self.assertFalse(Movimiento.objects.exists() or Gallina.objects.exists())
+
+
 class CancelarPedidoTests(TestCase):
     def setUp(self):
         self.ana = crear_cliente()

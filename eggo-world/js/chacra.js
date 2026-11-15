@@ -41,6 +41,8 @@ function boton(imagen, ancho, alto, x, y, cartel, panel, alAbrir) {
   const el = cosa(imagen, ancho, alto, x, y, "button");
   el.innerHTML = `<span class="cartel">${cartel}</span>`;
   el.setAttribute("aria-label", cartel);
+  // Con este nombre lo encuentra el recorrido de la primera vez (js/tour.js).
+  el.dataset.tour = panel;
   el.addEventListener("click", () => alAbrir(panel));
   return el;
 }
@@ -63,7 +65,8 @@ export function esDeNoche() {
 }
 
 // Arma la chacra entera. Se vuelve a llamar cuando cambian las gallinas o el tamaño de la pantalla.
-export function armar(estado, alAbrir) {
+// `sueltos` son los huevos recién puestos que esperan en el pasto; al tocar uno se llama a alJuntar.
+export function armar(estado, alAbrir, sueltos = 0, alJuntar = () => {}) {
   clearInterval(reloj);
   cosas.innerHTML = "";
   const u = Math.max(3, Math.floor(app.clientWidth / 96));
@@ -107,13 +110,13 @@ export function armar(estado, alAbrir) {
     cartel.classList.add("llama");
   }
   boton("casita", 22, 22, ancho * 0.62 - 11, horizonte - 17, "Mi cuenta", "cuenta", alAbrir);
-  const nido = boton("nido", 18, 8, 8, alto - 30, "Huevos", "huevos", alAbrir);
+  const nido = boton("nido", 18, 8, 12, alto - 30, "Canjear huevos", "huevos", alAbrir);
   boton("brote", 16, 16, ancho / 2 - 8, alto - 36, "Impacto", "impacto", alAbrir);
   const balde = boton("balde", 16, 16, ancho - 24, alto - 38, "Residuos", "residuos", alAbrir);
   const hayResiduosEnCamino = estado.levantes.some((levante) => levante.paso === "pedido");
   cuadro(balde, hayResiduosEnCamino ? 1 : 0);
-  for (let i = 0; i < Math.min(3, Math.floor(estado.huevos.para_pedir / 5)); i++) {
-    cosa("huevo", 7, 8, 10 + i * 5, alto - 36).style.pointerEvents = "none";
+  for (let i = 0; i < Math.min(3, Math.floor((estado.huevos.para_pedir - sueltos) / 5)); i++) {
+    cosa("huevo", 7, 8, 14 + i * 5, alto - 36).style.pointerEvents = "none";
   }
 
   // Comida y agua: son solo cariño. Las gallinas van a comer, pero no cambia la producción.
@@ -126,6 +129,7 @@ export function armar(estado, alAbrir) {
 
   // Por dónde andan las gallinas.
   zona = { x1: 4, x2: ancho - 20, y1: horizonte + 8, y2: alto - 62 };
+  for (let i = 0; i < sueltos; i++) huevoSuelto(nido, alJuntar);
   gallinas = estado.gallinas
     .filter((gallina) => gallina.estado === "activa")
     .map((gallina) => crearGallina(gallina, noche));
@@ -152,6 +156,20 @@ export function armar(estado, alAbrir) {
       bichos(TIC);
     }
   }, TIC);
+}
+
+// Un huevo recién puesto: aparece en el pasto y, al tocarlo, vuela hasta el nido.
+function huevoSuelto(nido, alJuntar) {
+  const el = cosa("huevo", 7, 8, azar(zona.x1 + 4, zona.x2 + 6), azar(zona.y1 + 10, zona.y2 + 14), "button");
+  el.classList.add("suelto");
+  el.style.animationDelay = `${azar(0, 1)}s`;
+  el.setAttribute("aria-label", "Juntar el huevo");
+  el.addEventListener("click", () => {
+    el.disabled = true;
+    el.classList.add("volando");
+    mover(el, Number(nido.style.getPropertyValue("--x")) + 5, Number(nido.style.getPropertyValue("--y")) - 4);
+    setTimeout(() => { el.remove(); alJuntar(); }, 450);
+  }, { once: true });
 }
 
 // --- Gallinas -------------------------------------------------------------------------------
