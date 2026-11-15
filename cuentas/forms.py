@@ -57,15 +57,14 @@ class LoginForm(AuthenticationForm):
                 import re
                 email_pattern = re.compile(r"[^@]+@[^@]+\.[^@]+")
                 if email_pattern.match(username):
-                    try:
-                        # Find user by email
-                        usuario = Usuario.objects.get(email__iexact=username)
-                        # Authenticate with the user's username field
+                    # Puede haber más de un usuario con el mismo email (cuentas viejas): se prueba
+                    # la contraseña con cada uno en lugar de fallar.
+                    for usuario in Usuario.objects.filter(email__iexact=username).order_by("pk"):
                         self.user_cache = authenticate(
                             self.request, username=usuario.username, password=password
                         )
-                    except Usuario.DoesNotExist:
-                        pass
+                        if self.user_cache is not None:
+                            break
 
                 if self.user_cache is None:
                     raise self.get_invalid_login_error()

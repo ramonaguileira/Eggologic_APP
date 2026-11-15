@@ -74,23 +74,32 @@ class InicioTests(TestCase):
 
 class RegistroTests(TestCase):
     def test_un_cliente_se_registra_y_queda_logueado(self):
+        # El alta pide solo nombre, email y contraseña; la dirección se pide en el primer pedido.
         respuesta = self.client.post(
             reverse("registrarse"),
             {
-                "username": "lucia",
                 "first_name": "Lucía",
                 "email": "lucia@example.com",
-                "telefono": "099 123 456",
-                "direccion": "Calle 1, Maldonado",
                 "password1": "una-clave-bastante-larga",
                 "password2": "una-clave-bastante-larga",
             },
         )
-        self.assertRedirects(respuesta, reverse("tienda:tienda"))
-        usuario = Usuario.objects.get(username="lucia")
+        self.assertRedirects(respuesta, reverse("impacto:mi_impacto"))
+        usuario = Usuario.objects.get(username="lucia@example.com")
         self.assertEqual(usuario.rol, Usuario.Rol.CLIENTE)
-        self.assertEqual(usuario.cliente.direccion, "Calle 1, Maldonado")
+        self.assertEqual(usuario.cliente.direccion, "")
         self.assertEqual(int(self.client.session["_auth_user_id"]), usuario.pk)
+
+    def test_dos_usuarios_con_el_mismo_email_no_rompen_el_login(self):
+        for nombre, clave in [("uno", "clave-del-primero-123"), ("dos", "clave-del-segundo-123")]:
+            Usuario.objects.create_user(username=nombre, email="igual@example.com", password=clave)
+        respuesta = self.client.post(
+            reverse("login"), {"username": "igual@example.com", "password": "clave-del-segundo-123"}
+        )
+        self.assertEqual(respuesta.status_code, 302)
+        self.assertEqual(
+            int(self.client.session["_auth_user_id"]), Usuario.objects.get(username="dos").pk
+        )
 
 
 class PermisosTests(TestCase):
@@ -103,11 +112,24 @@ class PermisosTests(TestCase):
         self.assertEqual(self.client.get(reverse("captura:retiro_nuevo")).status_code, 403)
 
 
+class PaginasLegalesTests(TestCase):
+    def test_privacidad_y_terminos_se_ven_sin_estar_logueado(self):
+        self.assertEqual(self.client.get(reverse("privacidad")).status_code, 200)
+        self.assertEqual(self.client.get(reverse("terminos")).status_code, 200)
+
+    def test_estan_enlazadas_desde_el_pie_de_pagina(self):
+        respuesta = self.client.get(reverse("login"))
+        self.assertContains(respuesta, reverse("privacidad"))
+        self.assertContains(respuesta, reverse("terminos"))
+
+
 class CrearAdminTests(TestCase):
     def test_crea_el_admin_una_sola_vez_y_solo_con_las_variables(self):
-        call_command("crear_admin", stdout=StringIO())
+        with patch.dict(os.environ, {"DJANGO_SUPERUSER_EMAIL": "", "DJANGO_SUPERUSER_PASSWORD": ""}):
+            call_command("crear_admin", stdout=StringIO())
         self.assertFalse(Usuario.objects.exists())
-        variables = {"DJANGO_SUPERUSER_USERNAME": "ramon", "DJANGO_SUPERUSER_PASSWORD": "clave-larga-de-prueba-123"}
+        # El comando usa el email como nombre de usuario (cambio del 14/10).
+        variables = {"DJANGO_SUPERUSER_EMAIL": "admin@example.com", "DJANGO_SUPERUSER_PASSWORD": "clave-larga-de-prueba-123"}
         with patch.dict(os.environ, variables):
             call_command("crear_admin", stdout=StringIO())
             call_command("crear_admin", stdout=StringIO())

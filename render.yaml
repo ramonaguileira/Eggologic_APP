@@ -51,6 +51,13 @@ services:
         sync: false
       - key: DJANGO_EMAIL_SMTP_PASSWORD
         sync: false
+      # Eggo World (docs/eggo-world-etapa-1.md). Apagado, la app funciona como siempre.
+      - key: EGGO_WORLD_ACTIVO
+        value: "False"
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: MERCADOPAGO_ACCESS_TOKEN
+        sync: false
       - key: DB_NAME
         fromDatabase: { name: eggologic-db, property: database }
       - key: DB_USER

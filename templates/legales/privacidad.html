@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block titulo %}Privacidad · Eggologic{% endblock %}
+
+{% block contenido %}
+{# SUPUESTO: texto preliminar escrito por Claude el 14/11/2026, para poder publicar la app de
+   Google y tener algo donde apoyar la tienda en línea. No lo revisó un abogado todavía: antes de
+   contar con mucho uso real, conviene que alguien con ese perfil lo mire. #}
+<div class="angosta">
+  <h1>Política de privacidad</h1>
+  <p class="tenue">Última actualización: 14/11/2026. Esta es una primera versión; todavía no la revisó un abogado.</p>
+
+  <section class="tarjeta">
+    <h2>Quiénes somos</h2>
+    <p>Eggologic es un proyecto de Maldonado, Uruguay, que transforma los residuos orgánicos de restaurantes y hogares en larvas, y las larvas en huevos de gallina. Esta política cubre la app de Eggologic (para quienes trabajan en el circuito) y Eggo World (para quienes compran huevos y adoptan gallinas).</p>
+    <p>Contacto: <a href="mailto:info@eggologic.org">info@eggologic.org</a>.</p>
+  </section>
+
+  <section class="tarjeta">
+    <h2>Qué datos guardamos</h2>
+    <p>Según cómo uses la app, podemos guardar:</p>
+    <ul class="lista">
+      <li>Nombre, email y, si entrás con Google, la foto de tu cuenta de Google.</li>
+      <li>Teléfono y dirección, para coordinar entregas y levantes de residuos.</li>
+      <li>Tus compras, tus adopciones de gallinas y tus movimientos de Eggos.</li>
+      <li>Si trabajás en el campo (retiros, planta, granja): fotos de los retiros y la ubicación del lugar donde se retiró, tomada por el GPS del celular en el momento.</li>
+    </ul>
+    <p>No pedimos ni guardamos datos de tarjetas: eso lo maneja Mercado Pago, que tiene su propia política de privacidad.</p>
+  </section>
+
+  <section class="tarjeta">
+    <h2>Para qué los usamos</h2>
+    <ul class="lista">
+      <li>Para que funcione tu cuenta, tus pedidos y tus entregas.</li>
+      <li>Para calcular tu impacto (cuánto residuo hay detrás de tus huevos, por ejemplo) y el de la comunidad.</li>
+      <li>Para avisarte sobre tus pedidos y tus levantes.</li>
+      <li>Para llevar la trazabilidad del circuito, que a veces compartimos con organismos como ANDE, sin datos personales.</li>
+    </ul>
+  </section>
+
+  <section class="tarjeta">
+    <h2>Con quién los compartimos</h2>
+    <p>No vendemos tus datos ni los compartimos con terceros para publicidad.</p>
+    <p>Los compartimos solo donde hace falta para que el servicio funcione:</p>
+    <ul class="lista">
+      <li><strong>Google:</strong> si entrás con Google, Google nos confirma tu email y tu nombre.</li>
+      <li><strong>Mercado Pago:</strong> si pagás con tarjeta, tus datos de pago los procesa Mercado Pago, no nosotros.</li>
+      <li><strong>El registro verificable del impacto (lo que en los documentos técnicos llamamos Guardian/Hedera):</strong> ahí solo mandamos códigos del circuito (por ejemplo, el código de un restaurante) y números de kilos o de impacto. <strong>Nunca mandamos tu nombre, tu email, tu teléfono ni tu dirección.</strong> Lo que se manda queda público y no se puede borrar.</li>
+    </ul>
+  </section>
+
+  <section class="tarjeta">
+    <h2>Cuánto tiempo los guardamos</h2>
+    <p>Mientras tengas la cuenta activa. Si pedís que la cerremos, borramos tus datos personales salvo los que tengamos que conservar por una obligación legal o contable (por ejemplo, una factura).</p>
+  </section>
+
+  <section class="tarjeta">
+    <h2>Tus derechos</h2>
+    <p>Podés pedirnos ver, corregir o borrar tus datos, o cerrar tu cuenta, escribiéndonos a <a href="mailto:info@eggologic.org">info@eggologic.org</a>. Te contestamos en los próximos días.</p>
+  </section>
+
+  <section class="tarjeta">
+    <h2>Menores de edad</h2>
+    <p>La app es para mayores de 18 años. Si sos menor, usala desde la cuenta de un adulto responsable.</p>
+  </section>
+
+  <section class="tarjeta">
+    <h2>Cambios en esta política</h2>
+    <p>Si la cambiamos, actualizamos la fecha de arriba. Los cambios importantes los avisamos por email o dentro de la app.</p>
+  </section>
+</div>
+{% endblock %}

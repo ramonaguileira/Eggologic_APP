@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from .forms import FirstDeliveryForm, LoginForm, RegistroClienteForm
+from .models import Cliente
 
 
 def ingresar(request):
@@ -43,6 +44,16 @@ def registrarse(request):
         messages.success(request, f"¡Bienvenido/a, {usuario.first_name}! Ya podés hacer tu primer pedido.")
         return redirect("impacto:mi_impacto")
     return render(request, "registration/registrarse.html", {"form": form})
+
+def privacidad(request):
+    """Pública: no hace falta estar logueado. Texto en templates/legales/privacidad.html."""
+    return render(request, "legales/privacidad.html")
+
+
+def terminos(request):
+    """Pública: no hace falta estar logueado. Texto en templates/legales/terminos.html."""
+    return render(request, "legales/terminos.html")
+
 
 @login_required
 def primera_entrega(request):

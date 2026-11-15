@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block titulo %}Levantes · Eggologic{% endblock %}
+
+{% block contenido %}
+  <div class="encabezado"><h1>Levantes de hogares</h1></div>
+  <p class="tenue">Baldes de clientes de Eggo World. Pesá el balde al retirarlo y anotá los kilos.</p>
+
+  {% for levante in pedidos %}
+    <section class="tarjeta">
+      <h2>{{ levante.usuario.get_full_name|default:levante.usuario.username }}</h2>
+      <p><strong>Dirección:</strong> {{ levante.direccion }}</p>
+      {% if levante.telefono %}<p><strong>Teléfono:</strong> {{ levante.telefono }}</p>{% endif %}
+      {% if levante.nota %}<p><strong>Nota:</strong> {{ levante.nota }}</p>{% endif %}
+      <p class="tenue">Pedido el {{ levante.pedido_en|date:"d/m H:i" }}</p>
+      <form method="post" action="{% url 'mundo:levante_retirar' levante.pk %}">
+        {% csrf_token %}
+        <div class="campo">
+          <label for="kg-{{ levante.pk }}">Kilos del balde</label>
+          <input id="kg-{{ levante.pk }}" name="kg" type="number" step="0.1" min="0.1" inputmode="decimal" required>
+        </div>
+        <button class="boton">Retirado</button>
+      </form>
+    </section>
+  {% empty %}
+    <section class="tarjeta"><p>No hay levantes pedidos.</p></section>
+  {% endfor %}
+
+  {% if retirados %}
+    <h2>Últimos retirados</h2>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Fecha</th><th>Cliente</th><th>kg</th></tr></thead>
+        <tbody>
+          {% for levante in retirados %}
+            <tr><td>{{ levante.retirado_en|date:"d/m H:i" }}</td><td>{{ levante.usuario.get_full_name|default:levante.usuario.username }}</td><td class="num">{{ levante.kg|floatformat:1 }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,150 @@
+{
+  "colores": [
+    {
+      "nombre": "tinta",
+      "hex": "#0c2a1f",
+      "rampa": "Verdes"
+    },
+    {
+      "nombre": "bosque",
+      "hex": "#143f2c",
+      "rampa": "Verdes"
+    },
+    {
+      "nombre": "verde-eggologic",
+      "hex": "#1d583b",
+      "rampa": "Verdes"
+    },
+    {
+      "nombre": "pradera",
+      "hex": "#2f7d4c",
+      "rampa": "Verdes"
+    },
+    {
+      "nombre": "brote",
+      "hex": "#58a95c",
+      "rampa": "Verdes"
+    },
+    {
+      "nombre": "hoja",
+      "hex": "#9ad37a",
+      "rampa": "Verdes"
+    },
+    {
+      "nombre": "blanco",
+      "hex": "#ffffff",
+      "rampa": "Cáscara"
+    },
+    {
+      "nombre": "cascara",
+      "hex": "#f6f0dc",
+      "rampa": "Cáscara"
+    },
+    {
+      "nombre": "paja",
+      "hex": "#d6cba6",
+      "rampa": "Cáscara"
+    },
+    {
+      "nombre": "nido",
+      "hex": "#a89c78",
+      "rampa": "Cáscara"
+    },
+    {
+      "nombre": "yema-luz",
+      "hex": "#ffdf6b",
+      "rampa": "Yema"
+    },
+    {
+      "nombre": "yema",
+      "hex": "#f5b921",
+      "rampa": "Yema"
+    },
+    {
+      "nombre": "ambar",
+      "hex": "#d98414",
+      "rampa": "Yema"
+    },
+    {
+      "nombre": "cresta",
+      "hex": "#c8472f",
+      "rampa": "Tierra"
+    },
+    {
+      "nombre": "tierra",
+      "hex": "#7a5230",
+      "rampa": "Tierra"
+    },
+    {
+      "nombre": "humus",
+      "hex": "#452c1b",
+      "rampa": "Tierra"
+    }
+  ],
+  "sprites": {
+    "eggo": {
+      "w": 22,
+      "h": 27
+    },
+    "eggo-chico": {
+      "w": 13,
+      "h": 16
+    },
+    "eggo-dorado": {
+      "w": 22,
+      "h": 27
+    },
+    "eggo-dorado-chico": {
+      "w": 13,
+      "h": 16
+    },
+    "eggo-linea": {
+      "w": 22,
+      "h": 27
+    },
+    "gallina-blanca": {
+      "w": 16,
+      "h": 16
+    },
+    "gallina-colorada": {
+      "w": 16,
+      "h": 16
+    },
+    "pollito": {
+      "w": 10,
+      "h": 10
+    },
+    "larva": {
+      "w": 16,
+      "h": 6
+    },
+    "nido": {
+      "w": 18,
+      "h": 8
+    },
+    "cerco": {
+      "w": 12,
+      "h": 13
+    },
+    "casita": {
+      "w": 22,
+      "h": 22
+    },
+    "gallinero": {
+      "w": 22,
+      "h": 18
+    },
+    "granero": {
+      "w": 28,
+      "h": 24
+    },
+    "brote": {
+      "w": 16,
+      "h": 16
+    },
+    "escena-granja": {
+      "w": 127,
+      "h": 36
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block titulo %}Cancelar pedido · Eggologic{% endblock %}
+
+{% block contenido %}
+  <section class="tarjeta">
+    <h1>Cancelar pedido</h1>
+    <p>¿Estás seguro de que querés cancelar el pedido #{{ pedido.pk }} de {{ pedido.usuario.get_full_name|default:pedido.usuario.username }}?</p>
+    <p>
+      <strong>Datos del pedido:</strong><br>
+      <span class="tenue">Fecha: {{ pedido.creado_en|date:"d/m/Y H:i" }}</span><br>
+      <span class="tenue">Forma de pago: {{ pedido.get_forma_pago_display }}</span><br>
+      <span class="tenue">Total: $ {{ pedido.total|floatformat:"0g" }}</span>
+    </p>
+    {% if pedido.de_eggo_world %}
+      <p class="aviso">
+        Es un pedido de Eggo World: al cancelarlo se devuelven sus {{ pedido.huevos }} huevos al cupo disponible
+        {% if pedido.forma_pago == pedido.FormaPago.EGGOS %}y se le devuelven los Eggos al cliente{% endif %}.
+      </p>
+    {% endif %}
+    {% if pedido.forma_pago != pedido.FormaPago.EGGOS and pedido.forma_pago != pedido.FormaPago.GALLINA %}
+      <p class="aviso">Si ya cobraste este pedido con plata (transferencia, Mercado Pago o al recibir), la devolución del dinero se hace por fuera, a mano.</p>
+    {% endif %}
+    <form method="post">
+      {% csrf_token %}
+      <div class="acciones">
+        <button type="submit" class="boton">Sí, cancelar el pedido</button>
+        <a href="{% url 'tienda:pedido_admin_detalle' pedido.pk %}" class="boton no-accion">Volver</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

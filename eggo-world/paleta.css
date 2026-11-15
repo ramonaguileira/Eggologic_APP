@@ -1,0 +1,19 @@
+:root{
+  --egg-tinta: #0c2a1f;
+  --egg-bosque: #143f2c;
+  --egg-verde-eggologic: #1d583b;
+  --egg-pradera: #2f7d4c;
+  --egg-brote: #58a95c;
+  --egg-hoja: #9ad37a;
+  --egg-blanco: #ffffff;
+  --egg-cascara: #f6f0dc;
+  --egg-paja: #d6cba6;
+  --egg-nido: #a89c78;
+  --egg-yema-luz: #ffdf6b;
+  --egg-yema: #f5b921;
+  --egg-ambar: #d98414;
+  --egg-cresta: #c8472f;
+  --egg-tierra: #7a5230;
+  --egg-humus: #452c1b;
+}
+.pixel{image-rendering:pixelated}
