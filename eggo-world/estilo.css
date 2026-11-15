@@ -95,7 +95,13 @@ button.cosa:active { transform: translateY(2px); }
   background: var(--egg-cascara); color: var(--egg-tinta);
   box-shadow: 0 -2px 0 var(--egg-tinta), 0 2px 0 var(--egg-tinta), -2px 0 0 var(--egg-tinta), 2px 0 0 var(--egg-tinta);
 }
-.cartel.llama { background: var(--egg-yema); animation: flotar 1.2s steps(2) infinite; }
+/* El cartelito de la pila de maples va arriba, para no tapar el nido. */
+.cartel.cuenta { top: auto; bottom: 100%; margin: 0 0 4px; font-size: 16px; }
+.cae { animation: caer .35s steps(4); }
+@keyframes caer { from { transform: translateY(-24px); } }
+/* Con su propia animación: la de "flotar" le sacaba el centrado al cartel. */
+.cartel.llama { background: var(--egg-yema); animation: llamar 1.2s steps(2) infinite; }
+@keyframes llamar { 50% { transform: translate(-50%, -4px); } }
 /* Pastitos y flores van siempre al fondo, para no tapar carteles. */
 .adorno { z-index: 0 !important; pointer-events: none; }
 .globo { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); pointer-events: none; animation: subir 1s steps(5) forwards; }
@@ -119,7 +125,8 @@ button.cosa:active { transform: translateY(2px); }
 #insignia { margin-left: auto; }
 #encargar { position: absolute; z-index: 20; left: 8px; top: calc(58px + env(safe-area-inset-top, 0px)); font-size: 22px; padding: 6px 14px; }
 /* Huevos recién puestos: saltan un poco para que se note que se pueden tocar. */
-.suelto { animation: flotar 1.2s steps(2) infinite; }
+/* Siempre por encima de las gallinas, para que ninguna tape un huevo y no se pueda tocar. */
+.suelto { animation: flotar 1.2s steps(2) infinite; z-index: 500 !important; }
 .suelto::after { content: ""; position: absolute; inset: -10px; }
 .suelto.volando { animation: none; transition: left .45s ease-in, top .45s ease-in; }
 
@@ -220,6 +227,6 @@ button.cosa:active { transform: translateY(2px); }
 #tour .boton { font-size: 22px; padding: 6px 16px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .flota, .nube, .estrella, .zzz, #panel, .suelto { animation: none; }
+  .flota, .nube, .estrella, .zzz, #panel, .suelto, .cae { animation: none; }
   #tour .foco, .suelto.volando { transition: none; }
 }

@@ -20,7 +20,7 @@ DESCUENTO_SOCIO = Decimal("0.075")
 PAQUETES = [500, 1000, 2000]
 # Socio: un mes calendario entero con este saldo o más. Vale para el mes siguiente.
 SALDO_PARA_SER_SOCIO = 1000
-# SUPUESTO: tope de saldo por cuenta. Es consumo de una familia, no un depósito.
+# Tope de saldo por cuenta (Ramón, 15/11). Es consumo de una familia, no un depósito.
 TOPE_POR_CUENTA = 10000
 
 # --- Gallinas ----------------------------------------------------------------------------
@@ -40,8 +40,8 @@ PLANES = {
     # SUPUESTO: el precio de la mensual. Se cobra del saldo de Eggos cada 30 días.
     PLAN_MENSUAL: {"nombre": "Mensual", "precio": 170, "dias": 30},
 }
-# SUPUESTO: es consumo de una familia, no una inversión.
-MAXIMO_DE_GALLINAS_POR_CUENTA = 4
+# Tope de adopción por cuenta (Ramón, 15/11).
+MAXIMO_DE_GALLINAS_POR_CUENTA = 15
 # Con esta cantidad de huevos juntados ya se puede pedir.
 HUEVOS_PARA_PEDIR = 15
 

@@ -59,11 +59,11 @@ class AdoptarTests(TestCase):
         self.assertFalse(Gallina.objects.exists())
 
     def test_maximo_por_cuenta_y_cupo(self):
-        con_saldo(self.ana, 9000)
-        for numero in range(4):
+        con_saldo(self.ana, 40000)
+        for numero in range(15):
             servicio.adoptar(self.ana, "un_anio", f"G{numero}", "blanca")
         with self.assertRaises(servicio.NoSePuede):
-            servicio.adoptar(self.ana, "un_anio", "Quinta", "blanca")
+            servicio.adoptar(self.ana, "un_anio", "Una más", "blanca")
         ajustes = Ajustes.actuales()
         ajustes.gallinas_en_postura = 1
         ajustes.save()

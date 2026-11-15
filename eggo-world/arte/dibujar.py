@@ -319,6 +319,26 @@ kyYaYYYYYak
 .krk...krk.
 """])
 
+# Maples apilados al lado del nido: el de 15, y el de 30 (dos de 15 atados con una cinta).
+tira("maple-15", ["""
+..kk.kk.kk.kk.kk..
+.kcckcckcckcckcck.
+knnnnnnnnnnnnnnnnk
+kpppppppppppppppnk
+.kkkkkkkkkkkkkkkk.
+"""])
+
+tira("maple-30", ["""
+..kk.kk.kk.kk.kk..
+.kcckcckcckcckcck.
+knnnnnnnnnnnnnnnnk
+kpppppppppppppppnk
+kyyyyyyyyyyyyyyyyk
+knnnnnnnnnnnnnnnnk
+kpppppppppppppppnk
+.kkkkkkkkkkkkkkkk.
+"""])
+
 # --- Ícono de la app: el huevo de los Eggos sobre el verde de la marca -----------------------
 
 huevo = Image.open(AQUI / "eggo.png").convert("RGBA")

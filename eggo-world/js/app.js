@@ -1,7 +1,7 @@
 // Arranque de Eggo World: carga, entrada, y lo que pasa cuando se toca algo.
 
 import { enviar, traerEstado } from "./api.js";
-import { armar } from "./chacra.js";
+import { apilar, armar } from "./chacra.js";
 import { compra, eleccion, paneles } from "./paneles.js";
 import { recorrido, yaVioElRecorrido } from "./tour.js";
 
@@ -58,6 +58,7 @@ function juntarHuevo() {
   eleccion.sueltos -= 1;
   guardarJuntados();
   $("huevos").textContent = (estado.huevos.para_pedir - eleccion.sueltos).toLocaleString("es-UY");
+  apilar(estado.huevos.para_pedir - eleccion.sueltos);
   if (abierto === "huevos") pintarPanel();
 }
 

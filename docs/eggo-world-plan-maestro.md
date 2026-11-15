@@ -97,7 +97,7 @@ La insignia se ve en la chacra. Se mantiene mientras el saldo no baje de 1.000; 
 
 El 2 % extra del socio le cuesta a Eggologic unos $ 6 por mes en una familia que compra dos quincenas, a cambio de tener $ 1.000 adelantados: cerca de un 8 % anual. Es más barato que la gallina (18 %).
 
-**Candados** (`SUPUESTO`): tope de 10.000 Eggos por cuenta, y tope total de Eggos en circulación de un mes de ventas, porque todo saldo guardado es deuda en huevos.
+**Candados:** tope de 10.000 Eggos por cuenta (confirmado por Ramón el 15/11), y tope total de Eggos en circulación de un mes de ventas, porque todo saldo guardado es deuda en huevos.
 
 ### 3.3 Por qué no cierra "1 Eggo cada $ 100 y gallina a 100 Eggos"
 
@@ -166,7 +166,7 @@ Conclusión: las gallinas adoptadas conviene asignarlas a los gallineros con men
 - **Cupo** (`SUPUESTO`): los huevos prometidos a adoptantes (220 por gallina) no pasan del 70 % de lo que queda después de la parte de los socios, calculado con el piso de 200 huevos por gallina real. El resto es para la venta directa, los restaurantes y el colchón.
   - **Hoy (60 gallinas, 10 % a Camino Verde): hasta 34 gallinas adoptadas, que son $ 122.400 por adelantado.**
   - Gallinero nuevo (50 gallinas): hasta 25 si los socios se llevan 20 % ($ 90.000), o hasta 23 si se llevan 25 % ($ 82.800).
-- **Máximo 4 gallinas por cuenta** (`SUPUESTO`): es consumo de una familia, no una inversión.
+- **Máximo 15 gallinas por cuenta** (Ramón, 15/11; antes era un supuesto de 4). Ojo: con el cupo de hoy (34), dos o tres cuentas pueden llevarse todas.
 - Los huevos acumulados se pueden pedir hasta 6 meses después de terminados los dos años (`SUPUESTO`).
 - **Tres formas de tener una gallina** (Ramón, 13/11: también de un año y mensual). Todas ponen lo mismo, 200 huevos por año, y entran en el mismo cupo:
 

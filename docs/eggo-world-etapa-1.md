@@ -124,7 +124,7 @@ La chacra se revisó a mano en un navegador: carga, entrada, chacra vacía, con 
 
 ## 4. SUPUESTOS
 
-Los números sin confirmar están marcados en `eggos/reglas.py`: precio de la gallina mensual ($ 170), máximo de 4 gallinas, tope de 10.000 Eggos, 70 % de la producción para adoptantes, 3 días hasta que la gallina come sola.
+Los números sin confirmar están marcados en `eggos/reglas.py`: precio de la gallina mensual ($ 170), 70 % de la producción para adoptantes, 3 días hasta que la gallina come sola.
 
 Otros:
 
@@ -225,7 +225,7 @@ Igual que antes. Hay dos migraciones nuevas (`eggos/0002_regalos`, `mundo/0002_r
 - "Efectivo" es el pago al recibir. "Tarjeta" es Mercado Pago, y se ve apagada mientras no esté la credencial.
 - **"Otra dirección" vale para ese pedido** y no cambia la guardada, que se edita en Mi cuenta. Usa el teléfono guardado.
 - Un pedido es de un solo envase (tantas quincenas o tantos maples), no mezclado.
-- **Los regalos no miran el cupo de adopciones, el máximo de 4 gallinas ni el tope de 10.000 Eggos.** La gallina mensual regalada es un mes gratis; después se cobra del saldo como cualquiera.
+- **Los regalos no miran el cupo de adopciones, el máximo de gallinas por cuenta ni el tope de 10.000 Eggos.** La gallina mensual regalada es un mes gratis; después se cobra del saldo como cualquiera.
 - Los huevos regalados se canjean desde el nido, como los de una gallina, y descuentan de los huevos disponibles recién al canjearse.
 - Un regalo no se borra desde la pantalla: se corrige con un ajuste.
 
@@ -241,3 +241,15 @@ Igual que antes. Hay dos migraciones nuevas (`eggos/0002_regalos`, `mundo/0002_r
 1. ¿La vuelta del 3 % se sigue dando sin anunciarla, o se elimina?
 2. ¿Los huevos sin juntar bloquean el canje, como quedó, o se canjean igual?
 3. ¿El recorrido dice lo que querés? Los textos están en `eggo-world/js/tour.js`.
+
+### Ajustes del mismo día (Ramón, 15/11)
+
+- **Tope de adopción: 15 gallinas por cuenta** (antes un supuesto de 4). **Tope de Eggos: 10.000 por cuenta**, confirmado. Los dos dejaron de ser supuestos en `eggos/reglas.py`.
+- **Pila de maples a la vista, al lado del nido**, sin abrir nada: cada 15 huevos juntados se apila un maple de 15; con dos, se atan en un maple de 30 (con una cinta amarilla) y arriba se vuelve a formar otro de 15. Un cartelito dice cuántos hay ("2 de 30 + 1 de 15"). Tocar la pila abre **Canjear huevos**.
+- Con 15 huevos o más, el cartel del nido cambia a **"¡Canjeá!"** y se mueve.
+- Los huevos sueltos quedan siempre por encima de las gallinas, para que ninguna los tape.
+- Dibujos nuevos: `maple-15.png` y `maple-30.png` (en `eggo-world/arte/dibujar.py`).
+
+SUPUESTOS: en la chacra se dibujan hasta 4 maples de 30; si hay más, el cartelito dice cuántos. **Para mirar:** con el cupo total de hoy (34 gallinas), dos o tres cuentas con 15 cada una se lo llevan entero.
+
+Tests: 172 en verde.

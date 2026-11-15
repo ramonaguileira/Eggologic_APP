@@ -11,6 +11,9 @@ let gallinas = [];
 let bicho = null;
 let zona = null;
 let proximoBicho = 0;
+// Dónde va la pila de maples, y qué había apilado la última vez.
+let lugarDeLaPila = null;
+let apilado = "";
 
 const azar = (desde, hasta) => desde + Math.random() * (hasta - desde);
 
@@ -115,9 +118,9 @@ export function armar(estado, alAbrir, sueltos = 0, alJuntar = () => {}) {
   const balde = boton("balde", 16, 16, ancho - 24, alto - 38, "Residuos", "residuos", alAbrir);
   const hayResiduosEnCamino = estado.levantes.some((levante) => levante.paso === "pedido");
   cuadro(balde, hayResiduosEnCamino ? 1 : 0);
-  for (let i = 0; i < Math.min(3, Math.floor((estado.huevos.para_pedir - sueltos) / 5)); i++) {
-    cosa("huevo", 7, 8, 14 + i * 5, alto - 36).style.pointerEvents = "none";
-  }
+  lugarDeLaPila = { x: 12, y: alto - 37, nido, minimo: estado.huevos.minimo, alAbrir };
+  apilado = "";
+  apilar(estado.huevos.para_pedir - sueltos);
 
   // Comida y agua: son solo cariño. Las gallinas van a comer, pero no cambia la producción.
   const comedero = cosa("comedero", 16, 5, ancho * 0.22, horizonte + 30, "button");
@@ -158,9 +161,51 @@ export function armar(estado, alAbrir, sueltos = 0, alJuntar = () => {}) {
   }, TIC);
 }
 
+// Los huevos juntados, a la vista sin abrir nada: en el nido los del maple que se está llenando
+// y, arriba, los maples completos. Cada 15 es un maple; dos de 15 se atan en uno de 30.
+// Se llama al armar la chacra y cada vez que se junta un huevo.
+export function apilar(huevos) {
+  if (!lugarDeLaPila) return;
+  const { x, y, nido, minimo, alAbrir } = lugarDeLaPila;
+  cosas.querySelectorAll(".pila").forEach((el) => el.remove());
+  huevos = Math.max(huevos, 0);
+  const de30 = Math.floor(huevos / 30);
+  const de15 = Math.floor((huevos % 30) / 15);
+  const sueltosEnElNido = huevos % 15;
+
+  for (let i = 0; i < Math.ceil(sueltosEnElNido / 5); i++) {
+    const huevo = cosa("huevo", 7, 8, x + 2 + i * 5, y + 1);
+    huevo.classList.add("pila");
+    huevo.style.pointerEvents = "none";
+  }
+  // En pantalla entran 4 maples de 30; si hay más, el cartelito dice cuántos.
+  const piezas = [...Array(Math.min(de30, 4)).fill(["maple-30", 8]), ...Array(de15).fill(["maple-15", 5])];
+  let base = y - 1;
+  let ultima = null;
+  for (const [imagen, altura] of piezas) {
+    base -= altura - 1;
+    ultima = cosa(imagen, 18, altura, x, base, "button");
+    ultima.classList.add("pila");
+    ultima.setAttribute("aria-label", "Canjear huevos");
+    ultima.addEventListener("click", () => alAbrir("huevos"));
+  }
+  if (ultima) {
+    const cuenta = [de30 ? `${de30} de 30` : "", de15 ? "1 de 15" : ""].filter(Boolean).join(" + ");
+    ultima.insertAdjacentHTML("beforeend", `<span class="cartel cuenta">${cuenta}</span>`);
+    // Cuando la pila cambia, el maple de arriba cae en su lugar.
+    if (apilado && apilado !== cuenta) ultima.classList.add("cae");
+  }
+  apilado = ultima ? ultima.textContent : "sin maples";
+  // Con un maple completo, el cartel del nido invita a canjear.
+  const cartel = nido.querySelector(".cartel");
+  cartel.textContent = huevos >= minimo ? "¡Canjeá!" : "Canjear huevos";
+  cartel.classList.toggle("llama", huevos >= minimo);
+}
+
 // Un huevo recién puesto: aparece en el pasto y, al tocarlo, vuela hasta el nido.
 function huevoSuelto(nido, alJuntar) {
-  const el = cosa("huevo", 7, 8, azar(zona.x1 + 4, zona.x2 + 6), azar(zona.y1 + 10, zona.y2 + 14), "button");
+  // Lejos del borde izquierdo, para que no caiga sobre la pila de maples.
+  const el = cosa("huevo", 7, 8, azar(36, zona.x2 + 6), azar(zona.y1 + 10, zona.y2 + 14), "button");
   el.classList.add("suelto");
   el.style.animationDelay = `${azar(0, 1)}s`;
   el.setAttribute("aria-label", "Juntar el huevo");

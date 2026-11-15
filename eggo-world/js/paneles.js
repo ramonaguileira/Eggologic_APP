@@ -112,9 +112,11 @@ function huevos(estado) {
     return `<p>Acá se juntan los huevos de tus gallinas. Todavía no tenés ninguna.</p>
       <button class="boton ancho" data-abrir="gallinas">Adoptar una gallina</button>`;
   }
-  // Un maple de 15 que se va llenando; los que ya se completaron se cuentan aparte.
-  const enMaple = hay && hay % 15 === 0 ? 15 : hay % 15;
-  const completos = (hay - enMaple) / 15;
+  // Un maple de 15 que se va llenando. Los completos se apilan: dos de 15 hacen uno de 30.
+  const enMaple = hay % 15;
+  const de30 = Math.floor(hay / 30);
+  const de15 = Math.floor((hay % 30) / 15);
+  const pila = [de30 ? `${de30} ${de30 === 1 ? "maple" : "maples"} de 30` : "", de15 ? "1 maple de 15" : ""].filter(Boolean).join(" y ");
   const maple = Array.from({ length: 15 }, (_, i) => `<i class="${i < enMaple ? "lleno" : ""}"></i>`).join("");
   const tamanos = [...new Set(estado.productos.map((p) => p.huevos))].sort((a, b) => a - b);
   const botones = tamanos
@@ -123,7 +125,7 @@ function huevos(estado) {
   const minimo = estado.huevos.minimo;
   return `<p class="fila"><span class="numero">${n(hay)}</span> <span>huevos juntados</span></p>
     <div class="maple">${maple}</div>
-    ${completos ? `<p class="centro"><strong>+ ${completos} ${completos === 1 ? "maple completo" : "maples completos"} de 15</strong></p>` : ""}
+    ${pila ? `<p class="centro"><strong>Ya completaste ${pila}</strong></p>` : ""}
     ${eleccion.sueltos ? `<p class="destacado">Hay ${eleccion.sueltos} ${eleccion.sueltos === 1 ? "huevo recién puesto" : "huevos recién puestos"} en la chacra. Tocalos para mandarlos al maple.</p>` : ""}
     <p>${hay >= minimo ? "Ya podés canjearlos. Te los llevamos sin costo." : `Con ${minimo} ya los podés canjear. Faltan ${minimo - hay}.`}</p>
     <form data-accion="entrega">${entrega(estado)}</form>
