@@ -24,8 +24,9 @@ SALDO_PARA_SER_SOCIO = 1000
 TOPE_POR_CUENTA = 10000
 
 # --- Gallinas ----------------------------------------------------------------------------
-# Se promete el piso de la producción real (200 a 250 huevos por año), no el techo.
-HUEVOS_POR_ANIO = 200
+# Entre 17 y 18 huevos por mes (Ramón, 15/11; antes 200 por año). La producción real es de
+# 200 a 250 por año, así que sigue del lado bajo.
+HUEVOS_POR_ANIO = 210
 # Las larvas suben la producción: un huevo más por ración, hasta este tope por gallina por año.
 HUEVOS_POR_RACION = 1
 BONO_MAXIMO_POR_ANIO = 20

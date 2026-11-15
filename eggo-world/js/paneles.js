@@ -78,14 +78,15 @@ function gallinas(estado) {
 
   const plan = estado.planes.find((p) => p.plan === eleccion.plan);
   const falta = Math.max(plan.precio - estado.eggos.saldo, 0);
-  const huevosDelPlan = { dos_anios: "400 huevos garantizados", un_anio: "200 huevos garantizados", mensual: "unos 17 huevos por mes" };
+  const porAnio = estado.adopcion.huevos_por_anio;
+  const huevosDelPlan = { dos_anios: `${porAnio * 2} huevos garantizados`, un_anio: `${porAnio} huevos garantizados`, mensual: "entre 17 y 18 huevos por mes" };
   const lleno = estado.gallinas.length >= estado.adopcion.maximo_por_cuenta;
   let adoptar = "";
   if (lleno) adoptar = `<p>Ya tenés ${estado.adopcion.maximo_por_cuenta} gallinas, que es el máximo por cuenta.</p>`;
   else if (!estado.adopcion.lugares) adoptar = "<p>Por ahora no quedan gallinas para adoptar. Te avisamos cuando haya lugar.</p>";
   else {
     adoptar = `<form data-accion="adoptar">
-      <p>Pagás por adelantado y tu gallina te va dando sus huevos: unos 4 por semana. Con 15 juntados ya los podés pedir.</p>
+      <p>Pagás por adelantado y tu gallina te va dando sus huevos: entre 17 y 18 por mes. Con 15 juntados ya los podés pedir.</p>
       ${opciones("plan", estado.planes.map((p) => [p.plan, `<strong>${p.nombre}</strong><br>${n(p.precio)} Eggos${p.plan === "mensual" ? " por mes" : ""}`]), eleccion.plan)}
       <p class="chico tenue">${huevosDelPlan[plan.plan]}.${plan.plan === "mensual" ? " Se cobra de tu saldo cada 30 días; la cortás cuando quieras." : ""}</p>
       <label class="campo">Nombre de tu gallina<input name="nombre" maxlength="30" required placeholder="Clota"></label>

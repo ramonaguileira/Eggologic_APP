@@ -83,14 +83,16 @@ class HuevosTests(TestCase):
             inicio=inicio, pago_hasta=inicio + timedelta(days=dias_pagos),
         )
 
-    def test_200_huevos_por_anio(self):
-        self.assertEqual(self.gallina(hace_dias=365).huevos_puestos(), 200)
-        # Una quincena cada 27 o 28 días.
-        self.assertEqual(Gallina.objects.get().huevos_puestos(self.hoy - timedelta(days=365 - 28)), 15)
+    def test_210_huevos_por_anio_entre_17_y_18_por_mes(self):
+        gallina = self.gallina(hace_dias=365)
+        self.assertEqual(gallina.huevos_puestos(), 210)
+        self.assertEqual(gallina.huevos_puestos(self.hoy - timedelta(days=365 - 30)), 17)
+        # Una quincena cada 27 días.
+        self.assertEqual(gallina.huevos_puestos(self.hoy - timedelta(days=365 - 27)), 15)
 
     def test_deja_de_poner_cuando_termina_el_plan(self):
         gallina = self.gallina(hace_dias=900)
-        self.assertEqual(gallina.huevos_puestos(), 400)
+        self.assertEqual(gallina.huevos_puestos(), 420)
 
     def test_las_larvas_suman_huevos_hasta_el_tope_del_anio(self):
         gallina = self.gallina(hace_dias=100)
@@ -99,7 +101,7 @@ class HuevosTests(TestCase):
         antes = gallina.huevos_puestos()
         self.assertEqual(servicio.dar_larvas(self.ana, gallina, 30), 20)
         self.assertEqual(gallina.huevos_puestos(), antes + 20)
-        self.assertEqual(gallina.produccion_anual(), 220)
+        self.assertEqual(gallina.produccion_anual(), 230)
         self.assertEqual(servicio.larvas_disponibles(self.ana), 10)
         with self.assertRaises(servicio.NoSePuede):
             servicio.dar_larvas(self.ana, gallina, 1)
@@ -119,12 +121,12 @@ class HuevosTests(TestCase):
 
     def test_pedir_los_huevos_de_la_gallina(self):
         crear_quincena()
-        self.gallina(hace_dias=60)  # 32 huevos
-        self.assertEqual(servicio.huevos_para_pedir(self.ana), 32)
+        self.gallina(hace_dias=60)  # 34 huevos
+        self.assertEqual(servicio.huevos_para_pedir(self.ana), 34)
         pedido = servicio.pedir_huevos(self.ana, 30, "Calle 1", "099")
         self.assertEqual(pedido.forma_pago, Pedido.FormaPago.GALLINA)
         self.assertEqual((pedido.huevos, pedido.total), (30, 0))
-        self.assertEqual(servicio.huevos_para_pedir(self.ana), 2)
+        self.assertEqual(servicio.huevos_para_pedir(self.ana), 4)
         self.assertEqual(Ajustes.actuales().huevos_disponibles, 170)
         with self.assertRaises(servicio.NoSePuede):
             servicio.pedir_huevos(self.ana, 15, "Calle 1", "099")
@@ -335,9 +337,9 @@ class CancelarPedidoTests(TestCase):
             inicio=timezone.localdate() - timedelta(days=60), pago_hasta=timezone.localdate() + timedelta(days=670),
         )
         pedido = servicio.pedir_huevos(self.ana, 30, "Calle 1", "099")
-        self.assertEqual(servicio.huevos_para_pedir(self.ana), 2)  # 32 puestos - 30 pedidos
+        self.assertEqual(servicio.huevos_para_pedir(self.ana), 4)  # 34 puestos - 30 pedidos
         servicio.cancelar_pedido(pedido)
-        self.assertEqual(servicio.huevos_para_pedir(self.ana), 32)
+        self.assertEqual(servicio.huevos_para_pedir(self.ana), 34)
         self.assertEqual(Ajustes.actuales().huevos_disponibles, 200)
 
     def test_un_pedido_de_la_tienda_de_siempre_no_toca_los_huevos_disponibles(self):

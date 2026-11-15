@@ -118,6 +118,8 @@ Se va casi la mitad del margen, y además ese cliente deja de comprar 400 huevos
 
 ### 3.4 La gallina: precio y qué deja
 
+> **Cambio del 15/11 (Ramón):** la gallina adoptada pone **entre 17 y 18 huevos por mes: 210 por año** (420 en dos años, 230 por año con larvas). Las cuentas de este punto están hechas con 200 por año y **no se rehicieron**: con 210, cada gallina de dos años entrega 20 huevos más por el mismo precio. El cupo de adopciones de hoy sigue en 34.
+
 **Qué compra el cliente:** la producción de una gallina durante dos años, con **200 huevos por año garantizados (400 en total)** y hasta 220 por año si le da larvas (440).
 
 Se promete el piso (200) y no el techo (250) a propósito: la diferencia que ponga la gallina real es el colchón de Eggologic para el invierno, la muda, la baja del segundo año y las gallinas que se mueren. La gallina virtual nunca se muere: ese riesgo lo absorbe el colchón.

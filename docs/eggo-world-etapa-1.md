@@ -252,4 +252,7 @@ Igual que antes. Hay dos migraciones nuevas (`eggos/0002_regalos`, `mundo/0002_r
 
 SUPUESTOS: en la chacra se dibujan hasta 4 maples de 30; si hay más, el cartelito dice cuántos. **Para mirar:** con el cupo total de hoy (34 gallinas), dos o tres cuentas con 15 cada una se lo llevan entero.
 
+- **La gallina adoptada pone entre 17 y 18 huevos por mes** (Ramón, 15/11): `HUEVOS_POR_ANIO` pasó de 200 a 210. Son 420 huevos en dos años y una quincena cada 27 días. Los textos de la chacra salen de ese número. **Para mirar:** las cuentas de margen del plan maestro (punto 3.4) están hechas con 200 y no se rehicieron.
+- **Precios:** Quincena $ 160 y Maple $ 310 (Ramón, 15/11). En el código (`cargar_demo`) ya estaban así; en Render los precios son datos y se cambian en Administración → Productos.
+
 Tests: 172 en verde.
