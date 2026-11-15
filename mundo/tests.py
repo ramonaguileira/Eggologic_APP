@@ -368,6 +368,13 @@ class CancelarPedidoTests(TestCase):
         self.assertEqual(pedido.estado, Pedido.Estado.CANCELADO)
 
 
+class ProductosPorDefectoTests(TestCase):
+    def test_la_tienda_arranca_con_quincena_y_maple(self):
+        # Los crea la migración 0003, para que una base nueva tenga huevos para encargar.
+        precios = dict(Producto.objects.filter(activo=True).values_list("nombre", "precio"))
+        self.assertEqual(precios, {"Quincena": Decimal("160"), "Maple": Decimal("310")})
+
+
 class SeparacionTests(TestCase):
     def test_la_app_de_siempre_no_importa_nada_de_eggo_world(self):
         """Si un día se borra Eggo World, el resto tiene que seguir andando."""

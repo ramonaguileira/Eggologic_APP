@@ -254,5 +254,6 @@ SUPUESTOS: en la chacra se dibujan hasta 4 maples de 30; si hay más, el carteli
 
 - **La gallina adoptada pone entre 17 y 18 huevos por mes** (Ramón, 15/11): `HUEVOS_POR_ANIO` pasó de 200 a 210. Son 420 huevos en dos años y una quincena cada 27 días. Los textos de la chacra salen de ese número. **Para mirar:** las cuentas de margen del plan maestro (punto 3.4) están hechas con 200 y no se rehicieron.
 - **Precios:** Quincena $ 160 y Maple $ 310 (Ramón, 15/11). En el código (`cargar_demo`) ya estaban así; en Render los precios son datos y se cambian en Administración → Productos.
+- **Huevos por defecto** (Ramón, 15/11): en una base sin productos, la tienda de la chacra decía "no quedan huevos". La migración `mundo/0003` crea Quincena ($ 160) y Maple ($ 310) si no hay ningún producto activo; donde ya hay productos no toca nada.
 
-Tests: 172 en verde.
+Tests: 173 en verde.
